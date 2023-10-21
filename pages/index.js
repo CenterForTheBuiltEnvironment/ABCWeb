@@ -66,6 +66,7 @@ import { useEffect, useState, Suspense, useMemo } from "react";
 import axios from "axios";
 import ReactECharts from "echarts-for-react";
 import { Canvas } from "@react-three/fiber";
+import styles from "../styles/Home.module.css";
 
 import {
   OrbitControls,
@@ -516,6 +517,25 @@ export default function WithSubnavigation() {
     return options;
   };
 
+  const uploadMRTJson = (uploadedFile) => {
+    const fileReader = new FileReader();
+    fileReader.onloadend = () => {
+      try {
+        const data = JSON.parse(fileReader.result).results;
+
+        let newState = [...params];
+        for (let i = 0; i < data.segment_data.length; i++) {
+          newState[ind][displayOptions[currentlyEditing].val][i] = data.segment_data[i].mrt;
+        }
+
+        setParams(newState);
+      } catch (e) {
+        console.log("error");
+      }
+    }
+    if (uploadedFile!== undefined) fileReader.readAsText(uploadedFile);
+  }
+
   return (
     <Box>
       <Head>
@@ -654,8 +674,21 @@ export default function WithSubnavigation() {
               </Button>
             </HStack>
             <HStack justifyContent="center" mt={3}>
-              {displayOptions[currentlyEditing].key == "MRT" ? (
-                <Button colorScheme="pink">Import from MRT JSON file</Button>
+            {displayOptions[currentlyEditing].key == "MRT" ? (
+                <label
+                  htmlFor="mrtJSON"
+                  style={{ width: "fit-content", cursor: "pointer" }}
+                >
+                  <input
+                    type="file"
+                    accept=".json"
+                    name="mrtJSON"
+                    id="mrtJSON"
+                    style={{ display: "none", cursor: "default" }}
+                    onChange={(e) => uploadMRTJson(e.target.files[0])}
+                  />
+                  <div className={styles.mrtJSONBtn}><p>Import from MRT JSON file</p></div>
+                </label>
               ) : (
                 <></>
               )}
