@@ -61,6 +61,7 @@ import EditModal from "@/components/editModal";
 import Spinner from "@/components/spinner";
 import ClothingSelector from "@/components/clothingSelector";
 import MetSelector from "@/components/metSelector";
+import Image from "next/image";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
@@ -89,15 +90,17 @@ export default function WithSubnavigation() {
 
     return isEditing ? (
       <IconButton
-        colorScheme="yellow"
-        textColor="#007AFF"
+        backgroundColor={"#3ebced"}
+        textColor={"white"}
+        colorScheme="blue"
         icon={<CheckIcon />}
         {...getSubmitButtonProps()}
       />
     ) : (
       <IconButton
-        colorScheme="yellow"
-        textColor="#007AFF"
+        backgroundColor={"#3ebced"}
+        textColor={"white"}
+        colorScheme="blue"
         icon={<EditIcon />}
         {...getEditButtonProps()}
       />
@@ -175,10 +178,10 @@ export default function WithSubnavigation() {
           <Text
             textAlign={useBreakpointValue({ base: "center", md: "left" })}
             fontFamily={"heading"}
-            color={useColorModeValue("gray.800", "white")}
             style={{ fontWeight: "800", fontSize: 35 }}
           >
-            <span id="styledText">Berkeley CBE</span> Comfort Tool
+            <span style={{ color: "#1b76bc" }}>Berkeley CBE</span>{" "}
+            <span style={{ color: "#3ebced" }}>Comfort Tool</span>
           </Text>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}></Flex>
@@ -207,30 +210,7 @@ export default function WithSubnavigation() {
             }}
           />
           <Text mr={5}>IP</Text>
-          <Button
-            as={"a"}
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"md"}
-            fontWeight={600}
-            color={"#007AFF"}
-            bg={"yellow.400"}
-            href={"#"}
-            _hover={{
-              bg: "yellow.300",
-            }}
-            onMouseEnter={() => {
-              toast.closeAll();
-              toast({
-                title: "To be implemented soon!",
-                status: "warning",
-                duration: 2000,
-                isClosable: true,
-                position: "top",
-              });
-            }}
-          >
-            Help
-          </Button>
+          <Image src="/logo.png" width={300} height={0} alt="CBE Logo" />
         </Stack>
       </Flex>
 
@@ -249,8 +229,9 @@ export default function WithSubnavigation() {
                     <Button
                       key={indx}
                       minW="110px"
-                      colorScheme={ind == indx ? "yellow" : "gray"}
-                      textColor={ind == indx ? "#007AFF" : "black"}
+                      backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
+                      textColor="white"
+                      colorScheme="blue"
                       onClick={() => {
                         if (ind == indx) return false;
                         else setIndex(indx);
@@ -266,7 +247,8 @@ export default function WithSubnavigation() {
               <IconButton
                 w="5%"
                 colorScheme="blue"
-                textColor="yellow.400"
+                backgroundColor={"#3ebced"}
+                textColor={"white"}
                 icon={<AddIcon />}
                 onClick={() => {
                   params.push(conditionParams(params.length + 1));
@@ -326,7 +308,6 @@ export default function WithSubnavigation() {
                     {listOfParameters.map((option) => {
                       return (
                         <OptionRenderer
-                          key={option.title}
                           {...{
                             params: params,
                             setParams: setParams,
@@ -381,8 +362,9 @@ export default function WithSubnavigation() {
                         as={Button}
                         rightIcon={<ChevronDownIcon />}
                         w="200px"
-                        colorScheme="yellow"
-                        textColor="#007AFF"
+                        backgroundColor={"#3ebced"}
+                        textColor={"white"}
+                        colorScheme="blue"
                       >
                         Edit data
                       </MenuButton>
@@ -431,8 +413,9 @@ export default function WithSubnavigation() {
             >
               <Button
                 mt="7px"
-                colorScheme="yellow"
-                textColor="#007AFF"
+                backgroundColor={"#3ebced"}
+                textColor={"white"}
+                colorScheme="blue"
                 alignSelf="center"
                 onClick={async () => {
                   loadingModal.onOpen();
