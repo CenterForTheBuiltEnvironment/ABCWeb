@@ -308,6 +308,7 @@ export default function WithSubnavigation() {
                     {listOfParameters.map((option) => {
                       return (
                         <OptionRenderer
+                          key={option.title}
                           {...{
                             params: params,
                             setParams: setParams,

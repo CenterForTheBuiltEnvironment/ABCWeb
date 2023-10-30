@@ -225,7 +225,7 @@ export default function EditModal({
               (value, indx) => {
                 if (indx >= 8)
                   return (
-                    <VStack>
+                    <VStack key={indx}>
                       <Text>{graphsVals[indx + 1].label}</Text>
                       <NumberInput
                         w="7vw"
