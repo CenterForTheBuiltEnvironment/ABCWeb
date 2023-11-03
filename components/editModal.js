@@ -107,7 +107,7 @@ export default function EditModal({
             </NumberInput>
             <Text>% delta</Text>
             <Button
-              colorScheme="yellow"
+              colorScheme="blue"
               onClick={() => {
                 let newState = [...params];
                 newState[ind][listOfParameters[currentlyEditing].val] = Array(
@@ -262,8 +262,9 @@ export default function EditModal({
           <HStack w="100%" justifyContent="end">
             <Text fontWeight="bold">Changes are automatically saved.</Text>
             <Button
-              colorScheme="yellow"
-              textColor="#007AFF"
+              colorScheme="blue"
+              backgroundColor={"#3ebced"}
+              textColor={"white"}
               ml={2}
               onClick={disclosure.onClose}
             >
