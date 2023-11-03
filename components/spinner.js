@@ -14,7 +14,7 @@ export default function Spinner({ loadingModal }) {
       <ModalContent boxShadow="0px" bgColor="transparent">
         <ModalBody>
           <Center>
-            <Spin size="xl" speed="0.75s" color="yellow.400" thickness="4px" />
+            <Spin size="xl" speed="0.75s" color="blue.400" thickness="4px" />
           </Center>
         </ModalBody>
       </ModalContent>
