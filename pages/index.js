@@ -36,7 +36,7 @@ import {
 } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import Head from "next/head";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
 import ReactECharts from "echarts-for-react";
 
@@ -46,12 +46,14 @@ import {
   listOfParameters,
   graphsVals,
   conditionParams,
+  csvHeaderLine,
 } from "@/constants/constants";
 
 import {
   colorSensation,
   colorComfort,
   determineColor,
+  getCurrentConditionName,
 } from "@/constants/helperFunctions";
 
 import OptionRenderer from "@/components/optionRenderer";
@@ -62,6 +64,7 @@ import Spinner from "@/components/spinner";
 import ClothingSelector from "@/components/clothingSelector";
 import MetSelector from "@/components/metSelector";
 import Image from "next/image";
+import { CSVDownload, CSVLink } from "react-csv";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
@@ -83,6 +86,7 @@ export default function WithSubnavigation() {
   const [currentColorArray, setCurrentColorArray] = useState(
     Array(18).fill("white")
   );
+  const [csvData, setCSVData] = useState();
 
   function EditableControls() {
     const { isEditing, getSubmitButtonProps, getEditButtonProps } =
@@ -282,6 +286,22 @@ export default function WithSubnavigation() {
                           tempParams[ind].condition_name =
                             "Condition #" + ind.toString();
                         }
+                        let data = [];
+                        data.push(csvHeaderLine);
+                        for (let time = 0; time < fullData.length; time++) {
+                          let tempRow = [
+                            time,
+                            getCurrentConditionName(time, tempParams),
+                          ];
+                          for (let i = 0; i < fullData[time].length; i++) {
+                            tempRow.push(
+                              fullData[time][i].comfort,
+                              fullData[time][i].sensation
+                            );
+                          }
+                          data.push(tempRow);
+                        }
+                        setCSVData(data);
                         setParams(tempParams);
                       }}
                       width="200px"
@@ -307,23 +327,23 @@ export default function WithSubnavigation() {
                   <VStack w="45%" alignItems="flex-start">
                     {listOfParameters.map((option) => {
                       return (
-                        <OptionRenderer
-                          key={option.title}
-                          {...{
-                            params: params,
-                            setParams: setParams,
-                            ind: ind,
-                            setIndex: ind,
-                            title: option.title,
-                            icon: option.icon,
-                            unit: option.unit,
-                            val: option.val,
-                            key: option.key,
-                            comp: option.comp,
-                            step: option.step,
-                            deltaKey: option.deltaKey,
-                          }}
-                        />
+                        <div key={option.title}>
+                          <OptionRenderer
+                            {...{
+                              params: params,
+                              setParams: setParams,
+                              ind: ind,
+                              setIndex: ind,
+                              title: option.title,
+                              icon: option.icon,
+                              unit: option.unit,
+                              val: option.val,
+                              comp: option.comp,
+                              step: option.step,
+                              deltaKey: option.deltaKey,
+                            }}
+                          />
+                        </div>
                       );
                     })}
                   </VStack>
@@ -474,6 +494,22 @@ export default function WithSubnavigation() {
                         }
                         setBodyColors(colorsArr);
                         setCurrentColorArray(Array(18).fill("white"));
+                        let data = [];
+                        data.push(csvHeaderLine);
+                        for (let time = 0; time < res.data.length; time++) {
+                          let tempRow = [
+                            time,
+                            getCurrentConditionName(time, params),
+                          ];
+                          for (let i = 0; i < res.data[time].length; i++) {
+                            tempRow.push(
+                              res.data[time][i].comfort,
+                              res.data[time][i].sensation
+                            );
+                          }
+                          data.push(tempRow);
+                        }
+                        setCSVData(data);
                         loadingModal.onClose();
                       });
                   } catch (err) {
@@ -535,6 +571,19 @@ export default function WithSubnavigation() {
                         loadingModal.onClose();
                       }}
                     />
+                    <Button colorScheme="blue" variant="outline">
+                      <CSVLink
+                        data={csvData}
+                        filename={`ABCWEB_${new Date().toDateString({
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })}.csv`}
+                        target="_blank"
+                      >
+                        Export to CSV file
+                      </CSVLink>
+                    </Button>
                   </HStack>
                   <HStack w="100%">
                     <VStack w="75%">
@@ -550,7 +599,7 @@ export default function WithSubnavigation() {
                     <VStack w="25%">
                       <Text fontWeight="bold">
                         {params[currIndex[0]].condition_name}{" "}
-                        <span style={{ color: "red", marginLeft: "5px" }}>
+                        <span style={{ color: "#3ebced", marginLeft: "5px" }}>
                           {" "}
                           {currIndex[1]} mins{" "}
                         </span>

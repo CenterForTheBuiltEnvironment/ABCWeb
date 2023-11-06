@@ -48,6 +48,12 @@ export const graphsVals = [
   { label: "Right Foot", value: 16, stand: 0.0, sit: 0.0 },
 ];
 
+export const csvHeaderLine = ["Time", "Condition Name"].concat(
+  graphsVals
+    .map((value) => [`Comfort (${value.label})`, `Sensation (${value.label})`])
+    .flat()
+);
+
 export const conditionParams = (num) => {
   return {
     condition_name: "Condition #" + num.toString(),

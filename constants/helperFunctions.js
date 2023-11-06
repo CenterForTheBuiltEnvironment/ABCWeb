@@ -35,3 +35,11 @@ export const determineColor = (cs) => {
   else s = "pink";
   return [f, s];
 };
+export const getCurrentConditionName = (time, params) => {
+  let currParamTime = 0;
+  for (let i = 0; i < params.length; i++) {
+    currParamTime += params[i].exposure_duration;
+    if (time < currParamTime) return params[i].condition_name;
+  }
+  return "Erroneous Condition";
+};

@@ -11,7 +11,6 @@ export default function OptionRenderer({
   unit,
   val,
   icon,
-  key,
   step,
   precision,
   params,
@@ -19,7 +18,7 @@ export default function OptionRenderer({
   ind,
 }) {
   return (
-    <div key={key}>
+    <>
       <Text fontWeight="black" mb="10px">
         {title}
       </Text>
@@ -65,6 +64,6 @@ export default function OptionRenderer({
       ) : (
         <></>
       )}
-    </div>
+    </>
   );
 }
