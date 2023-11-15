@@ -5,6 +5,13 @@ import {
 } from "@/constants/helperFunctions";
 
 export default function graphBuilderOptions(data) {
+  // Schema data:
+  // {
+  //   title: string
+  //   legends: array
+  //   data: array
+  //   isBasic: boolean (determining whether the graph is either comfort or sensation)
+  // }
   const options = {
     textStyle: {
       fontFamily: "IBM Plex Sans",
@@ -60,8 +67,8 @@ export default function graphBuilderOptions(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: parseInt(Math.floor(miniMax(0, data.data))),
-      max: parseInt(Math.ceil(miniMax(1, data.data))),
+      min: data.isBasic ? -4 : parseInt(Math.floor(miniMax(0, data.data))),
+      max: data.isBasic ? 4 : parseInt(Math.ceil(miniMax(1, data.data))),
     },
     dataZoom: [
       {

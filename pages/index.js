@@ -477,6 +477,7 @@ export default function WithSubnavigation() {
                             title: "Comfort and Sensation vs. Time",
                             data: tempArr,
                             legends: ["Comfort", "Sensation"],
+                            isBasic: true,
                           })
                         );
                         let colorsArr = [];
@@ -566,6 +567,7 @@ export default function WithSubnavigation() {
                               "Comfort and Sensation vs. Time - " + val.label,
                             data: changedArr,
                             legends: ["Comfort", "Sensation"],
+                            isBasic: true,
                           })
                         );
                         loadingModal.onClose();
