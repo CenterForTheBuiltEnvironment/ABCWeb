@@ -14,16 +14,38 @@ export const miniMax = (value, data) => {
   }
   return curr;
 };
+const colorHelper = (value, mn, mx) => {
+  const fraction = (value - mn) / (mx - mn),
+    midpoint = 0.5,
+    fq = 0.25,
+    tq = 0.75;
+
+  // blue -> green -> red
+  let blue = ((midpoint - fraction) * 255) / midpoint,
+    green =
+      fraction <= midpoint
+        ? Math.abs(2 * fraction) * 255
+        : 2 * (1 - fraction) * 255,
+    red = ((fraction - midpoint) * 255) / midpoint;
+
+  // clamp values
+  blue = Math.max(0, Math.min(blue, 255));
+  green = Math.max(0, Math.min(green, 255));
+  red = Math.max(0, Math.min(red, 255));
+
+  // output final values
+  return "rgb(" + red + "," + green + "," + blue + ")";
+};
 export const colorSensation = (sensation) => {
-  if (sensation < -1) return "blue";
-  else if (sensation >= -1 && sensation <= 1) return "green";
-  else return "pink";
+  return colorHelper(sensation, -4, 4);
 };
 export const colorComfort = (comfort) => {
   if (comfort < -1) return "black";
   else if (comfort >= -1 && comfort <= 1) return "gray";
   else return "white";
 };
+
+// for human body model color-rendering
 export const determineColor = (cs) => {
   // cs = [comfort, sensation]
   let f, s;
