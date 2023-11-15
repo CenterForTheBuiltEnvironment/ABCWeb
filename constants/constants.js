@@ -47,10 +47,51 @@ export const graphsVals = [
   { label: "Left Foot", value: 15, stand: 0.0, sit: 0.0 },
   { label: "Right Foot", value: 16, stand: 0.0, sit: 0.0 },
 ];
+export const signals = [
+  "tskin-",
+  "tcore-",
+  "sensation-",
+  "sensation_weighted-",
+  "comfort-",
+  "comfort_weighted-",
+  "eht-",
+  "tskin_set-",
+  "tskin_set_reg-",
+];
 
-export const csvHeaderLine = ["Time", "Condition Name"].concat(
-  graphsVals
-    .map((value) => [`Comfort (${value.label})`, `Sensation (${value.label})`])
+export const csvHeaderLine = [
+  "elapsed_time",
+  "air",
+  "mrt",
+  "rh",
+  "velocity",
+  "solar",
+  "clo",
+  "met",
+  "overall_comfort",
+  "overall_comfort_weighted",
+  "overall_sensation",
+  "overall_sensation_linear",
+  "overall_sensation_weighted",
+  "meanskintemp",
+  "tblood",
+  "tneutral",
+  "pmv",
+  "ppd",
+  "eht",
+  "qmet",
+  "qconv",
+  "qrad",
+  "qsolar",
+  "qresp",
+  "qsweat",
+].concat(
+  signals
+    .map((value) =>
+      graphsVals
+        .map((value2, idx) => (idx != 0 ? [`${value}${value2.label}`] : []))
+        .flat()
+    )
     .flat()
 );
 

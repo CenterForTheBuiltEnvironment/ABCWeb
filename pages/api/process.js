@@ -227,6 +227,8 @@ export default async function handler(req, res) {
                   innerGraph.push(result.data.results[ctr].segments[key]);
                 }
               }
+              innerGraph[0]["met"] = result.data.results[ctr].met;
+              innerGraph[0]["clo"] = result.data.results[ctr].clo;
               graphObject.push(innerGraph);
               ctr += 1;
             }

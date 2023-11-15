@@ -47,6 +47,7 @@ import {
   graphsVals,
   conditionParams,
   csvHeaderLine,
+  signals,
 } from "@/constants/constants";
 
 import {
@@ -286,22 +287,6 @@ export default function WithSubnavigation() {
                           tempParams[ind].condition_name =
                             "Condition #" + ind.toString();
                         }
-                        let data = [];
-                        data.push(csvHeaderLine);
-                        for (let time = 0; time < fullData.length; time++) {
-                          let tempRow = [
-                            time,
-                            getCurrentConditionName(time, tempParams),
-                          ];
-                          for (let i = 0; i < fullData[time].length; i++) {
-                            tempRow.push(
-                              fullData[time][i].comfort,
-                              fullData[time][i].sensation
-                            );
-                          }
-                          data.push(tempRow);
-                        }
-                        setCSVData(data);
                         setParams(tempParams);
                       }}
                       width="200px"
@@ -498,15 +483,65 @@ export default function WithSubnavigation() {
                         let data = [];
                         data.push(csvHeaderLine);
                         for (let time = 0; time < res.data.length; time++) {
-                          let tempRow = [
-                            time,
-                            getCurrentConditionName(time, params),
-                          ];
-                          for (let i = 0; i < res.data[time].length; i++) {
-                            tempRow.push(
-                              res.data[time][i].comfort,
-                              res.data[time][i].sensation
-                            );
+                          let tempRow = [time];
+                          const {
+                            ta,
+                            mrt,
+                            rh,
+                            v,
+                            solar,
+                            clo,
+                            met,
+                            comfort,
+                            comfort_weighted,
+                            sensation,
+                            sensation_linear,
+                            sensation_weighted,
+                            tskin,
+                            tblood,
+                            tneutral,
+                            pmv,
+                            ppd,
+                            eht,
+                            q_met,
+                            q_conv,
+                            q_rad,
+                            q_solar,
+                            q_resp,
+                            q_sweat,
+                          } = res.data[time][0];
+                          tempRow.push(
+                            ta,
+                            mrt,
+                            rh,
+                            v,
+                            solar,
+                            clo,
+                            met,
+                            comfort,
+                            comfort_weighted,
+                            sensation,
+                            sensation_linear,
+                            sensation_weighted,
+                            tskin,
+                            tblood,
+                            tneutral,
+                            pmv,
+                            ppd,
+                            eht,
+                            q_met,
+                            q_conv,
+                            q_rad,
+                            q_solar,
+                            q_resp,
+                            q_sweat
+                          );
+                          for (let i = 0; i < signals.length; i++) {
+                            for (let j = 1; j < res.data[time].length; j++) {
+                              tempRow.push(
+                                res.data[time][j][signals[i].slice(0, -1)]
+                              );
+                            }
                           }
                           data.push(tempRow);
                         }
@@ -580,7 +615,9 @@ export default function WithSubnavigation() {
                           year: "numeric",
                           month: "2-digit",
                           day: "2-digit",
-                        })}.csv`}
+                        })}-${new Date()
+                          .toTimeString()
+                          .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
                         target="_blank"
                       >
                         Export to CSV file
