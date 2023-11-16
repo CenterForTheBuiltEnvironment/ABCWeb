@@ -1,0 +1,11 @@
+Sensation,,,Comfort,
+numerical number,meaning,,numerical number,meaning
+-4,Very cold,,-4,Very uncomfortable
+-3,Cold,,-3,
+-2,Cool,,-2,Uncomofrtable
+-1,Slightly cool,,-1,
+0,Neutral,,0,Just comfortable/ just uncomfortable
+1,Slightly warm,,1,
+2,Warm,,2,Comfortable
+3,Hot,,3,
+4,Very hot,,4,Very comfortable
