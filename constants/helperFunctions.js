@@ -1,19 +1,48 @@
-export const miniMax = (value, data) => {
+export const miniMax = (value, data, label) => {
   // 0 for finding min, 1 for finding max
   let curr = 0;
   if (value == 0) {
-    curr = Math.min(data[0].comfort, data[0].sensation);
+    curr = data[0][label];
     for (let i = 1; i < data.length; i++) {
-      curr = Math.min(curr, data[i].comfort, data[i].sensation);
+      curr = Math.min(curr, data[i][label]);
     }
   } else {
-    curr = Math.max(data[0].comfort, data[0].sensation);
+    curr = data[0][label];
     for (let i = 1; i < data.length; i++) {
-      curr = Math.max(curr, data[i].comfort, data[i].sensation);
+      curr = Math.max(curr, data[i][label]);
     }
   }
   return curr;
 };
+export const hfluxMinimax = (value, data, label) => {
+  // 0 for finding min, 1 for finding max
+  let curr = data[0][label[0]];
+  for (let j = 0; j < label.length; j++) {
+    for (let i = 1; i < data.length; i++) {
+      if (value == 1) {
+        curr = Math.max(curr, data[i][label[j]]);
+      } else {
+        curr = Math.min(curr, data[i][label[j]]);
+      }
+    }
+  }
+  return curr;
+};
+export const environmentMinimax = (value, data, label) => {
+  // 0 for finding min, 1 for finding max
+  let curr = data[0][label[0]];
+  for (let j = 0; j < label.length; j++) {
+    for (let i = 1; i < data.length; i++) {
+      if (value == 1) {
+        curr = Math.max(curr, data[i][label[j]]);
+      } else {
+        curr = Math.min(curr, data[i][label[j]]);
+      }
+    }
+  }
+  return curr;
+};
+
 const colorHelper = (value, mn, mx) => {
   const fraction = (value - mn) / (mx - mn),
     midpoint = 0.5,
@@ -38,6 +67,18 @@ const colorHelper = (value, mn, mx) => {
 };
 export const colorSensation = (sensation) => {
   return colorHelper(sensation, -4, 4);
+};
+export const colorTskin = (tskin, min, max) => {
+  return colorHelper(tskin, min, max);
+};
+export const colorTcore = (tcore, min, max) => {
+  return colorHelper(tcore, min, max);
+};
+export const colorHflux = (hflux, min, max) => {
+  return colorHelper(hflux, min, max);
+};
+export const colorEnv = (env, min, max) => {
+  return colorHelper(env, min, max);
 };
 export const colorComfort = (comfort) => {
   if (comfort < -1) return "black";

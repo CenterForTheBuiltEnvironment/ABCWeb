@@ -49,6 +49,7 @@ import {
   conditionParams,
   csvHeaderLine,
   signals,
+  modes,
 } from "@/constants/constants";
 
 import {
@@ -60,13 +61,20 @@ import {
 
 import OptionRenderer from "@/components/optionRenderer";
 import Canvass from "@/components/model";
-import graphBuilderOptions from "@/components/graphBuilder";
 import EditModal from "@/components/editModal";
 import Spinner from "@/components/spinner";
 import ClothingSelector from "@/components/clothingSelector";
 import MetSelector from "@/components/metSelector";
 import Image from "next/image";
 import { CSVDownload, CSVLink } from "react-csv";
+import {
+  comfBuilder,
+  environmentBuilder,
+  hfluxBuilder,
+  sensBuilder,
+  tcoreBuilder,
+  tskinBuilder,
+} from "@/components/graphBuilder";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
@@ -89,6 +97,67 @@ export default function WithSubnavigation() {
     Array(18).fill("white")
   );
   const [csvData, setCSVData] = useState();
+  const [currentChoiceToGraph, setCurrentChoiceToGraph] = useState("comfort");
+
+  const decideGraph = (tempArr, choice = "") => {
+    let graphedChoice = choice;
+    if (graphedChoice == "") graphedChoice = currentChoiceToGraph;
+    if (graphedChoice == "sensation") {
+      return sensBuilder({
+        data: tempArr,
+        legends: ["Sensation"],
+      });
+    } else if (graphedChoice == "comfort") {
+      return comfBuilder({
+        data: tempArr,
+        legends: ["Comfort"],
+      });
+    } else if (graphedChoice == "tskin") {
+      return tskinBuilder({
+        data: tempArr,
+        legends: ["Skin Temperature"],
+      });
+    } else if (graphedChoice == "tcore") {
+      let tcoreArr = [...tempArr];
+      if (numtoGraph == 0) {
+        // overall
+        for (let i = 0; i < tcoreArr.length; i++) {
+          tcoreArr[i]["tcore"] = tcoreArr[i].tblood;
+        }
+      }
+      return tcoreBuilder({
+        data: tempArr,
+        legends: ["Core Temperature"],
+      });
+    } else if (graphedChoice == "hflux") {
+      if (numtoGraph == 0) {
+        // overall
+        return hfluxBuilder({
+          data: tempArr,
+          legends: ["q_met", "q_conv", "q_rad", "q_solar", "q_resp", "q_sweat"],
+        });
+      } else {
+        return hfluxBuilder({
+          data: tempArr,
+          legends: [
+            "q_met",
+            "q_conv",
+            "q_rad",
+            "q_solar",
+            "q_resp",
+            "q_sweat",
+            "q_blood",
+            "q_blood_skin",
+          ],
+        });
+      }
+    } else if (graphedChoice == "environment") {
+      return environmentBuilder({
+        data: tempArr,
+        legends: ["ta", "mrt", "solar", "eht", "rh", "v"],
+      });
+    }
+  };
 
   function EditableControls() {
     const { isEditing, getSubmitButtonProps, getEditButtonProps } =
@@ -458,14 +527,7 @@ export default function WithSubnavigation() {
                         setData(tempArr);
                         setFullData(res.data);
                         setCache(params.slice());
-                        setGraph(
-                          graphBuilderOptions({
-                            title: "Comfort and Sensation vs. Time",
-                            data: tempArr,
-                            legends: ["Comfort", "Sensation"],
-                            isBasic: true,
-                          })
-                        );
+                        setGraph(decideGraph(tempArr));
                         let colorsArr = [];
                         for (let time = 0; time < res.data.length; time++) {
                           let bodyPartsArr = [];
@@ -597,15 +659,29 @@ export default function WithSubnavigation() {
                           changedArr.push(fullData[j][val.value]);
                         }
                         setData(changedArr);
-                        setGraph(
-                          graphBuilderOptions({
-                            title:
-                              "Comfort and Sensation vs. Time - " + val.label,
-                            data: changedArr,
-                            legends: ["Comfort", "Sensation"],
-                            isBasic: true,
-                          })
-                        );
+                        setGraph(decideGraph(changedArr));
+                        loadingModal.onClose();
+                      }}
+                    />
+                    <RSelect
+                      className="basic-single"
+                      classNamePrefix="select"
+                      defaultValue={"comfort"}
+                      isSearchable={true}
+                      isClearable={false}
+                      options={modes}
+                      instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          width: "20vw",
+                        }),
+                      }}
+                      placeholder="Select regimen to plot."
+                      onChange={(val) => {
+                        loadingModal.onOpen();
+                        setCurrentChoiceToGraph(val.value);
+                        setGraph(decideGraph(graphData, val.value));
                         loadingModal.onClose();
                       }}
                     />
@@ -646,21 +722,6 @@ export default function WithSubnavigation() {
                       </Text>
                       <Canvass currentColorArray={currentColorArray} />
                       <Text>Drag to rotate model.</Text>
-                      <Text
-                        fontWeight="black"
-                        color={colorComfort(graphData[currIndex[1]].comfort)}
-                      >
-                        {graphData[currIndex[1]].comfort.toFixed(2)} comfort
-                      </Text>
-                      <Text
-                        fontWeight="black"
-                        color={colorSensation(
-                          graphData[currIndex[1]].sensation
-                        )}
-                      >
-                        {" "}
-                        {graphData[currIndex[1]].sensation.toFixed(2)} sensation
-                      </Text>
                     </VStack>
                   </HStack>
                 </VStack>

@@ -28,6 +28,30 @@ export const places = [
   1, 3, 4, 2, 2, 2, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5,
 ];
 
+export const modes = [
+  { label: "Comfort", value: "comfort" },
+  {
+    label: "Sensation",
+    value: "sensation",
+  },
+  {
+    label: "Skin Temperature",
+    value: "tskin",
+  },
+  {
+    label: "Core Temperature",
+    value: "tcore",
+  },
+  {
+    label: "Heat Flux Variables",
+    value: "hflux",
+  },
+  {
+    label: "Environment Variables",
+    value: "environment",
+  },
+];
+
 export const graphsVals = [
   { label: "Overall", value: 0 },
   { label: "Head", value: 1, stand: 1.0, sit: 1.0 },
