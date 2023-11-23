@@ -38,7 +38,8 @@ import clo_correspondence from "../reference/local clo input/clothing_ensembles.
 import Head from "next/head";
 import { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
-import ReactECharts from "echarts-for-react";
+import dynamic from 'next/dynamic';
+const ReactECharts = dynamic(() => import('echarts-for-react'), { ssr: false });
 
 import {
   met_auto,
