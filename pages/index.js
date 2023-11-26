@@ -91,6 +91,7 @@ export default function WithSubnavigation() {
   const [numtoGraph, setNumToGraph] = useState(0);
   const [fullData, setFullData] = useState([]);
   const [ind, setIndex] = useState(0);
+  const [currGraphIndex, setCurrGraphIndex] = useState(0)
   const [currIndex, setCurrIndex] = useState([0, 0]);
   const [metOptions, setMetOptions] = useState(met_auto);
   const [graphOptions, setGraph] = useState();
@@ -103,6 +104,9 @@ export default function WithSubnavigation() {
   );
   const [csvData, setCSVData] = useState();
   const [currentChoiceToGraph, setCurrentChoiceToGraph] = useState("comfort");
+  const [sliderMinVal, setSliderMinVal] = useState(0)
+  const [sliderMaxVal, setSliderMaxVal] = useState(0)
+  const [sliderVal, setSliderVal] = useState([0, 0])
 
   const decideGraph = (tempArr, choice = "") => {
     let graphedChoice = choice;
@@ -190,6 +194,12 @@ export default function WithSubnavigation() {
   const toast = useToast();
 
   useEffect(() => {}, [graphOptions, ind, numtoGraph, currentColorArray]);
+
+  useEffect(() => {
+    setSliderMinVal(0)
+    setSliderMaxVal(params[currGraphIndex].exposure_duration)
+    setSliderVal([0, params[currGraphIndex].exposure_duration - 1])
+  }, [currGraphIndex])
 
   const onEvents = useMemo(
     () => ({
@@ -527,12 +537,19 @@ export default function WithSubnavigation() {
                       .then((res) => {
                         let tempArr = [];
                         for (let j = 0; j < res.data.length; j++) {
+                          console.log(res.data.length)
+                          // TODO
+                          // This is when graph/condition index changes
                           tempArr.push({...res.data[j][numtoGraph], index: j});
                         }
                         setData(tempArr);
                         setFullData(res.data);
                         setCache(params.slice());
                         setGraph(decideGraph(tempArr));
+                        setCurrGraphIndex(ind)
+                        setSliderMinVal(0)
+                        setSliderMaxVal(params[ind].exposure_duration)
+                        setSliderVal([0, params[ind].exposure_duration - 1])
                         let colorsArr = [];
                         for (let time = 0; time < res.data.length; time++) {
                           let bodyPartsArr = [];
@@ -661,6 +678,10 @@ export default function WithSubnavigation() {
                         setNumToGraph(val.value);
                         let changedArr = [];
                         for (let j = 0; j < fullData.length; j++) {
+                          // TODO
+                          // This is when body part changes
+                          console.log(fullData.length)
+
                           changedArr.push({...fullData[j][val.value], index: j});
                         }
                         setData(changedArr);
@@ -717,12 +738,13 @@ export default function WithSubnavigation() {
                         />
                         <RangeSlider
                           width="100%"
-                          defaultValue={[0, 59]}
-                          min={0}
-                          max={59}
+                          value={sliderVal}
+                          min={sliderMinVal}
+                          max={sliderMaxVal - 1}
                           step={1}
                           onChange={(e) => {
-                            const tempArr = [];
+                            setSliderVal([e[0], e[1]])
+                            let tempArr = [];
                             for (let j = e[0]; j < e[1]; j++) {
                               tempArr.push({...fullData[j][numtoGraph], index: j});
                             }
@@ -733,27 +755,11 @@ export default function WithSubnavigation() {
                           </RangeSliderTrack>
                           <RangeSliderThumb boxSize={3} index={0} />
                           <RangeSliderThumb boxSize={3} index={1} />
-                          <RangeSliderMark value={0} mt='1' ml='-2.5' fontSize='sm'>
-                            1
-                          </RangeSliderMark>
-                          <RangeSliderMark value={9} mt='1' ml='-2.5' fontSize='sm'>
-                            10
-                          </RangeSliderMark>
-                          <RangeSliderMark value={19} mt='1' ml='-2.5' fontSize='sm'>
-                            20
-                          </RangeSliderMark>
-                          <RangeSliderMark value={29} mt='1' ml='-2.5' fontSize='sm'>
-                            30
-                          </RangeSliderMark>
-                          <RangeSliderMark value={39} mt='1' ml='-2.5' fontSize='sm'>
-                            40
-                          </RangeSliderMark>
-                          <RangeSliderMark value={49} mt='1' ml='-2.5' fontSize='sm'>
-                            50
-                          </RangeSliderMark>
-                          <RangeSliderMark value={59} mt='1' ml='-2.5' fontSize='sm'>
-                            60
-                          </RangeSliderMark>
+                          {[0, 1, 2, 3, 4, 5, 6].map(i => (
+                            <RangeSliderMark key={i} value={(sliderMaxVal / 6) * i} mt='1' ml='-2.5' fontSize='sm'>
+                              {Math.round((sliderMaxVal / 6) * i)}
+                            </RangeSliderMark>
+                          ))}
                         </RangeSlider>
                       </Box>
                     </VStack>
