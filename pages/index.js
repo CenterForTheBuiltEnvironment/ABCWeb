@@ -24,6 +24,11 @@ import {
   EditablePreview,
   EditableInput,
   useEditableControls,
+  RangeSlider,
+  RangeSliderTrack,
+  RangeSliderFilledTrack,
+  RangeSliderThumb,
+  RangeSliderMark,
 } from "@chakra-ui/react";
 import RSelect from "react-select";
 import {
@@ -522,7 +527,7 @@ export default function WithSubnavigation() {
                       .then((res) => {
                         let tempArr = [];
                         for (let j = 0; j < res.data.length; j++) {
-                          tempArr.push(res.data[j][numtoGraph]);
+                          tempArr.push({...res.data[j][numtoGraph], index: j});
                         }
                         setData(tempArr);
                         setFullData(res.data);
@@ -656,7 +661,7 @@ export default function WithSubnavigation() {
                         setNumToGraph(val.value);
                         let changedArr = [];
                         for (let j = 0; j < fullData.length; j++) {
-                          changedArr.push(fullData[j][val.value]);
+                          changedArr.push({...fullData[j][val.value], index: j});
                         }
                         setData(changedArr);
                         setGraph(decideGraph(changedArr));
@@ -710,6 +715,46 @@ export default function WithSubnavigation() {
                           onEvents={onEvents}
                           style={{ height: "100%" }}
                         />
+                        <RangeSlider
+                          width="100%"
+                          defaultValue={[0, 59]}
+                          min={0}
+                          max={59}
+                          step={1}
+                          onChange={(e) => {
+                            const tempArr = [];
+                            for (let j = e[0]; j < e[1]; j++) {
+                              tempArr.push({...fullData[j][numtoGraph], index: j});
+                            }
+                            setGraph(decideGraph(tempArr))
+                          }}>
+                          <RangeSliderTrack bg='#3ebced'>
+                            <RangeSliderFilledTrack bg='#1b75bc' />
+                          </RangeSliderTrack>
+                          <RangeSliderThumb boxSize={3} index={0} />
+                          <RangeSliderThumb boxSize={3} index={1} />
+                          <RangeSliderMark value={0} mt='1' ml='-2.5' fontSize='sm'>
+                            1
+                          </RangeSliderMark>
+                          <RangeSliderMark value={9} mt='1' ml='-2.5' fontSize='sm'>
+                            10
+                          </RangeSliderMark>
+                          <RangeSliderMark value={19} mt='1' ml='-2.5' fontSize='sm'>
+                            20
+                          </RangeSliderMark>
+                          <RangeSliderMark value={29} mt='1' ml='-2.5' fontSize='sm'>
+                            30
+                          </RangeSliderMark>
+                          <RangeSliderMark value={39} mt='1' ml='-2.5' fontSize='sm'>
+                            40
+                          </RangeSliderMark>
+                          <RangeSliderMark value={49} mt='1' ml='-2.5' fontSize='sm'>
+                            50
+                          </RangeSliderMark>
+                          <RangeSliderMark value={59} mt='1' ml='-2.5' fontSize='sm'>
+                            60
+                          </RangeSliderMark>
+                        </RangeSlider>
                       </Box>
                     </VStack>
                     <VStack w="25%">
