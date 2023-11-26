@@ -59,8 +59,8 @@ export function comfBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e, index) => {
-        return index + 1;
+      data: data.data.map((e) => {
+        return e.index + 1;
       }),
     },
     yAxis: {
@@ -139,8 +139,8 @@ export function sensBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e, index) => {
-        return index + 1;
+      data: data.data.map((e) => {
+        return e.index + 1;
       }),
     },
     yAxis: {
@@ -220,8 +220,8 @@ export function tskinBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e, index) => {
-        return index + 1;
+      data: data.data.map((e) => {
+        return e.index + 1;
       }),
     },
     yAxis: {
@@ -305,8 +305,8 @@ export function tcoreBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e, index) => {
-        return index + 1;
+      data: data.data.map((e) => {
+        return e.index + 1;
       }),
     },
     yAxis: {
@@ -370,7 +370,7 @@ export function hfluxBuilder(data) {
       },
     },
     legend: {
-      selectedMode: false,
+      selectedMode: true,
       data: data.legends,
     },
     grid: {
@@ -393,8 +393,8 @@ export function hfluxBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e, index) => {
-        return index + 1;
+      data: data.data.map((e) => {
+        return e.index + 1;
       }),
     },
     yAxis: {
@@ -458,7 +458,7 @@ export function environmentBuilder(data) {
       },
     },
     legend: {
-      selectedMode: false,
+      selectedMode: true,
       data: data.legends,
     },
     grid: {
@@ -481,8 +481,8 @@ export function environmentBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e, index) => {
-        return index + 1;
+      data: data.data.map((e) => {
+        return e.index + 1;
       }),
     },
     yAxis: [
