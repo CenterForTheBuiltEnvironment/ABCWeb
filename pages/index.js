@@ -532,14 +532,13 @@ export default function WithSubnavigation() {
                     }
                     const metrics = await axios
                       .post("/api/process", {
-                        phases: phases,
+                        // Only get data for current selected condition
+                        // Prevents chaining of data when multiple conditions are created
+                        phases: [phases[ind]],
                       })
                       .then((res) => {
                         let tempArr = [];
                         for (let j = 0; j < res.data.length; j++) {
-                          console.log(res.data.length)
-                          // TODO
-                          // This is when graph/condition index changes
                           tempArr.push({...res.data[j][numtoGraph], index: j});
                         }
                         setData(tempArr);
@@ -678,10 +677,6 @@ export default function WithSubnavigation() {
                         setNumToGraph(val.value);
                         let changedArr = [];
                         for (let j = 0; j < fullData.length; j++) {
-                          // TODO
-                          // This is when body part changes
-                          console.log(fullData.length)
-
                           changedArr.push({...fullData[j][val.value], index: j});
                         }
                         setData(changedArr);
