@@ -29,6 +29,7 @@ import {
   RangeSliderFilledTrack,
   RangeSliderThumb,
   RangeSliderMark,
+  Tooltip,
 } from "@chakra-ui/react";
 import RSelect from "react-select";
 import {
@@ -43,8 +44,8 @@ import clo_correspondence from "../reference/local clo input/clothing_ensembles.
 import Head from "next/head";
 import { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
-import dynamic from 'next/dynamic';
-const ReactECharts = dynamic(() => import('echarts-for-react'), { ssr: false });
+import dynamic from "next/dynamic";
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
 
 import {
   met_auto,
@@ -103,8 +104,8 @@ export default function WithSubnavigation() {
   );
   const [csvData, setCSVData] = useState();
   const [currentChoiceToGraph, setCurrentChoiceToGraph] = useState("comfort");
-  const [sliderMaxVal, setSliderMaxVal] = useState(0)
-  const [sliderVal, setSliderVal] = useState([0, 0])
+  const [sliderMaxVal, setSliderMaxVal] = useState(0);
+  const [sliderVal, setSliderVal] = useState([0, 0]);
 
   const decideGraph = (tempArr, choice = "") => {
     let graphedChoice = choice;
@@ -530,19 +531,22 @@ export default function WithSubnavigation() {
                       .then((res) => {
                         let tempArr = [];
                         for (let j = 0; j < res.data.length; j++) {
-                          tempArr.push({...res.data[j][numtoGraph], index: j});
+                          tempArr.push({
+                            ...res.data[j][numtoGraph],
+                            index: j,
+                          });
                         }
                         setData(tempArr);
                         setFullData(res.data);
                         setCache(params.slice());
                         setGraph(decideGraph(tempArr));
 
-                        let totalDuration = 0
+                        let totalDuration = 0;
                         for (let i = 0; i < params.length; i++) {
-                          totalDuration += params[i].exposure_duration
+                          totalDuration += params[i].exposure_duration;
                         }
-                        setSliderMaxVal(totalDuration)
-                        setSliderVal([0, totalDuration - 1])
+                        setSliderMaxVal(totalDuration);
+                        setSliderVal([0, totalDuration - 1]);
 
                         let colorsArr = [];
                         for (let time = 0; time < res.data.length; time++) {
@@ -672,7 +676,10 @@ export default function WithSubnavigation() {
                         setNumToGraph(val.value);
                         let changedArr = [];
                         for (let j = 0; j < fullData.length; j++) {
-                          changedArr.push({...fullData[j][val.value], index: j});
+                          changedArr.push({
+                            ...fullData[j][val.value],
+                            index: j,
+                          });
                         }
                         setData(changedArr);
                         setGraph(decideGraph(changedArr));
@@ -697,7 +704,12 @@ export default function WithSubnavigation() {
                       onChange={(val) => {
                         loadingModal.onOpen();
                         setCurrentChoiceToGraph(val.value);
-                        setGraph(decideGraph(graphData, val.value));
+                        setGraph(
+                          decideGraph(
+                            graphData.slice(sliderVal[0], sliderVal[1]),
+                            val.value
+                          )
+                        );
                         loadingModal.onClose();
                       }}
                     />
@@ -727,29 +739,61 @@ export default function WithSubnavigation() {
                           style={{ height: "100%" }}
                         />
                         <RangeSlider
-                          width="100%"
+                          left="5%"
+                          top="10px"
+                          w="90%"
                           value={sliderVal}
                           min={0}
-                          max={sliderMaxVal - 1}
+                          max={sliderMaxVal}
                           step={1}
                           onChange={(e) => {
-                            setSliderVal([e[0], e[1]])
+                            setSliderVal([e[0], e[1]]);
                             let tempArr = [];
                             for (let j = e[0]; j < e[1]; j++) {
-                              tempArr.push({...fullData[j][numtoGraph], index: j});
+                              tempArr.push({
+                                ...fullData[j][numtoGraph],
+                                index: j,
+                              });
                             }
-                            setGraph(decideGraph(tempArr))
-                          }}>
-                          <RangeSliderTrack bg='#3ebced'>
-                            <RangeSliderFilledTrack bg='#1b75bc' />
+                            setGraph(decideGraph(tempArr));
+                          }}
+                        >
+                          <RangeSliderTrack height="10px" bg="#3ebced">
+                            <RangeSliderFilledTrack bg="#1b75bc" />
                           </RangeSliderTrack>
-                          <RangeSliderThumb boxSize={3} index={0} />
-                          <RangeSliderThumb boxSize={3} index={1} />
-                          {[0, 1, 2, 3, 4, 5, 6].map(i => (
-                            <RangeSliderMark key={i} value={(sliderMaxVal / 6) * i} mt='1' ml='-2.5' fontSize='sm'>
-                              {Math.round((sliderMaxVal / 6) * i)}
-                            </RangeSliderMark>
-                          ))}
+                          <Tooltip
+                            label={`${sliderVal[0]} mins`}
+                            placement="top"
+                          >
+                            <RangeSliderThumb
+                              borderWidth="7px"
+                              boxSize={3}
+                              index={0}
+                            />
+                          </Tooltip>
+                          <Tooltip
+                            label={`${sliderVal[1]} mins`}
+                            placement="top"
+                          >
+                            <RangeSliderThumb
+                              borderWidth="7px"
+                              boxSize={3}
+                              index={1}
+                            />
+                          </Tooltip>
+                          <div style={{ marginTop: "10px" }}>
+                            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                              <RangeSliderMark
+                                key={i}
+                                value={(sliderMaxVal / 6) * i}
+                                mt="1"
+                                ml="-2.5"
+                                fontSize="sm"
+                              >
+                                {Math.round((sliderMaxVal / 6) * i)}
+                              </RangeSliderMark>
+                            ))}
+                          </div>
                         </RangeSlider>
                       </Box>
                     </VStack>
