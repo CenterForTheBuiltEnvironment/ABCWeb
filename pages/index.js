@@ -546,7 +546,7 @@ export default function WithSubnavigation() {
                           totalDuration += params[i].exposure_duration;
                         }
                         setSliderMaxVal(totalDuration);
-                        setSliderVal([0, totalDuration - 1]);
+                        setSliderVal([0, totalDuration]);
 
                         let colorsArr = [];
                         for (let time = 0; time < res.data.length; time++) {

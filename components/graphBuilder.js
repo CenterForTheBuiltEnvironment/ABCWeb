@@ -314,8 +314,8 @@ export function tcoreBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: miniMax(0, data.data, "tcore").toFixed(2),
-      max: miniMax(1, data.data, "tcore").toFixed(2),
+      min: miniMax(0, data.data, "tcore").toFixed(5),
+      max: miniMax(1, data.data, "tcore").toFixed(5),
     },
     dataZoom: [
       {
@@ -333,8 +333,8 @@ export function tcoreBuilder(data) {
               normal: {
                 color: colorTcore(
                   item.tcore,
-                  miniMax(0, data.data, "tcore").toFixed(2),
-                  miniMax(1, data.data, "tcore").toFixed(2)
+                  miniMax(0, data.data, "tcore").toFixed(5),
+                  miniMax(1, data.data, "tcore").toFixed(5)
                 ),
               },
             },
@@ -402,8 +402,8 @@ export function hfluxBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: hfluxMinimax(0, data.data, data.legends).toFixed(2),
-      max: hfluxMinimax(1, data.data, data.legends).toFixed(2),
+      min: hfluxMinimax(0, data.data, data.legends).toFixed(5),
+      max: hfluxMinimax(1, data.data, data.legends).toFixed(5),
     },
     dataZoom: [
       {
@@ -421,8 +421,8 @@ export function hfluxBuilder(data) {
               normal: {
                 color: colorHflux(
                   item[elem],
-                  hfluxMinimax(0, data.data, [elem]).toFixed(2),
-                  hfluxMinimax(1, data.data, [elem]).toFixed(2)
+                  hfluxMinimax(0, data.data, [elem]).toFixed(5),
+                  hfluxMinimax(1, data.data, [elem]).toFixed(5)
                 ),
               },
             },
@@ -491,8 +491,8 @@ export function environmentBuilder(data) {
         name: "Value",
         nameLocation: "center",
         nameTextStyle: { padding: 10 },
-        min: environmentMinimax(0, data.data, data.legends).toFixed(2),
-        max: environmentMinimax(1, data.data, data.legends).toFixed(2),
+        min: environmentMinimax(0, data.data, data.legends).toFixed(5),
+        max: environmentMinimax(1, data.data, data.legends).toFixed(5),
       },
       {
         type: "value",
@@ -546,8 +546,8 @@ export function environmentBuilder(data) {
                 normal: {
                   color: colorEnv(
                     item[elem],
-                    environmentMinimax(0, data.data, [elem]).toFixed(2),
-                    environmentMinimax(1, data.data, [elem]).toFixed(2)
+                    environmentMinimax(0, data.data, [elem]).toFixed(5),
+                    environmentMinimax(1, data.data, [elem]).toFixed(5)
                   ),
                 },
               },
