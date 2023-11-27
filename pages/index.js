@@ -334,8 +334,8 @@ export default function WithSubnavigation() {
                 textColor={"white"}
                 icon={<AddIcon />}
                 onClick={() => {
-                  params.push(conditionParams(params.length + 1));
-                  setIndex(params.length - 1);
+                  setParams([...params, conditionParams(params.length + 1)]);
+                  setIndex(ind + 1);
                 }}
               ></IconButton>
             </HStack>
@@ -350,7 +350,7 @@ export default function WithSubnavigation() {
               <>
                 <Flex w="100%" alignItems="center">
                   <Editable
-                    defaultValue={params[ind].condition_name}
+                    value={params[ind].condition_name}
                     fontSize="2xl"
                     fontWeight="bold"
                     isPreviewFocusable={false}
