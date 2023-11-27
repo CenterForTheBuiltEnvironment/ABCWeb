@@ -483,18 +483,7 @@ export default function WithSubnavigation() {
                 </Text>
               </>
             </VStack>
-            <div
-              style={{ alignSelf: "center" }}
-              onMouseEnter={() => {
-                if (Object.values(params).some((x) => x == -1 || x == "-1"))
-                  toast({
-                    title: "Please fill out all fields first.",
-                    status: "warning",
-                    duration: 2000,
-                    isClosable: true,
-                  });
-              }}
-            >
+            <HStack align="center">
               <Button
                 mt="7px"
                 backgroundColor={"#3ebced"}
@@ -641,7 +630,7 @@ export default function WithSubnavigation() {
               >
                 Run simulation
               </Button>
-            </div>
+            </HStack>
           </VStack>
 
           <VStack w="70%">
@@ -731,7 +720,7 @@ export default function WithSubnavigation() {
                   </HStack>
                   <HStack w="100%">
                     <VStack w="75%">
-                      <Box width="100%" height="40vh">
+                      <Box width="100%" height="45vh">
                         <ReactECharts
                           notMerge={true}
                           option={graphOptions}

@@ -359,15 +359,7 @@ export function hfluxBuilder(data) {
     },
     tooltip: {
       trigger: "axis",
-      formatter: function (params) {
-        return `<span id="inlineColor">${
-          params[0].dataIndex
-        }</span> min from start${data.legends.map((e, idx) => {
-          return `<br />${e}: <span id="inlineColor">${params[
-            idx
-          ].data.value.toFixed(3)}</span>`;
-        })}`;
-      },
+      valueFormatter: (value) => value.toFixed(5),
     },
     legend: {
       selectedMode: true,
@@ -402,8 +394,6 @@ export function hfluxBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: hfluxMinimax(0, data.data, data.legends).toFixed(5),
-      max: hfluxMinimax(1, data.data, data.legends).toFixed(5),
     },
     dataZoom: [
       {
@@ -447,15 +437,7 @@ export function environmentBuilder(data) {
     },
     tooltip: {
       trigger: "axis",
-      formatter: function (params) {
-        return `<span id="inlineColor">${
-          params[0].dataIndex
-        }</span> min from start${data.legends.map((e, idx) => {
-          return `<br />${e}: <span id="inlineColor">${params[
-            idx
-          ].data.value.toFixed(3)}</span>`;
-        })}`;
-      },
+      valueFormatter: (value) => value.toFixed(5),
     },
     legend: {
       selectedMode: true,
@@ -491,8 +473,6 @@ export function environmentBuilder(data) {
         name: "Value",
         nameLocation: "center",
         nameTextStyle: { padding: 10 },
-        min: environmentMinimax(0, data.data, data.legends).toFixed(5),
-        max: environmentMinimax(1, data.data, data.legends).toFixed(5),
       },
       {
         type: "value",
