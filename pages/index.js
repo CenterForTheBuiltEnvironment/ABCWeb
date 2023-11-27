@@ -91,7 +91,6 @@ export default function WithSubnavigation() {
   const [numtoGraph, setNumToGraph] = useState(0);
   const [fullData, setFullData] = useState([]);
   const [ind, setIndex] = useState(0);
-  const [currGraphIndex, setCurrGraphIndex] = useState(0)
   const [currIndex, setCurrIndex] = useState([0, 0]);
   const [metOptions, setMetOptions] = useState(met_auto);
   const [graphOptions, setGraph] = useState();
@@ -104,7 +103,6 @@ export default function WithSubnavigation() {
   );
   const [csvData, setCSVData] = useState();
   const [currentChoiceToGraph, setCurrentChoiceToGraph] = useState("comfort");
-  const [sliderMinVal, setSliderMinVal] = useState(0)
   const [sliderMaxVal, setSliderMaxVal] = useState(0)
   const [sliderVal, setSliderVal] = useState([0, 0])
 
@@ -194,12 +192,6 @@ export default function WithSubnavigation() {
   const toast = useToast();
 
   useEffect(() => {}, [graphOptions, ind, numtoGraph, currentColorArray]);
-
-  useEffect(() => {
-    setSliderMinVal(0)
-    setSliderMaxVal(params[currGraphIndex].exposure_duration)
-    setSliderVal([0, params[currGraphIndex].exposure_duration - 1])
-  }, [currGraphIndex])
 
   const onEvents = useMemo(
     () => ({
@@ -532,9 +524,8 @@ export default function WithSubnavigation() {
                     }
                     const metrics = await axios
                       .post("/api/process", {
-                        // Only get data for current selected condition
-                        // Prevents chaining of data when multiple conditions are created
-                        phases: [phases[ind]],
+                        // Chaining of data is intentional
+                        phases,
                       })
                       .then((res) => {
                         let tempArr = [];
@@ -545,10 +536,14 @@ export default function WithSubnavigation() {
                         setFullData(res.data);
                         setCache(params.slice());
                         setGraph(decideGraph(tempArr));
-                        setCurrGraphIndex(ind)
-                        setSliderMinVal(0)
-                        setSliderMaxVal(params[ind].exposure_duration)
-                        setSliderVal([0, params[ind].exposure_duration - 1])
+
+                        let totalDuration = 0
+                        for (let i = 0; i < params.length; i++) {
+                          totalDuration += params[i].exposure_duration
+                        }
+                        setSliderMaxVal(totalDuration)
+                        setSliderVal([0, totalDuration - 1])
+
                         let colorsArr = [];
                         for (let time = 0; time < res.data.length; time++) {
                           let bodyPartsArr = [];
@@ -734,7 +729,7 @@ export default function WithSubnavigation() {
                         <RangeSlider
                           width="100%"
                           value={sliderVal}
-                          min={sliderMinVal}
+                          min={0}
                           max={sliderMaxVal - 1}
                           step={1}
                           onChange={(e) => {
