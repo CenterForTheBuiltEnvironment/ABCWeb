@@ -39,6 +39,7 @@ import {
   AddIcon,
   CheckIcon,
   EditIcon,
+  ViewIcon,
 } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import Head from "next/head";
@@ -108,6 +109,7 @@ export default function WithSubnavigation() {
   const [currentChoiceToGraph, setCurrentChoiceToGraph] = useState("comfort");
   const [sliderMaxVal, setSliderMaxVal] = useState(0);
   const [sliderVal, setSliderVal] = useState([0, 0]);
+  const [comfortView, setComfortView] = useState(true);
 
   const decideGraph = (tempArr, choice = "") => {
     let graphedChoice = choice;
@@ -325,7 +327,7 @@ export default function WithSubnavigation() {
         style={{ width: "100%" }}
         transition={{ enter: { duration: 0.5 } }}
       >
-        {graphOptions ? (
+        {!comfortView ? (
           <HStack margin="20px" alignItems="flex-start" spacing={5}>
             <VStack w="30%">
               <HStack w="100%" padding={2} alignItems="flex-start">
@@ -512,7 +514,6 @@ export default function WithSubnavigation() {
               </VStack>
               <HStack align="center">
                 <Button
-                  mt="7px"
                   backgroundColor={"#3ebced"}
                   textColor={"white"}
                   colorScheme="blue"
@@ -598,6 +599,7 @@ export default function WithSubnavigation() {
                             data.push(tempRow);
                           }
                           setCSVData(data);
+                          setComfortView(false);
                           loadingModal.onClose();
                         });
                     } catch (err) {
@@ -609,168 +611,190 @@ export default function WithSubnavigation() {
                 >
                   Run simulation
                 </Button>
+                <Tooltip label="Switch layout of web tool" placement="right">
+                  <IconButton
+                    icon={<ViewIcon />}
+                    onClick={() => setComfortView(true)}
+                  />
+                </Tooltip>
               </HStack>
             </VStack>
 
             <VStack w="70%">
-              <VStack
-                alignSelf="center"
-                borderColor="#1b75bc"
-                borderWidth="1px"
-                padding={5}
-                spacing={8}
-                w="100%"
-                borderRadius="10px"
-              >
-                <HStack>
-                  <RSelect
-                    className="basic-single"
-                    classNamePrefix="select"
-                    defaultValue={graphsVals[numtoGraph]}
-                    isSearchable={true}
-                    isClearable={false}
-                    options={graphsVals}
-                    instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        width: "20vw",
-                      }),
-                    }}
-                    placeholder="Input body part to graph."
-                    onChange={(val) => {
-                      loadingModal.onOpen();
-                      setNumToGraph(val.value);
-                      let changedArr = [];
-                      for (let j = 0; j < fullData.length; j++) {
-                        changedArr.push({
-                          ...fullData[j][val.value],
-                          index: j,
-                        });
-                      }
-                      setData(changedArr);
-                      setGraph(decideGraph(changedArr));
-                      loadingModal.onClose();
-                    }}
-                  />
-                  <RSelect
-                    className="basic-single"
-                    classNamePrefix="select"
-                    defaultValue={"comfort"}
-                    isSearchable={true}
-                    isClearable={false}
-                    options={modes}
-                    instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        width: "20vw",
-                      }),
-                    }}
-                    placeholder="Select regimen to plot."
-                    onChange={(val) => {
-                      loadingModal.onOpen();
-                      setCurrentChoiceToGraph(val.value);
-                      setGraph(
-                        decideGraph(
-                          graphData.slice(sliderVal[0], sliderVal[1]),
-                          val.value
-                        )
-                      );
-                      loadingModal.onClose();
-                    }}
-                  />
-                  <Button colorScheme="blue" variant="outline">
-                    <CSVLink
-                      data={csvData}
-                      filename={`ABCWEB_${new Date().toDateString({
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })}-${new Date()
-                        .toTimeString()
-                        .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
-                      target="_blank"
-                    >
-                      Export to CSV file
-                    </CSVLink>
-                  </Button>
-                </HStack>
-                <HStack w="100%">
-                  <VStack w="75%">
-                    <Box width="100%" height="45vh">
-                      <ReactECharts
-                        notMerge={true}
-                        option={graphOptions}
-                        onEvents={onEvents}
-                        style={{ height: "100%" }}
-                      />
-                      <RangeSlider
-                        left="5%"
-                        top="10px"
-                        w="90%"
-                        value={sliderVal}
-                        min={0}
-                        max={sliderMaxVal}
-                        step={1}
-                        onChange={(e) => {
-                          setSliderVal([e[0], e[1]]);
-                          let tempArr = [];
-                          for (let j = e[0]; j < e[1]; j++) {
-                            tempArr.push({
-                              ...fullData[j][numtoGraph],
+              {graphOptions ? (
+                <>
+                  <VStack
+                    alignSelf="center"
+                    borderColor="#1b75bc"
+                    bgColor="gray.200"
+                    borderWidth="1px"
+                    padding={5}
+                    spacing={8}
+                    w="100%"
+                    borderRadius="10px"
+                  >
+                    <HStack>
+                      <RSelect
+                        className="basic-single"
+                        classNamePrefix="select"
+                        defaultValue={graphsVals[numtoGraph]}
+                        isSearchable={true}
+                        isClearable={false}
+                        options={graphsVals}
+                        instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            width: "20vw",
+                          }),
+                        }}
+                        placeholder="Input body part to graph."
+                        onChange={(val) => {
+                          loadingModal.onOpen();
+                          setNumToGraph(val.value);
+                          let changedArr = [];
+                          for (let j = 0; j < fullData.length; j++) {
+                            changedArr.push({
+                              ...fullData[j][val.value],
                               index: j,
                             });
                           }
-                          setGraph(decideGraph(tempArr));
+                          setData(changedArr);
+                          setGraph(decideGraph(changedArr));
+                          loadingModal.onClose();
                         }}
-                      >
-                        <RangeSliderTrack height="10px" bg="#3ebced">
-                          <RangeSliderFilledTrack bg="#1b75bc" />
-                        </RangeSliderTrack>
-                        <Tooltip label={`${sliderVal[0]} mins`} placement="top">
-                          <RangeSliderThumb
-                            borderWidth="7px"
-                            boxSize={3}
-                            index={0}
+                      />
+                      <RSelect
+                        className="basic-single"
+                        classNamePrefix="select"
+                        defaultValue={"comfort"}
+                        isSearchable={true}
+                        isClearable={false}
+                        options={modes}
+                        instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            width: "20vw",
+                          }),
+                        }}
+                        placeholder="Select regimen to plot."
+                        onChange={(val) => {
+                          loadingModal.onOpen();
+                          setCurrentChoiceToGraph(val.value);
+                          setGraph(
+                            decideGraph(
+                              graphData.slice(sliderVal[0], sliderVal[1]),
+                              val.value
+                            )
+                          );
+                          loadingModal.onClose();
+                        }}
+                      />
+                      <Button colorScheme="blue" variant="outline">
+                        <CSVLink
+                          data={csvData}
+                          filename={`ABCWEB_${new Date().toDateString({
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}-${new Date()
+                            .toTimeString()
+                            .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
+                          target="_blank"
+                        >
+                          Export to CSV file
+                        </CSVLink>
+                      </Button>
+                    </HStack>
+                    <HStack w="100%">
+                      <VStack w="75%">
+                        <Box width="100%" height="45vh">
+                          <ReactECharts
+                            notMerge={true}
+                            option={graphOptions}
+                            onEvents={onEvents}
+                            style={{ height: "100%" }}
                           />
-                        </Tooltip>
-                        <Tooltip label={`${sliderVal[1]} mins`} placement="top">
-                          <RangeSliderThumb
-                            borderWidth="7px"
-                            boxSize={3}
-                            index={1}
-                          />
-                        </Tooltip>
-                        <div style={{ marginTop: "10px" }}>
-                          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                            <RangeSliderMark
-                              key={i}
-                              value={(sliderMaxVal / 6) * i}
-                              mt="1"
-                              ml="-2.5"
-                              fontSize="sm"
+                          <RangeSlider
+                            left="5%"
+                            top="10px"
+                            w="90%"
+                            value={sliderVal}
+                            min={0}
+                            max={sliderMaxVal}
+                            step={1}
+                            onChange={(e) => {
+                              setSliderVal([e[0], e[1]]);
+                              let tempArr = [];
+                              for (let j = e[0]; j < e[1]; j++) {
+                                tempArr.push({
+                                  ...fullData[j][numtoGraph],
+                                  index: j,
+                                });
+                              }
+                              setGraph(decideGraph(tempArr));
+                            }}
+                          >
+                            <RangeSliderTrack height="10px" bg="#3ebced">
+                              <RangeSliderFilledTrack bg="#1b75bc" />
+                            </RangeSliderTrack>
+                            <Tooltip
+                              label={`${sliderVal[0]} mins`}
+                              placement="top"
                             >
-                              {Math.round((sliderMaxVal / 6) * i)}
-                            </RangeSliderMark>
-                          ))}
-                        </div>
-                      </RangeSlider>
-                    </Box>
+                              <RangeSliderThumb
+                                borderWidth="7px"
+                                boxSize={3}
+                                index={0}
+                              />
+                            </Tooltip>
+                            <Tooltip
+                              label={`${sliderVal[1]} mins`}
+                              placement="top"
+                            >
+                              <RangeSliderThumb
+                                borderWidth="7px"
+                                boxSize={3}
+                                index={1}
+                              />
+                            </Tooltip>
+                            <div style={{ marginTop: "10px" }}>
+                              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                                <RangeSliderMark
+                                  key={i}
+                                  value={(sliderMaxVal / 6) * i}
+                                  mt="1"
+                                  ml="-2.5"
+                                  fontSize="sm"
+                                >
+                                  {Math.round((sliderMaxVal / 6) * i)}
+                                </RangeSliderMark>
+                              ))}
+                            </div>
+                          </RangeSlider>
+                        </Box>
+                      </VStack>
+                      <VStack w="25%">
+                        <Text fontWeight="bold">
+                          {params[currIndex[0]].condition_name}{" "}
+                          <span style={{ color: "#3ebced", marginLeft: "5px" }}>
+                            {" "}
+                            {currIndex[1]} mins{" "}
+                          </span>
+                        </Text>
+                        <Canvass currentColorArray={currentColorArray} />
+                        <Text>Drag to rotate model.</Text>
+                      </VStack>
+                    </HStack>
                   </VStack>
-                  <VStack w="25%">
-                    <Text fontWeight="bold">
-                      {params[currIndex[0]].condition_name}{" "}
-                      <span style={{ color: "#3ebced", marginLeft: "5px" }}>
-                        {" "}
-                        {currIndex[1]} mins{" "}
-                      </span>
-                    </Text>
-                    <Canvass currentColorArray={currentColorArray} />
-                    <Text>Drag to rotate model.</Text>
-                  </VStack>
-                </HStack>
-              </VStack>
+                </>
+              ) : (
+                <Text>
+                  No simulation run yet. Please input data and{" "}
+                  <span style={{ fontWeight: "bold" }}>Run simulation</span>.
+                </Text>
+              )}
             </VStack>
           </HStack>
         ) : (
@@ -948,13 +972,11 @@ export default function WithSubnavigation() {
                   </Text>
                 </>
               </VStack>
-              <HStack align="center">
+              <HStack align="center" justifyContent="center">
                 <Button
-                  mt="7px"
                   backgroundColor={"#3ebced"}
                   textColor={"white"}
                   colorScheme="blue"
-                  alignSelf="center"
                   onClick={async () => {
                     loadingModal.onOpen();
                     try {
@@ -1036,6 +1058,7 @@ export default function WithSubnavigation() {
                             data.push(tempRow);
                           }
                           setCSVData(data);
+                          setComfortView(false);
                           loadingModal.onClose();
                         });
                     } catch (err) {
@@ -1047,6 +1070,12 @@ export default function WithSubnavigation() {
                 >
                   Run simulation
                 </Button>
+                <Tooltip label="Switch layout of web tool" placement="right">
+                  <IconButton
+                    icon={<ViewIcon />}
+                    onClick={() => setComfortView(false)}
+                  />
+                </Tooltip>
               </HStack>
             </VStack>
           </>
