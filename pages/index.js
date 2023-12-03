@@ -63,6 +63,7 @@ import {
   colorComfort,
   determineColor,
   getCurrentConditionName,
+  convertResultToArrayForCSV,
 } from "@/constants/helperFunctions";
 
 import OptionRenderer from "@/components/optionRenderer";
@@ -81,6 +82,7 @@ import {
   tcoreBuilder,
   tskinBuilder,
 } from "@/components/graphBuilder";
+import CloseButton from "@/components/closeButton";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
@@ -167,7 +169,7 @@ export default function WithSubnavigation() {
     }
   };
 
-  function EditableControls() {
+  function EditableControls({ isHome = false }) {
     const { isEditing, getSubmitButtonProps, getEditButtonProps } =
       useEditableControls();
 
@@ -180,13 +182,33 @@ export default function WithSubnavigation() {
         {...getSubmitButtonProps()}
       />
     ) : (
-      <IconButton
-        backgroundColor={"#3ebced"}
-        textColor={"white"}
-        colorScheme="blue"
-        icon={<EditIcon />}
-        {...getEditButtonProps()}
-      />
+      <>
+        {isHome ? (
+          <HStack justifyContent={"center"} spacing={2}>
+            <IconButton
+              backgroundColor={"#3ebced"}
+              textColor={"white"}
+              colorScheme="blue"
+              icon={<EditIcon />}
+              {...getEditButtonProps()}
+            />
+            <CloseButton
+              params={params}
+              ind={ind}
+              setParams={setParams}
+              setIndex={setIndex}
+            />
+          </HStack>
+        ) : (
+          <IconButton
+            backgroundColor={"#3ebced"}
+            textColor={"white"}
+            colorScheme="blue"
+            icon={<EditIcon />}
+            {...getEditButtonProps()}
+          />
+        )}
+      </>
     );
   }
 
@@ -303,511 +325,732 @@ export default function WithSubnavigation() {
         style={{ width: "100%" }}
         transition={{ enter: { duration: 0.5 } }}
       >
-        <HStack margin="20px" alignItems="flex-start" spacing={5}>
-          <VStack w="30%">
-            <HStack w="100%" padding={2} alignItems="flex-start">
-              <HStack w="90%" overflowY={"scroll"} spacing={3}>
-                {params.map((elem, indx) => {
-                  return (
-                    <Button
-                      key={indx}
-                      minW="110px"
-                      backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
-                      textColor="white"
-                      colorScheme="blue"
-                      onClick={() => {
-                        if (ind == indx) return false;
-                        else setIndex(indx);
-                      }}
-                    >
-                      {params[indx].condition_name.length > 13
-                        ? params[indx].condition_name.substring(0, 13) + "..."
-                        : params[indx].condition_name}
-                    </Button>
-                  );
-                })}
-              </HStack>
-              <IconButton
-                w="5%"
-                colorScheme="blue"
-                backgroundColor={"#3ebced"}
-                textColor={"white"}
-                icon={<AddIcon />}
-                onClick={() => {
-                  setParams([...params, conditionParams(params.length + 1)]);
-                  setIndex(ind + 1);
-                }}
-              ></IconButton>
-            </HStack>
-            <VStack
-              w="100%"
-              backgroundColor="gray.200"
-              borderRadius="10px"
-              padding={5}
-              spacing={1}
-              alignItems="flex-start"
-            >
-              <>
-                <Flex w="100%" alignItems="center">
-                  <Editable
-                    value={params[ind].condition_name}
-                    fontSize="2xl"
-                    fontWeight="bold"
-                    isPreviewFocusable={false}
-                  >
-                    <EditablePreview mr="10px" />
-                    <Input
-                      as={EditableInput}
-                      onChange={(e) => {
-                        let tempParams = [...params];
-                        tempParams[ind].condition_name = e.target.value;
-                        if (e.target.value.length == 0) {
-                          tempParams[ind].condition_name =
-                            "Condition #" + ind.toString();
-                        }
-                        setParams(tempParams);
-                      }}
-                      width="200px"
-                      mr="10px"
-                    />
-                    <EditableControls />
-                  </Editable>
-                  <Spacer />
-                  <IconButton
-                    w="5%"
-                    colorScheme="red"
-                    icon={<CloseIcon />}
-                    isDisabled={params.length == 1}
-                    onClick={() => {
-                      let tempParams = [...params];
-                      tempParams.splice(ind, 1);
-                      setParams(tempParams);
-                      setIndex(Math.max(0, ind - 1));
-                    }}
-                  ></IconButton>
-                </Flex>
-                <HStack w="100%" alignItems="flex-start">
-                  <VStack w="45%" alignItems="flex-start">
-                    {listOfParameters.map((option) => {
-                      return (
-                        <div key={option.title}>
-                          <OptionRenderer
-                            {...{
-                              params: params,
-                              setParams: setParams,
-                              ind: ind,
-                              setIndex: ind,
-                              title: option.title,
-                              icon: option.icon,
-                              unit: option.unit,
-                              val: option.val,
-                              comp: option.comp,
-                              step: option.step,
-                              deltaKey: option.deltaKey,
-                            }}
-                          />
-                        </div>
-                      );
-                    })}
-                  </VStack>
-                  <VStack
-                    pl={0}
-                    w="55%"
-                    alignItems="flex-start"
-                    justifyContent={"center"}
-                  >
-                    <MetSelector
-                      params={params}
-                      setParams={setParams}
-                      setMetIndex={setMetIndex}
-                      metIndex={metIndex}
-                      setMetOptions={setMetOptions}
-                      metOptions={metOptions}
-                      ind={ind}
-                    />
-                    <ClothingSelector
-                      params={params}
-                      setParams={setParams}
-                      clo_correspondence={clo_correspondence}
-                      ind={ind}
-                    />
-                    <Text color="gray.600">
-                      {
-                        clo_correspondence[params[ind].clo_value].whole_body
-                          .iclo
-                      }{" "}
-                      clo -{" "}
-                      <span style={{ fontSize: "13px", color: "gray.600" }}>
-                        {clo_correspondence[params[ind].clo_value].description}
-                      </span>
-                    </Text>
-                    <Menu>
-                      <MenuButton
-                        as={Button}
-                        rightIcon={<ChevronDownIcon />}
-                        w="200px"
-                        backgroundColor={"#3ebced"}
-                        textColor={"white"}
+        {graphOptions ? (
+          <HStack margin="20px" alignItems="flex-start" spacing={5}>
+            <VStack w="30%">
+              <HStack w="100%" padding={2} alignItems="flex-start">
+                <HStack w="90%" overflowY={"scroll"} spacing={3}>
+                  {params.map((elem, indx) => {
+                    return (
+                      <Button
+                        key={indx}
+                        minW="110px"
+                        backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
+                        textColor="white"
                         colorScheme="blue"
+                        onClick={() => {
+                          if (ind == indx) return false;
+                          else setIndex(indx);
+                        }}
                       >
-                        Edit data
-                      </MenuButton>
-                      <MenuList>
-                        {listOfParameters.map((e, ind) => {
-                          if (ind >= 1)
-                            return (
-                              <MenuItem
-                                key={e.key}
-                                onClick={() => {
-                                  setCurrentlyEditing(ind);
-                                  editModal.onOpen();
-                                }}
-                              >
-                                <Text mr={2}>
-                                  Edit{" "}
-                                  <span style={{ fontWeight: "bold" }}>
-                                    {e.key}
-                                  </span>
-                                </Text>
-                                {e.icon}
-                              </MenuItem>
-                            );
-                        })}
-                      </MenuList>
-                    </Menu>
-                  </VStack>
+                        {params[indx].condition_name.length > 13
+                          ? params[indx].condition_name.substring(0, 13) + "..."
+                          : params[indx].condition_name}
+                      </Button>
+                    );
+                  })}
                 </HStack>
-                <Text>
-                  These values are averages. Open the advanced editor to see
-                  your input data more accurately.
-                </Text>
-              </>
-            </VStack>
-            <HStack align="center">
-              <Button
-                mt="7px"
-                backgroundColor={"#3ebced"}
-                textColor={"white"}
-                colorScheme="blue"
-                alignSelf="center"
-                onClick={async () => {
-                  loadingModal.onOpen();
-                  try {
-                    let phases = [];
-                    for (let i = 0; i < params.length; i++) {
-                      phases.push({
-                        exposure_duration: params[i].exposure_duration,
-                        met_activity_name: "Custom-defined Met Activity",
-                        met_activity_value: parseFloat(params[i].met_value),
-                        relative_humidity: params[i].relative_humidity.map(
-                          (x) => {
-                            return x / 100;
-                          }
-                        ),
-                        air_speed: params[i].air_speed,
-                        air_temperature: params[i].air_temperature,
-                        radiant_temperature: params[i].radiant_temperature,
-                        clo_ensemble_name:
-                          clo_correspondence[parseInt(params[i].clo_value)]
-                            .ensemble_name,
-                      });
-                    }
-                    const metrics = await axios
-                      .post("/api/process", {
-                        // Chaining of data is intentional
-                        phases,
-                      })
-                      .then((res) => {
-                        let tempArr = [];
-                        for (let j = 0; j < res.data.length; j++) {
-                          tempArr.push({
-                            ...res.data[j][numtoGraph],
-                            index: j,
-                          });
-                        }
-                        setData(tempArr);
-                        setFullData(res.data);
-                        setCache(params.slice());
-                        setGraph(decideGraph(tempArr));
-
-                        let totalDuration = 0;
-                        for (let i = 0; i < params.length; i++) {
-                          totalDuration += params[i].exposure_duration;
-                        }
-                        setSliderMaxVal(totalDuration);
-                        setSliderVal([0, totalDuration]);
-
-                        let colorsArr = [];
-                        for (let time = 0; time < res.data.length; time++) {
-                          let bodyPartsArr = [];
-                          for (let i = 0; i <= 17; i++) {
-                            bodyPartsArr.push(
-                              determineColor([
-                                res.data[time][places[i]].comfort,
-                                res.data[time][places[i]].sensation,
-                              ])
-                            );
-                          }
-                          colorsArr.push(bodyPartsArr);
-                        }
-                        setBodyColors(colorsArr);
-                        setCurrentColorArray(Array(18).fill("white"));
-                        let data = [];
-                        data.push(csvHeaderLine);
-                        for (let time = 0; time < res.data.length; time++) {
-                          let tempRow = [time];
-                          const {
-                            ta,
-                            mrt,
-                            rh,
-                            v,
-                            solar,
-                            clo,
-                            met,
-                            comfort,
-                            comfort_weighted,
-                            sensation,
-                            sensation_linear,
-                            sensation_weighted,
-                            tskin,
-                            tblood,
-                            tneutral,
-                            pmv,
-                            ppd,
-                            eht,
-                            q_met,
-                            q_conv,
-                            q_rad,
-                            q_solar,
-                            q_resp,
-                            q_sweat,
-                          } = res.data[time][0];
-                          tempRow.push(
-                            ta,
-                            mrt,
-                            rh,
-                            v,
-                            solar,
-                            clo,
-                            met,
-                            comfort,
-                            comfort_weighted,
-                            sensation,
-                            sensation_linear,
-                            sensation_weighted,
-                            tskin,
-                            tblood,
-                            tneutral,
-                            pmv,
-                            ppd,
-                            eht,
-                            q_met,
-                            q_conv,
-                            q_rad,
-                            q_solar,
-                            q_resp,
-                            q_sweat
-                          );
-                          for (let i = 0; i < signals.length; i++) {
-                            for (let j = 1; j < res.data[time].length; j++) {
-                              tempRow.push(
-                                res.data[time][j][signals[i].slice(0, -1)]
-                              );
-                            }
-                          }
-                          data.push(tempRow);
-                        }
-                        setCSVData(data);
-                        loadingModal.onClose();
-                      });
-                  } catch (err) {
-                    loadingModal.onClose();
-                    alert("An error has occurred. Please try again.");
-                    console.log(err);
-                  }
-                }}
-                isDisabled={params.some((elem) => !elem.met_value)}
+                <IconButton
+                  w="5%"
+                  colorScheme="blue"
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  icon={<AddIcon />}
+                  onClick={() => {
+                    setParams([...params, conditionParams(params.length + 1)]);
+                    setIndex(ind + 1);
+                  }}
+                ></IconButton>
+              </HStack>
+              <VStack
+                w="100%"
+                borderColor="#1b75bc"
+                borderWidth="1px"
+                borderRadius="10px"
+                padding={5}
+                spacing={1}
+                alignItems="flex-start"
               >
-                Run simulation
-              </Button>
-            </HStack>
-          </VStack>
-
-          <VStack w="70%">
-            {graphOptions ? (
-              <>
-                <VStack
-                  alignSelf="center"
-                  backgroundColor="gray.200"
-                  padding={5}
-                  spacing={8}
-                  w="100%"
-                  borderRadius="10px"
-                >
-                  <HStack>
-                    <RSelect
-                      className="basic-single"
-                      classNamePrefix="select"
-                      defaultValue={graphsVals[numtoGraph]}
-                      isSearchable={true}
-                      isClearable={false}
-                      options={graphsVals}
-                      instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          width: "20vw",
-                        }),
+                <>
+                  <Flex w="100%" alignItems="center">
+                    <Editable
+                      value={params[ind].condition_name}
+                      fontSize="2xl"
+                      fontWeight="bold"
+                      isPreviewFocusable={false}
+                    >
+                      <EditablePreview mr="10px" />
+                      <Input
+                        as={EditableInput}
+                        onChange={(e) => {
+                          let tempParams = [...params];
+                          tempParams[ind].condition_name = e.target.value;
+                          if (e.target.value.length == 0) {
+                            tempParams[ind].condition_name =
+                              "Condition #" + ind.toString();
+                          }
+                          setParams(tempParams);
+                        }}
+                        width="200px"
+                        mr="10px"
+                      />
+                      <EditableControls />
+                    </Editable>
+                    <Spacer />
+                    <IconButton
+                      w="5%"
+                      colorScheme="red"
+                      icon={<CloseIcon />}
+                      isDisabled={params.length == 1}
+                      onClick={() => {
+                        let tempParams = [...params];
+                        tempParams.splice(ind, 1);
+                        setParams(tempParams);
+                        setIndex(Math.max(0, ind - 1));
                       }}
-                      placeholder="Input body part to graph."
-                      onChange={(val) => {
-                        loadingModal.onOpen();
-                        setNumToGraph(val.value);
-                        let changedArr = [];
-                        for (let j = 0; j < fullData.length; j++) {
-                          changedArr.push({
-                            ...fullData[j][val.value],
-                            index: j,
-                          });
-                        }
-                        setData(changedArr);
-                        setGraph(decideGraph(changedArr));
-                        loadingModal.onClose();
-                      }}
-                    />
-                    <RSelect
-                      className="basic-single"
-                      classNamePrefix="select"
-                      defaultValue={"comfort"}
-                      isSearchable={true}
-                      isClearable={false}
-                      options={modes}
-                      instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          width: "20vw",
-                        }),
-                      }}
-                      placeholder="Select regimen to plot."
-                      onChange={(val) => {
-                        loadingModal.onOpen();
-                        setCurrentChoiceToGraph(val.value);
-                        setGraph(
-                          decideGraph(
-                            graphData.slice(sliderVal[0], sliderVal[1]),
-                            val.value
-                          )
-                        );
-                        loadingModal.onClose();
-                      }}
-                    />
-                    <Button colorScheme="blue" variant="outline">
-                      <CSVLink
-                        data={csvData}
-                        filename={`ABCWEB_${new Date().toDateString({
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}-${new Date()
-                          .toTimeString()
-                          .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
-                        target="_blank"
-                      >
-                        Export to CSV file
-                      </CSVLink>
-                    </Button>
-                  </HStack>
-                  <HStack w="100%">
-                    <VStack w="75%">
-                      <Box width="100%" height="45vh">
-                        <ReactECharts
-                          notMerge={true}
-                          option={graphOptions}
-                          onEvents={onEvents}
-                          style={{ height: "100%" }}
-                        />
-                        <RangeSlider
-                          left="5%"
-                          top="10px"
-                          w="90%"
-                          value={sliderVal}
-                          min={0}
-                          max={sliderMaxVal}
-                          step={1}
-                          onChange={(e) => {
-                            setSliderVal([e[0], e[1]]);
-                            let tempArr = [];
-                            for (let j = e[0]; j < e[1]; j++) {
-                              tempArr.push({
-                                ...fullData[j][numtoGraph],
-                                index: j,
-                              });
-                            }
-                            setGraph(decideGraph(tempArr));
-                          }}
-                        >
-                          <RangeSliderTrack height="10px" bg="#3ebced">
-                            <RangeSliderFilledTrack bg="#1b75bc" />
-                          </RangeSliderTrack>
-                          <Tooltip
-                            label={`${sliderVal[0]} mins`}
-                            placement="top"
-                          >
-                            <RangeSliderThumb
-                              borderWidth="7px"
-                              boxSize={3}
-                              index={0}
+                    ></IconButton>
+                  </Flex>
+                  <HStack w="100%" alignItems="flex-start">
+                    <VStack w="45%" alignItems="flex-start">
+                      {listOfParameters.map((option) => {
+                        return (
+                          <div key={option.title}>
+                            <OptionRenderer
+                              {...{
+                                params: params,
+                                setParams: setParams,
+                                ind: ind,
+                                setIndex: ind,
+                                title: option.title,
+                                icon: option.icon,
+                                unit: option.unit,
+                                val: option.val,
+                                comp: option.comp,
+                                step: option.step,
+                                deltaKey: option.deltaKey,
+                              }}
                             />
-                          </Tooltip>
-                          <Tooltip
-                            label={`${sliderVal[1]} mins`}
-                            placement="top"
-                          >
-                            <RangeSliderThumb
-                              borderWidth="7px"
-                              boxSize={3}
-                              index={1}
-                            />
-                          </Tooltip>
-                          <div style={{ marginTop: "10px" }}>
-                            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                              <RangeSliderMark
-                                key={i}
-                                value={(sliderMaxVal / 6) * i}
-                                mt="1"
-                                ml="-2.5"
-                                fontSize="sm"
-                              >
-                                {Math.round((sliderMaxVal / 6) * i)}
-                              </RangeSliderMark>
-                            ))}
                           </div>
-                        </RangeSlider>
-                      </Box>
+                        );
+                      })}
                     </VStack>
-                    <VStack w="25%">
-                      <Text fontWeight="bold">
-                        {params[currIndex[0]].condition_name}{" "}
-                        <span style={{ color: "#3ebced", marginLeft: "5px" }}>
-                          {" "}
-                          {currIndex[1]} mins{" "}
+                    <VStack
+                      pl={0}
+                      w="55%"
+                      alignItems="flex-start"
+                      justifyContent={"center"}
+                    >
+                      <MetSelector
+                        params={params}
+                        setParams={setParams}
+                        setMetIndex={setMetIndex}
+                        metIndex={metIndex}
+                        setMetOptions={setMetOptions}
+                        metOptions={metOptions}
+                        ind={ind}
+                      />
+                      <ClothingSelector
+                        params={params}
+                        setParams={setParams}
+                        clo_correspondence={clo_correspondence}
+                        ind={ind}
+                      />
+                      <Text color="gray.600">
+                        {
+                          clo_correspondence[params[ind].clo_value].whole_body
+                            .iclo
+                        }{" "}
+                        clo -{" "}
+                        <span style={{ fontSize: "13px", color: "gray.600" }}>
+                          {
+                            clo_correspondence[params[ind].clo_value]
+                              .description
+                          }
                         </span>
                       </Text>
-                      <Canvass currentColorArray={currentColorArray} />
-                      <Text>Drag to rotate model.</Text>
+                      <Menu>
+                        <MenuButton
+                          as={Button}
+                          rightIcon={<ChevronDownIcon />}
+                          w="200px"
+                          backgroundColor={"#3ebced"}
+                          textColor={"white"}
+                          colorScheme="blue"
+                        >
+                          Edit data
+                        </MenuButton>
+                        <MenuList>
+                          {listOfParameters.map((e, ind) => {
+                            if (ind >= 1)
+                              return (
+                                <MenuItem
+                                  key={e.key}
+                                  onClick={() => {
+                                    setCurrentlyEditing(ind);
+                                    editModal.onOpen();
+                                  }}
+                                >
+                                  <Text mr={2}>
+                                    Edit{" "}
+                                    <span style={{ fontWeight: "bold" }}>
+                                      {e.key}
+                                    </span>
+                                  </Text>
+                                  {e.icon}
+                                </MenuItem>
+                              );
+                          })}
+                        </MenuList>
+                      </Menu>
                     </VStack>
                   </HStack>
-                </VStack>
-              </>
-            ) : (
-              <Text>
-                No simulation run yet. Please input data and{" "}
-                <span style={{ fontWeight: "bold" }}>Run simulation</span>.
-              </Text>
-            )}
-          </VStack>
-        </HStack>
+                  <Text>
+                    These values are averages. Open the advanced editor to see
+                    your input data more accurately.
+                  </Text>
+                </>
+              </VStack>
+              <HStack align="center">
+                <Button
+                  mt="7px"
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick={async () => {
+                    loadingModal.onOpen();
+                    try {
+                      let phases = [];
+                      for (let i = 0; i < params.length; i++) {
+                        phases.push({
+                          exposure_duration: params[i].exposure_duration,
+                          met_activity_name: "Custom-defined Met Activity",
+                          met_activity_value: parseFloat(params[i].met_value),
+                          relative_humidity: params[i].relative_humidity.map(
+                            function (x) {
+                              return parseFloat(x) / 100;
+                            }
+                          ),
+                          air_speed: params[i].air_speed.map(Number),
+                          air_temperature:
+                            params[i].air_temperature.map(Number),
+                          radiant_temperature:
+                            params[i].radiant_temperature.map(Number),
+                          clo_ensemble_name:
+                            clo_correspondence[parseInt(params[i].clo_value)]
+                              .ensemble_name,
+                        });
+                      }
+                      const metrics = await axios
+                        .post("/api/process", {
+                          // Chaining of data is intentional
+                          phases,
+                        })
+                        .then((res) => {
+                          let tempArr = [];
+                          for (let j = 0; j < res.data.length; j++) {
+                            tempArr.push({
+                              ...res.data[j][numtoGraph],
+                              index: j,
+                            });
+                          }
+                          setData(tempArr);
+                          setFullData(res.data);
+                          setCache(params.slice());
+                          setGraph(decideGraph(tempArr));
+
+                          let totalDuration = 0;
+                          for (let i = 0; i < params.length; i++) {
+                            totalDuration += params[i].exposure_duration;
+                          }
+                          setSliderMaxVal(totalDuration);
+                          setSliderVal([0, totalDuration]);
+
+                          let colorsArr = [];
+                          for (let time = 0; time < res.data.length; time++) {
+                            let bodyPartsArr = [];
+                            for (let i = 0; i <= 17; i++) {
+                              bodyPartsArr.push(
+                                determineColor([
+                                  res.data[time][places[i]].comfort,
+                                  res.data[time][places[i]].sensation,
+                                ])
+                              );
+                            }
+                            colorsArr.push(bodyPartsArr);
+                          }
+                          setBodyColors(colorsArr);
+                          setCurrentColorArray(Array(18).fill("white"));
+                          let data = [];
+                          data.push(csvHeaderLine);
+                          for (let time = 0; time < res.data.length; time++) {
+                            let tempRow = [time];
+                            tempRow.push(
+                              ...convertResultToArrayForCSV(res.data[time][0])
+                            );
+                            for (let i = 0; i < signals.length; i++) {
+                              for (let j = 1; j < res.data[time].length; j++) {
+                                tempRow.push(
+                                  res.data[time][j][signals[i].slice(0, -1)]
+                                );
+                              }
+                            }
+                            data.push(tempRow);
+                          }
+                          setCSVData(data);
+                          loadingModal.onClose();
+                        });
+                    } catch (err) {
+                      loadingModal.onClose();
+                      alert("An error has occurred. Please try again.");
+                      console.log(err);
+                    }
+                  }}
+                >
+                  Run simulation
+                </Button>
+              </HStack>
+            </VStack>
+
+            <VStack w="70%">
+              <VStack
+                alignSelf="center"
+                borderColor="#1b75bc"
+                borderWidth="1px"
+                padding={5}
+                spacing={8}
+                w="100%"
+                borderRadius="10px"
+              >
+                <HStack>
+                  <RSelect
+                    className="basic-single"
+                    classNamePrefix="select"
+                    defaultValue={graphsVals[numtoGraph]}
+                    isSearchable={true}
+                    isClearable={false}
+                    options={graphsVals}
+                    instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        width: "20vw",
+                      }),
+                    }}
+                    placeholder="Input body part to graph."
+                    onChange={(val) => {
+                      loadingModal.onOpen();
+                      setNumToGraph(val.value);
+                      let changedArr = [];
+                      for (let j = 0; j < fullData.length; j++) {
+                        changedArr.push({
+                          ...fullData[j][val.value],
+                          index: j,
+                        });
+                      }
+                      setData(changedArr);
+                      setGraph(decideGraph(changedArr));
+                      loadingModal.onClose();
+                    }}
+                  />
+                  <RSelect
+                    className="basic-single"
+                    classNamePrefix="select"
+                    defaultValue={"comfort"}
+                    isSearchable={true}
+                    isClearable={false}
+                    options={modes}
+                    instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        width: "20vw",
+                      }),
+                    }}
+                    placeholder="Select regimen to plot."
+                    onChange={(val) => {
+                      loadingModal.onOpen();
+                      setCurrentChoiceToGraph(val.value);
+                      setGraph(
+                        decideGraph(
+                          graphData.slice(sliderVal[0], sliderVal[1]),
+                          val.value
+                        )
+                      );
+                      loadingModal.onClose();
+                    }}
+                  />
+                  <Button colorScheme="blue" variant="outline">
+                    <CSVLink
+                      data={csvData}
+                      filename={`ABCWEB_${new Date().toDateString({
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}-${new Date()
+                        .toTimeString()
+                        .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
+                      target="_blank"
+                    >
+                      Export to CSV file
+                    </CSVLink>
+                  </Button>
+                </HStack>
+                <HStack w="100%">
+                  <VStack w="75%">
+                    <Box width="100%" height="45vh">
+                      <ReactECharts
+                        notMerge={true}
+                        option={graphOptions}
+                        onEvents={onEvents}
+                        style={{ height: "100%" }}
+                      />
+                      <RangeSlider
+                        left="5%"
+                        top="10px"
+                        w="90%"
+                        value={sliderVal}
+                        min={0}
+                        max={sliderMaxVal}
+                        step={1}
+                        onChange={(e) => {
+                          setSliderVal([e[0], e[1]]);
+                          let tempArr = [];
+                          for (let j = e[0]; j < e[1]; j++) {
+                            tempArr.push({
+                              ...fullData[j][numtoGraph],
+                              index: j,
+                            });
+                          }
+                          setGraph(decideGraph(tempArr));
+                        }}
+                      >
+                        <RangeSliderTrack height="10px" bg="#3ebced">
+                          <RangeSliderFilledTrack bg="#1b75bc" />
+                        </RangeSliderTrack>
+                        <Tooltip label={`${sliderVal[0]} mins`} placement="top">
+                          <RangeSliderThumb
+                            borderWidth="7px"
+                            boxSize={3}
+                            index={0}
+                          />
+                        </Tooltip>
+                        <Tooltip label={`${sliderVal[1]} mins`} placement="top">
+                          <RangeSliderThumb
+                            borderWidth="7px"
+                            boxSize={3}
+                            index={1}
+                          />
+                        </Tooltip>
+                        <div style={{ marginTop: "10px" }}>
+                          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                            <RangeSliderMark
+                              key={i}
+                              value={(sliderMaxVal / 6) * i}
+                              mt="1"
+                              ml="-2.5"
+                              fontSize="sm"
+                            >
+                              {Math.round((sliderMaxVal / 6) * i)}
+                            </RangeSliderMark>
+                          ))}
+                        </div>
+                      </RangeSlider>
+                    </Box>
+                  </VStack>
+                  <VStack w="25%">
+                    <Text fontWeight="bold">
+                      {params[currIndex[0]].condition_name}{" "}
+                      <span style={{ color: "#3ebced", marginLeft: "5px" }}>
+                        {" "}
+                        {currIndex[1]} mins{" "}
+                      </span>
+                    </Text>
+                    <Canvass currentColorArray={currentColorArray} />
+                    <Text>Drag to rotate model.</Text>
+                  </VStack>
+                </HStack>
+              </VStack>
+            </VStack>
+          </HStack>
+        ) : (
+          <>
+            <VStack w="100%" margin="20px">
+              <HStack padding={2} alignItems="flex-start">
+                <HStack w="100%" overflowY={"scroll"} spacing={3}>
+                  {params.map((elem, indx) => {
+                    return (
+                      <Button
+                        key={indx}
+                        minW="110px"
+                        backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
+                        textColor="white"
+                        colorScheme="blue"
+                        onClick={() => {
+                          if (ind == indx) return false;
+                          else setIndex(indx);
+                        }}
+                      >
+                        {params[indx].condition_name.length > 13
+                          ? params[indx].condition_name.substring(0, 13) + "..."
+                          : params[indx].condition_name}
+                      </Button>
+                    );
+                  })}
+                </HStack>
+                <IconButton
+                  w="5%"
+                  colorScheme="blue"
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  icon={<AddIcon />}
+                  onClick={() => {
+                    setParams([...params, conditionParams(params.length + 1)]);
+                    setIndex(ind + 1);
+                  }}
+                ></IconButton>
+              </HStack>
+              <VStack
+                minW="60%"
+                borderColor="#1b75bc"
+                borderWidth="3px"
+                borderRadius="10px"
+                padding={5}
+                spacing={1}
+                alignItems="flex-start"
+              >
+                <>
+                  <Flex w="100%" alignItems="center" justifyContent="center">
+                    <Editable
+                      value={params[ind].condition_name}
+                      fontSize="2xl"
+                      fontWeight="bold"
+                      isPreviewFocusable={false}
+                    >
+                      <EditablePreview mr="10px" />
+                      <Input
+                        as={EditableInput}
+                        onChange={(e) => {
+                          let tempParams = [...params];
+                          tempParams[ind].condition_name = e.target.value;
+                          if (e.target.value.length == 0) {
+                            tempParams[ind].condition_name =
+                              "Condition #" + ind.toString();
+                          }
+                          setParams(tempParams);
+                        }}
+                        width="200px"
+                        mr="10px"
+                      />
+                      <EditableControls isHome />
+                    </Editable>
+                  </Flex>
+                  <HStack w="100%" alignItems="center">
+                    <VStack w="50%" alignItems="center">
+                      {listOfParameters.map((option) => {
+                        return (
+                          <div key={option.title}>
+                            <OptionRenderer
+                              {...{
+                                params: params,
+                                setParams: setParams,
+                                ind: ind,
+                                setIndex: ind,
+                                title: option.fullTitle,
+                                icon: option.icon,
+                                unit: option.fullUnit,
+                                val: option.val,
+                                comp: option.comp,
+                                step: option.step,
+                                deltaKey: option.deltaKey,
+                                isHome: true,
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </VStack>
+                    <VStack
+                      pl={0}
+                      w="50%"
+                      alignItems="center"
+                      justifyContent={"center"}
+                    >
+                      <MetSelector
+                        params={params}
+                        setParams={setParams}
+                        setMetIndex={setMetIndex}
+                        metIndex={metIndex}
+                        setMetOptions={setMetOptions}
+                        metOptions={metOptions}
+                        ind={ind}
+                        isHome
+                      />
+                      <ClothingSelector
+                        params={params}
+                        setParams={setParams}
+                        clo_correspondence={clo_correspondence}
+                        ind={ind}
+                        isHome
+                      />
+                      <Text color="gray.600">
+                        {
+                          clo_correspondence[params[ind].clo_value].whole_body
+                            .iclo
+                        }{" "}
+                        clo -{" "}
+                        <span style={{ fontSize: "13px", color: "gray.600" }}>
+                          {
+                            clo_correspondence[params[ind].clo_value]
+                              .description
+                          }
+                        </span>
+                      </Text>
+                      <Menu>
+                        <MenuButton
+                          as={Button}
+                          rightIcon={<ChevronDownIcon />}
+                          w="60%"
+                          backgroundColor={"#3ebced"}
+                          textColor={"white"}
+                          colorScheme="blue"
+                        >
+                          Edit variable data
+                        </MenuButton>
+                        <MenuList>
+                          {listOfParameters.map((e, ind) => {
+                            if (ind >= 1)
+                              return (
+                                <MenuItem
+                                  key={e.key}
+                                  onClick={() => {
+                                    setCurrentlyEditing(ind);
+                                    editModal.onOpen();
+                                  }}
+                                >
+                                  <Text mr={2}>
+                                    Edit{" "}
+                                    <span style={{ fontWeight: "bold" }}>
+                                      {e.key}
+                                    </span>
+                                  </Text>
+                                  {e.icon}
+                                </MenuItem>
+                              );
+                          })}
+                        </MenuList>
+                      </Menu>
+                    </VStack>
+                  </HStack>
+                  <Text textAlign="center" w="100%">
+                    These values are averages. Open the advanced editor to see
+                    your input data more accurately.
+                  </Text>
+                </>
+              </VStack>
+              <HStack align="center">
+                <Button
+                  mt="7px"
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick={async () => {
+                    loadingModal.onOpen();
+                    try {
+                      let phases = [];
+                      for (let i = 0; i < params.length; i++) {
+                        phases.push({
+                          exposure_duration: params[i].exposure_duration,
+                          met_activity_name: "Custom-defined Met Activity",
+                          met_activity_value: parseFloat(params[i].met_value),
+                          relative_humidity: params[i].relative_humidity.map(
+                            function (x) {
+                              return parseFloat(x) / 100;
+                            }
+                          ),
+                          air_speed: params[i].air_speed.map(Number),
+                          air_temperature:
+                            params[i].air_temperature.map(Number),
+                          radiant_temperature:
+                            params[i].radiant_temperature.map(Number),
+                          clo_ensemble_name:
+                            clo_correspondence[parseInt(params[i].clo_value)]
+                              .ensemble_name,
+                        });
+                      }
+                      const metrics = await axios
+                        .post("/api/process", {
+                          // Chaining of data is intentional
+                          phases,
+                        })
+                        .then((res) => {
+                          let tempArr = [];
+                          for (let j = 0; j < res.data.length; j++) {
+                            tempArr.push({
+                              ...res.data[j][numtoGraph],
+                              index: j,
+                            });
+                          }
+                          setData(tempArr);
+                          setFullData(res.data);
+                          setCache(params.slice());
+                          setGraph(decideGraph(tempArr));
+
+                          let totalDuration = 0;
+                          for (let i = 0; i < params.length; i++) {
+                            totalDuration += params[i].exposure_duration;
+                          }
+                          setSliderMaxVal(totalDuration);
+                          setSliderVal([0, totalDuration]);
+
+                          let colorsArr = [];
+                          for (let time = 0; time < res.data.length; time++) {
+                            let bodyPartsArr = [];
+                            for (let i = 0; i <= 17; i++) {
+                              bodyPartsArr.push(
+                                determineColor([
+                                  res.data[time][places[i]].comfort,
+                                  res.data[time][places[i]].sensation,
+                                ])
+                              );
+                            }
+                            colorsArr.push(bodyPartsArr);
+                          }
+                          setBodyColors(colorsArr);
+                          setCurrentColorArray(Array(18).fill("white"));
+                          let data = [];
+                          data.push(csvHeaderLine);
+                          for (let time = 0; time < res.data.length; time++) {
+                            let tempRow = [time];
+                            tempRow.push(
+                              ...convertResultToArrayForCSV(res.data[time][0])
+                            );
+                            for (let i = 0; i < signals.length; i++) {
+                              for (let j = 1; j < res.data[time].length; j++) {
+                                tempRow.push(
+                                  res.data[time][j][signals[i].slice(0, -1)]
+                                );
+                              }
+                            }
+                            data.push(tempRow);
+                          }
+                          setCSVData(data);
+                          loadingModal.onClose();
+                        });
+                    } catch (err) {
+                      loadingModal.onClose();
+                      alert("An error has occurred. Please try again.");
+                      console.log(err);
+                    }
+                  }}
+                >
+                  Run simulation
+                </Button>
+              </HStack>
+            </VStack>
+          </>
+        )}
       </Fade>
     </Box>
   );

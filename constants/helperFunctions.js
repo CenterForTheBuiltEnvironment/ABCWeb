@@ -85,6 +85,60 @@ export const colorComfort = (comfort) => {
   else if (comfort >= -1 && comfort <= 1) return "gray";
   else return "white";
 };
+export const convertResultToArrayForCSV = (result) => {
+  const {
+    ta,
+    mrt,
+    rh,
+    v,
+    solar,
+    clo,
+    met,
+    comfort,
+    comfort_weighted,
+    sensation,
+    sensation_linear,
+    sensation_weighted,
+    tskin,
+    tblood,
+    tneutral,
+    pmv,
+    ppd,
+    eht,
+    q_met,
+    q_conv,
+    q_rad,
+    q_solar,
+    q_resp,
+    q_sweat,
+  } = result;
+  return [
+    ta,
+    mrt,
+    rh,
+    v,
+    solar,
+    clo,
+    met,
+    comfort,
+    comfort_weighted,
+    sensation,
+    sensation_linear,
+    sensation_weighted,
+    tskin,
+    tblood,
+    tneutral,
+    pmv,
+    ppd,
+    eht,
+    q_met,
+    q_conv,
+    q_rad,
+    q_solar,
+    q_resp,
+    q_sweat,
+  ];
+};
 
 // for human body model color-rendering
 export const determineColor = (cs) => {

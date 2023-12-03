@@ -5,13 +5,14 @@ export default function ClothingSelector({
   setParams,
   clo_correspondence,
   ind,
+  isHome = false,
 }) {
   return (
     <>
       <Text fontWeight="black">Clothing level</Text>
       <Select
         backgroundColor="white"
-        w="200px"
+        w={isHome ? "250px" : "200px"}
         onChange={(e) => {
           let newState = [...params];
           newState[ind].clo_value = e.target.value.toString();

@@ -68,7 +68,7 @@ export default function EditModal({
               onChange={(e) => {
                 let newState = [...params];
                 newState[ind][listOfParameters[currentlyEditing].tempKey] =
-                  parseFloat(e);
+                  e.toString();
                 setParams(newState);
               }}
               min={0}
@@ -88,15 +88,17 @@ export default function EditModal({
               allowMouseWheel
               backgroundColor="white"
               textAlign="right"
-              value={params[ind][listOfParameters[currentlyEditing].deltaKey]}
+              defaultValue={
+                params[ind][listOfParameters[currentlyEditing].deltaKey]
+              }
               onChange={(e) => {
                 let newState = [...params];
                 newState[ind][listOfParameters[currentlyEditing].deltaKey] =
-                  parseFloat(e);
+                  e.toString();
                 setParams(newState);
               }}
-              min={-100}
-              max={100}
+              // min={-100}
+              // max={100}
               step={1}
             >
               <NumberInputField />
@@ -105,31 +107,39 @@ export default function EditModal({
                 <NumberDecrementStepper />
               </NumberInputStepper>
             </NumberInput>
-            <Text>% delta</Text>
+            <Text>Δ delta</Text>
             <Button
               colorScheme="blue"
               onClick={() => {
                 let newState = [...params];
                 newState[ind][listOfParameters[currentlyEditing].val] = Array(
                   16
-                ).fill(params[ind][listOfParameters[currentlyEditing].tempKey]);
+                ).fill(
+                  params[ind][
+                    listOfParameters[currentlyEditing].tempKey
+                  ].toString()
+                );
                 setParams(newState);
               }}
             >
               Apply to all
             </Button>
+            <Text>OR</Text>
             <Button
               onClick={() => {
                 let newState = [...params],
                   newArray = [];
                 for (let i = 0; i < 16; i++) {
                   newArray.push(
-                    params[ind][listOfParameters[currentlyEditing].tempKey] +
-                      (params[ind][
-                        listOfParameters[currentlyEditing].deltaKey
-                      ] /
-                        100) *
+                    (
+                      parseFloat(
+                        params[ind][listOfParameters[currentlyEditing].tempKey]
+                      ) +
+                      parseFloat(
+                        params[ind][listOfParameters[currentlyEditing].deltaKey]
+                      ) *
                         (1 - graphsVals[i + 1].stand)
+                    ).toString()
                   );
                 }
                 newState[ind][listOfParameters[currentlyEditing].val] =
@@ -145,12 +155,15 @@ export default function EditModal({
                   newArray = [];
                 for (let i = 0; i < 16; i++) {
                   newArray.push(
-                    params[ind][listOfParameters[currentlyEditing].tempKey] +
-                      (params[ind][
-                        listOfParameters[currentlyEditing].deltaKey
-                      ] /
-                        100) *
+                    (
+                      parseFloat(
+                        params[ind][listOfParameters[currentlyEditing].tempKey]
+                      ) +
+                      parseFloat(
+                        params[ind][listOfParameters[currentlyEditing].deltaKey]
+                      ) *
                         (1 - graphsVals[i + 1].sit)
+                    ).toString()
                   );
                 }
                 newState[ind][listOfParameters[currentlyEditing].val] =
@@ -201,7 +214,7 @@ export default function EditModal({
                           let newState = [...params];
                           newState[ind][listOfParameters[currentlyEditing].val][
                             indx
-                          ] = parseFloat(e);
+                          ] = e.toString();
                           setParams(newState);
                         }}
                         min={0}
@@ -238,7 +251,7 @@ export default function EditModal({
                           let newState = [...params];
                           newState[ind][listOfParameters[currentlyEditing].val][
                             indx
-                          ] = parseFloat(e);
+                          ] = e.toString();
                           setParams(newState);
                         }}
                         min={0}

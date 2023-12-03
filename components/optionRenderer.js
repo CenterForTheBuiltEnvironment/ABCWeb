@@ -4,6 +4,7 @@ import {
   InputGroup,
   InputLeftElement,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 
 export default function OptionRenderer({
@@ -16,20 +17,22 @@ export default function OptionRenderer({
   params,
   setParams,
   ind,
+  isHome = false,
 }) {
   return (
-    <>
-      <Text fontWeight="black" mb="10px">
+    <VStack>
+      <Text fontWeight="black" w="100%" textAlign={isHome ? "center" : ""}>
         {title}
       </Text>
       {val != "exposure_duration" ? (
         <>
-          <HStack width="100%">
+          <HStack width="100%" justify={isHome ? "center" : ""}>
             {icon}
             <Text>
               {(
-                params[ind][val].reduce((a, b) => a + b) /
-                params[ind][val].length
+                params[ind][val].reduce(
+                  (a, b) => parseFloat(a) + parseFloat(b)
+                ) / params[ind][val].length
               ).toFixed(1)}
 
               {unit}
@@ -40,8 +43,8 @@ export default function OptionRenderer({
         <></>
       )}
       {val == "exposure_duration" ? (
-        <HStack>
-          <InputGroup w="7vw">
+        <HStack w="100%" justify={isHome ? "center" : ""}>
+          <InputGroup w="8vw">
             <InputLeftElement>{icon}</InputLeftElement>
             <Input
               backgroundColor="white"
@@ -64,6 +67,6 @@ export default function OptionRenderer({
       ) : (
         <></>
       )}
-    </>
+    </VStack>
   );
 }

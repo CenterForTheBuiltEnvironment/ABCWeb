@@ -9,6 +9,7 @@ export default function MetSelector({
   setMetOptions,
   metOptions,
   ind,
+  isHome = false,
 }) {
   return (
     <>
@@ -18,7 +19,7 @@ export default function MetSelector({
         styles={{
           control: (baseStyles, state) => ({
             ...baseStyles,
-            width: "200px",
+            width: isHome ? "250px" : "200px",
           }),
         }}
         isClearable
