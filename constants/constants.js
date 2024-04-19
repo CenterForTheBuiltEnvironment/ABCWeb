@@ -123,6 +123,7 @@ export const conditionParams = (num) => {
   return {
     condition_name: "Condition #" + num.toString(),
     exposure_duration: 60,
+    ramp: false,
     air_temperature: Array(16).fill("25"),
     radiant_temperature: Array(16).fill("25"),
     air_speed: Array(16).fill("0.1"),
