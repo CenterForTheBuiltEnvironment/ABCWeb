@@ -31,6 +31,13 @@ import {
   RangeSliderThumb,
   RangeSliderMark,
   Tooltip,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import RSelect from "react-select";
 import {
@@ -71,6 +78,7 @@ import {
 import OptionRenderer from "@/components/optionRenderer";
 import Canvass from "@/components/model";
 import EditModal from "@/components/editModal";
+import UploadModal from "@/components/uploadParam";
 import Spinner from "@/components/spinner";
 import ClothingSelector from "@/components/clothingSelector";
 import MetSelector from "@/components/metSelector";
@@ -96,12 +104,12 @@ export default function WithSubnavigation() {
   const [fullData, setFullData] = useState([]);
   const [ind, setIndex] = useState(0);
   const [currIndex, setCurrIndex] = useState([0, 0]);
-  // const [ramp, setRamp] = useState([false]);
   const [metOptions, setMetOptions] = useState(met_auto);
   const [graphOptions, setGraph] = useState();
   const [graphData, setData] = useState([]);
   const loadingModal = useDisclosure();
   const editModal = useDisclosure();
+  const uploadModal = useDisclosure();
   const [bodyColors, setBodyColors] = useState([]);
   const [currentColorArray, setCurrentColorArray] = useState(
     Array(18).fill("white")
@@ -256,7 +264,14 @@ export default function WithSubnavigation() {
         params={params}
         ind={ind}
         setParams={setParams}
-        //setRamp={setRamp}
+      />
+      <UploadModal
+        disclosure = {uploadModal}
+        params = {params}
+        ind = {ind}
+        setParams = {setParams}
+        conditionParams = {conditionParams}
+        toast = {toast}
       />
       <Spinner loadingModal={loadingModal} />
       <Flex
@@ -364,7 +379,6 @@ export default function WithSubnavigation() {
                   onClick={() => {
                     setParams([...params, conditionParams(params.length + 1)]);
                     setIndex(ind + 1);
-                    //setRamp([...ramp, false]);
                   }}
                 ></IconButton>
               </HStack>
@@ -413,9 +427,6 @@ export default function WithSubnavigation() {
                         tempParams.splice(ind, 1);
                         setParams(tempParams);
                         setIndex(Math.max(0, ind - 1));
-                        /* let tempramp = [...ramp];
-                        tempramp.splice(ind, 1);
-                        setRamp(tempramp) */;
                       }}
                     ></IconButton>
                   </Flex>
@@ -466,14 +477,12 @@ export default function WithSubnavigation() {
                       />
                       <Text color="gray.600">
                         {
-                          clo_correspondence[params[ind].clo_value].whole_body
-                            .iclo
+                          params[ind].clo_value
                         }{" "}
                         clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
                           {
-                            clo_correspondence[params[ind].clo_value]
-                              .description
+                            (clo_correspondence.find(ensemble => (ensemble.whole_body.iclo === Number(params[ind].clo_value)))).description
                           }
                         </span>
                       </Text>
@@ -520,6 +529,17 @@ export default function WithSubnavigation() {
                 </>
               </VStack>
               <HStack align="center">
+                <Button
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick = {() => {
+                    uploadModal.onOpen();
+                  }}
+                >
+                  Upload Parameter
+                </Button>
                 <Button
                   backgroundColor={"#3ebced"}
                   textColor={"white"}
@@ -894,7 +914,6 @@ export default function WithSubnavigation() {
                   onClick={() => {
                     setParams([...params, conditionParams(params.length + 1)]);
                     setIndex(ind + 1);
-                    //setRamp([...ramp, false]);
                   }}
                 ></IconButton>
               </HStack>
@@ -983,14 +1002,12 @@ export default function WithSubnavigation() {
                       />
                       <Text color="gray.600">
                         {
-                          clo_correspondence[params[ind].clo_value].whole_body
-                            .iclo
+                          params[ind].clo_value
                         }{" "}
                         clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
                           {
-                            clo_correspondence[params[ind].clo_value]
-                              .description
+                            (clo_correspondence.find(ensemble => (ensemble.whole_body.iclo === Number(params[ind].clo_value)))).description
                           }
                         </span>
                       </Text>
@@ -1052,6 +1069,17 @@ export default function WithSubnavigation() {
                 </>
               </VStack>
               <HStack align="center" justifyContent="center">
+              <Button
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick = {() => {
+                    uploadModal.onOpen();
+                  }}
+                >
+                  Upload Parameter
+                </Button>
                 <Button
                   backgroundColor={"#3ebced"}
                   textColor={"white"}
