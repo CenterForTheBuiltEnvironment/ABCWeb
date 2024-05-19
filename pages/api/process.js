@@ -208,6 +208,7 @@ export default async function handler(req, res) {
           ignore_physiology: false,
           neutralSimulationOutput: false,
         },
+        bodybuilder: req.body.bodyb,
         phases: phases,
         clothing: clothing,
       };

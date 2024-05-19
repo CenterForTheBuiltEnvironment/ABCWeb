@@ -65,6 +65,7 @@ import {
   csvHeaderLine,
   signals,
   modes,
+  bodyBuildParams,
 } from "@/constants/constants";
 
 import {
@@ -93,23 +94,32 @@ import {
   tskinBuilder,
 } from "@/components/graphBuilder";
 import CloseButton from "@/components/closeButton";
+import AdvancedSettingsModal from "@/components/advancedSettingsModal";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
   const [params, setParams] = useState([conditionParams(1)]);
+  const [bodybuilderObj, setBodyBuilderObj] = useState(bodyBuildParams);
+
   const [metIndex, setMetIndex] = useState(1);
   const [currentlyEditing, setCurrentlyEditing] = useState(1);
   const [cache, setCache] = useState();
   const [numtoGraph, setNumToGraph] = useState(0);
   const [fullData, setFullData] = useState([]);
+
   const [ind, setIndex] = useState(0);
+  const [advInd, setAdvIndex] = useState(0);
+
   const [currIndex, setCurrIndex] = useState([0, 0]);
   const [metOptions, setMetOptions] = useState(met_auto);
   const [graphOptions, setGraph] = useState();
   const [graphData, setData] = useState([]);
+
   const loadingModal = useDisclosure();
   const editModal = useDisclosure();
   const uploadModal = useDisclosure();
+  const advancedModal = useDisclosure();
+
   const [bodyColors, setBodyColors] = useState([]);
   const [currentColorArray, setCurrentColorArray] = useState(
     Array(18).fill("white")
@@ -266,12 +276,21 @@ export default function WithSubnavigation() {
         setParams={setParams}
       />
       <UploadModal
-        disclosure = {uploadModal}
-        params = {params}
-        ind = {ind}
-        setParams = {setParams}
-        conditionParams = {conditionParams}
-        toast = {toast}
+        disclosure={uploadModal}
+        params={params}
+        ind={ind}
+        setParams={setParams}
+        conditionParams={conditionParams}
+        toast={toast}
+      />
+      <AdvancedSettingsModal
+        disclosure={advancedModal}
+        bbParams={bodybuilderObj}
+        ind={advInd}
+        setAdvIndex={setAdvIndex}
+        setbbParams={setBodyBuilderObj}
+        params={params}
+        setParams={setParams}
       />
       <Spinner loadingModal={loadingModal} />
       <Flex
@@ -311,7 +330,6 @@ export default function WithSubnavigation() {
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}></Flex>
         </Flex>
-
         <Stack
           flex={{ base: 1, md: 0 }}
           justify={"flex-end"}
@@ -476,13 +494,14 @@ export default function WithSubnavigation() {
                         ind={ind}
                       />
                       <Text color="gray.600">
-                        {
-                          params[ind].clo_value
-                        }{" "}
-                        clo -{" "}
+                        {params[ind].clo_value} clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
                           {
-                            (clo_correspondence.find(ensemble => (ensemble.whole_body.iclo === Number(params[ind].clo_value)))).description
+                            clo_correspondence.find(
+                              (ensemble) =>
+                                ensemble.whole_body.iclo ===
+                                Number(params[ind].clo_value)
+                            ).description
                           }
                         </span>
                       </Text>
@@ -523,23 +542,12 @@ export default function WithSubnavigation() {
                     </VStack>
                   </HStack>
                   <Text>
-                    These values are averages. Open the advanced editor to see
-                    your input data more accurately.
+                    These values are averages. Click "Edit Data" to see your
+                    input data more accurately.
                   </Text>
                 </>
               </VStack>
               <HStack align="center">
-                <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  alignSelf="center"
-                  onClick = {() => {
-                    uploadModal.onOpen();
-                  }}
-                >
-                  Upload Parameter
-                </Button>
                 <Button
                   backgroundColor={"#3ebced"}
                   textColor={"white"}
@@ -570,12 +578,19 @@ export default function WithSubnavigation() {
                               .ensemble_name,
                         });
                       }
+                      let bodyb = bodybuilderObj;
                       const metrics = await axios
                         .post("/api/process", {
                           // Chaining of data is intentional
                           phases,
+                          bodyb,
                         })
                         .then((res) => {
+                          if ("success" in res.data) {
+                            loadingModal.onClose();
+                            alert("An error has occurred. Please try again.");
+                            return;
+                          }
                           let tempArr = [];
                           for (let j = 0; j < res.data.length; j++) {
                             tempArr.push({
@@ -637,15 +652,26 @@ export default function WithSubnavigation() {
                     }
                   }}
                 >
-                  Run simulation
+                  Run
                 </Button>
                 <Button
-                backgroundColor={"#3ebced"}
-                textColor={"white"}
-                colorScheme="blue"
-                alignSelf="center"
-                onClick={async () => {
-                  let phases = [];
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick={() => {
+                    uploadModal.onOpen();
+                  }}
+                >
+                  Open
+                </Button>
+                <Button
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick={async () => {
+                    let phases = [];
                     for (let i = 0; i < params.length; i++) {
                       phases.push({
                         exposure_duration: params[i].exposure_duration,
@@ -658,8 +684,7 @@ export default function WithSubnavigation() {
                           }
                         ),
                         air_speed: params[i].air_speed.map(Number),
-                        air_temperature:
-                          params[i].air_temperature.map(Number),
+                        air_temperature: params[i].air_temperature.map(Number),
                         radiant_temperature:
                           params[i].radiant_temperature.map(Number),
                         clo_ensemble_name:
@@ -683,16 +708,28 @@ export default function WithSubnavigation() {
                       phases: phases,
                       clothing: clo_correspondence,
                     };
-                    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
-                    var downloadAncharNode = document.createElement('a');
-                    downloadAncharNode.setAttribute('href', dataStr);
-                    downloadAncharNode.setAttribute('download', 'Parameters.json');
+                    var dataStr =
+                      "data:text/json;charset=utf-8," +
+                      encodeURIComponent(JSON.stringify(obj));
+                    var downloadAncharNode = document.createElement("a");
+                    downloadAncharNode.setAttribute("href", dataStr);
+                    downloadAncharNode.setAttribute(
+                      "download",
+                      "Parameters.json"
+                    );
                     document.body.appendChild(downloadAncharNode);
                     downloadAncharNode.click();
                     downloadAncharNode.remove();
-                }}
+                  }}
                 >
-                Export Parameter
+                  Save
+                </Button>
+                <Button
+                  textColor="white"
+                  colorScheme="blackAlpha"
+                  onClick={advancedModal.onOpen}
+                >
+                  Advanced
                 </Button>
                 <Tooltip label="Switch layout of web tool" placement="right">
                   <IconButton
@@ -1001,29 +1038,30 @@ export default function WithSubnavigation() {
                         isHome
                       />
                       <Text color="gray.600">
-                        {
-                          params[ind].clo_value
-                        }{" "}
-                        clo -{" "}
+                        {params[ind].clo_value} clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
                           {
-                            (clo_correspondence.find(ensemble => (ensemble.whole_body.iclo === Number(params[ind].clo_value)))).description
+                            clo_correspondence.find(
+                              (ensemble) =>
+                                ensemble.whole_body.iclo ===
+                                Number(params[ind].clo_value)
+                            ).description
                           }
                         </span>
                       </Text>
-                      <Checkbox 
-                        size='lg' 
-                        colorScheme='blue' 
+                      <Checkbox
+                        size="lg"
+                        colorScheme="blue"
                         defaultChecked={false}
-                        isChecked = {params[ind].ramp}
-                        onChange = {(e) => {
+                        isChecked={params[ind].ramp}
+                        onChange={(e) => {
                           setParams((prevParams) => {
                             const updatedParams = [...prevParams];
                             updatedParams[ind].ramp = e.target.checked;
                             return updatedParams;
                           });
                         }}
-                        >
+                      >
                         Ramp
                       </Checkbox>
                       <Menu>
@@ -1063,23 +1101,12 @@ export default function WithSubnavigation() {
                     </VStack>
                   </HStack>
                   <Text textAlign="center" w="100%">
-                    These values are averages. Open the advanced editor to see
-                    your input data more accurately.
+                    These values are averages. Click "Edit Data" to see your
+                    input data more accurately.
                   </Text>
                 </>
               </VStack>
               <HStack align="center" justifyContent="center">
-              <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  alignSelf="center"
-                  onClick = {() => {
-                    uploadModal.onOpen();
-                  }}
-                >
-                  Upload Parameter
-                </Button>
                 <Button
                   backgroundColor={"#3ebced"}
                   textColor={"white"}
@@ -1109,12 +1136,20 @@ export default function WithSubnavigation() {
                               .ensemble_name,
                         });
                       }
+                      let bodyb = bodybuilderObj;
                       const metrics = await axios
                         .post("/api/process", {
                           // Chaining of data is intentional
                           phases,
+                          bodyb,
                         })
                         .then((res) => {
+                          if ("success" in res.data) {
+                            loadingModal.onClose();
+                            alert("An error has occurred. Please try again.");
+                            return;
+                          }
+
                           let tempArr = [];
                           for (let j = 0; j < res.data.length; j++) {
                             tempArr.push({
@@ -1176,29 +1211,47 @@ export default function WithSubnavigation() {
                     }
                   }}
                 >
-                  Run simulation
+                  Run
                 </Button>
                 <Button
-                backgroundColor={"#3ebced"}
-                textColor={"white"}
-                colorScheme="blue"
-                alignSelf="center"
-                onClick={async () => {
-                  let phases = [];
-                  let currTimer = 0;
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick={() => {
+                    uploadModal.onOpen();
+                  }}
+                >
+                  Open
+                </Button>
+                <Button
+                  backgroundColor={"#3ebced"}
+                  textColor={"white"}
+                  colorScheme="blue"
+                  alignSelf="center"
+                  onClick={async () => {
+                    let phases = [];
+                    let currTimer = 0;
                     for (let i = 0; i < params.length; i++) {
                       let temp_duration = params[i].exposure_duration;
-                      let temp_met_activity_name = "Custom-defined Met Activity";
-                      let temp_met_activity_value = parseFloat(params[i].met_value);
-                      let temp_relative_humidity = params[i].relative_humidity.map(
-                        function (x) {
-                          return parseFloat(x) / 100;
-                      }
-                    );
+                      let temp_met_activity_name =
+                        "Custom-defined Met Activity";
+                      let temp_met_activity_value = parseFloat(
+                        params[i].met_value
+                      );
+                      let temp_relative_humidity = params[
+                        i
+                      ].relative_humidity.map(function (x) {
+                        return parseFloat(x) / 100;
+                      });
                       let temp_air_speed = params[i].air_speed.map(Number);
-                      let temp_air_temperature = params[i].air_temperature.map(Number);
-                      let temp_radiant_temperature = params[i].radiant_temperature.map(Number);
-                      let temp_clo_ensemble_name = clo_correspondence[parseInt(params[i].clo_value)].ensemble_name;
+                      let temp_air_temperature =
+                        params[i].air_temperature.map(Number);
+                      let temp_radiant_temperature =
+                        params[i].radiant_temperature.map(Number);
+                      let temp_clo_ensemble_name =
+                        clo_correspondence[parseInt(params[i].clo_value)]
+                          .ensemble_name;
                       phases.push({
                         start_time: currTimer,
                         time_units: "minutes",
@@ -1208,7 +1261,7 @@ export default function WithSubnavigation() {
                         met: temp_met_activity_value,
                         default_data: {
                           rh:
-                          temp_relative_humidity.reduce((a, b) => a + b) /
+                            temp_relative_humidity.reduce((a, b) => a + b) /
                             (temp_relative_humidity.length * 100),
                           v:
                             temp_air_speed.reduce((a, b) => a + b) /
@@ -1355,16 +1408,21 @@ export default function WithSubnavigation() {
                       phases: phases,
                       clothing: clo_correspondence,
                     };
-                    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
-                    var downloadAncharNode = document.createElement('a');
-                    downloadAncharNode.setAttribute('href', dataStr);
-                    downloadAncharNode.setAttribute('download', 'Parameters.json');
+                    var dataStr =
+                      "data:text/json;charset=utf-8," +
+                      encodeURIComponent(JSON.stringify(obj));
+                    var downloadAncharNode = document.createElement("a");
+                    downloadAncharNode.setAttribute("href", dataStr);
+                    downloadAncharNode.setAttribute(
+                      "download",
+                      "Parameters.json"
+                    );
                     document.body.appendChild(downloadAncharNode);
                     downloadAncharNode.click();
                     downloadAncharNode.remove();
-                }}
+                  }}
                 >
-                Export Parameter
+                  Save
                 </Button>
                 <Tooltip label="Switch layout of web tool" placement="right">
                   <IconButton

@@ -141,6 +141,19 @@ export const conditionParams = (num) => {
   };
 };
 
+export const bodyBuildParams = () => {
+  return {
+    height: 1.8,
+    weight: 70.4,
+    age: 25,
+    gender: "male",
+    body_fat: 0.15,
+    skin_color: "white",
+  };
+};
+
+export const advancedSettingsArr = ["Body Builder"];
+
 export const listOfParameters = [
   {
     title: "Exposure time",
