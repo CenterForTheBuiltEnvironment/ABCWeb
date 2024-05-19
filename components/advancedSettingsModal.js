@@ -34,7 +34,9 @@ export default function AdvancedSettingsModal({
   params,
   setParams,
 }) {
-  const [componentArr, setCompArr] = useState([<BodyBuilderChanger />]);
+  const [componentArr, setCompArr] = useState([
+    <BodyBuilderChanger key={"bodybuilder"} />,
+  ]);
 
   function BodyBuilderChanger() {
     const isValidHeight = (height) =>
