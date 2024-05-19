@@ -547,197 +547,6 @@ export default function WithSubnavigation() {
                   </Text>
                 </>
               </VStack>
-              <HStack align="center">
-                <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  alignSelf="center"
-                  onClick={async () => {
-                    loadingModal.onOpen();
-                    try {
-                      let phases = [];
-                      for (let i = 0; i < params.length; i++) {
-                        phases.push({
-                          exposure_duration: params[i].exposure_duration,
-                          met_activity_name: "Custom-defined Met Activity",
-                          ramp: params[i].ramp,
-                          met_activity_value: parseFloat(params[i].met_value),
-                          relative_humidity: params[i].relative_humidity.map(
-                            function (x) {
-                              return parseFloat(x) / 100;
-                            }
-                          ),
-                          air_speed: params[i].air_speed.map(Number),
-                          air_temperature:
-                            params[i].air_temperature.map(Number),
-                          radiant_temperature:
-                            params[i].radiant_temperature.map(Number),
-                          clo_ensemble_name:
-                            clo_correspondence[parseInt(params[i].clo_value)]
-                              .ensemble_name,
-                        });
-                      }
-                      let bodyb = bodybuilderObj;
-                      const metrics = await axios
-                        .post("/api/process", {
-                          // Chaining of data is intentional
-                          phases,
-                          bodyb,
-                        })
-                        .then((res) => {
-                          if ("success" in res.data) {
-                            loadingModal.onClose();
-                            alert("An error has occurred. Please try again.");
-                            return;
-                          }
-                          let tempArr = [];
-                          for (let j = 0; j < res.data.length; j++) {
-                            tempArr.push({
-                              ...res.data[j][numtoGraph],
-                              index: j,
-                            });
-                          }
-                          setData(tempArr);
-                          setFullData(res.data);
-                          setCache(params.slice());
-                          setGraph(decideGraph(tempArr));
-
-                          let totalDuration = 0;
-                          for (let i = 0; i < params.length; i++) {
-                            totalDuration += params[i].exposure_duration;
-                          }
-                          setSliderMaxVal(totalDuration);
-                          setSliderVal([0, totalDuration]);
-
-                          let colorsArr = [];
-                          for (let time = 0; time < res.data.length; time++) {
-                            let bodyPartsArr = [];
-                            for (let i = 0; i <= 17; i++) {
-                              bodyPartsArr.push(
-                                determineColor([
-                                  res.data[time][places[i]].comfort,
-                                  res.data[time][places[i]].sensation,
-                                ])
-                              );
-                            }
-                            colorsArr.push(bodyPartsArr);
-                          }
-                          setBodyColors(colorsArr);
-                          setCurrentColorArray(Array(18).fill("white"));
-                          let data = [];
-                          data.push(csvHeaderLine);
-                          for (let time = 0; time < res.data.length; time++) {
-                            let tempRow = [time];
-                            tempRow.push(
-                              ...convertResultToArrayForCSV(res.data[time][0])
-                            );
-                            for (let i = 0; i < signals.length; i++) {
-                              for (let j = 1; j < res.data[time].length; j++) {
-                                tempRow.push(
-                                  res.data[time][j][signals[i].slice(0, -1)]
-                                );
-                              }
-                            }
-                            data.push(tempRow);
-                          }
-                          setCSVData(data);
-                          setComfortView(false);
-                          loadingModal.onClose();
-                        });
-                    } catch (err) {
-                      loadingModal.onClose();
-                      alert("An error has occurred. Please try again.");
-                      console.log(err);
-                    }
-                  }}
-                >
-                  Run
-                </Button>
-                <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  alignSelf="center"
-                  onClick={() => {
-                    uploadModal.onOpen();
-                  }}
-                >
-                  Open
-                </Button>
-                <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  alignSelf="center"
-                  onClick={async () => {
-                    let phases = [];
-                    for (let i = 0; i < params.length; i++) {
-                      phases.push({
-                        exposure_duration: params[i].exposure_duration,
-                        met_activity_name: "Custom-defined Met Activity",
-                        ramp: params[i].ramp,
-                        met_activity_value: parseFloat(params[i].met_value),
-                        relative_humidity: params[i].relative_humidity.map(
-                          function (x) {
-                            return parseFloat(x) / 100;
-                          }
-                        ),
-                        air_speed: params[i].air_speed.map(Number),
-                        air_temperature: params[i].air_temperature.map(Number),
-                        radiant_temperature:
-                          params[i].radiant_temperature.map(Number),
-                        clo_ensemble_name:
-                          clo_correspondence[parseInt(params[i].clo_value)]
-                            .ensemble_name,
-                      });
-                    }
-                    const obj = {
-                      name: "CBE Interface Test",
-                      description: "Prototype testing requests",
-                      reference_time: new Date(),
-                      output_freq: 60,
-                      options: {
-                        csvOutput: false,
-                        sensation_adaptation: false,
-                        sensation_coredTdt: false,
-                        ignore_segments: false,
-                        ignore_physiology: false,
-                        neutralSimulationOutput: false,
-                      },
-                      phases: phases,
-                      clothing: clo_correspondence,
-                    };
-                    var dataStr =
-                      "data:text/json;charset=utf-8," +
-                      encodeURIComponent(JSON.stringify(obj));
-                    var downloadAncharNode = document.createElement("a");
-                    downloadAncharNode.setAttribute("href", dataStr);
-                    downloadAncharNode.setAttribute(
-                      "download",
-                      "Parameters.json"
-                    );
-                    document.body.appendChild(downloadAncharNode);
-                    downloadAncharNode.click();
-                    downloadAncharNode.remove();
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  textColor="white"
-                  colorScheme="blackAlpha"
-                  onClick={advancedModal.onOpen}
-                >
-                  Advanced
-                </Button>
-                <Tooltip label="Switch layout of web tool" placement="right">
-                  <IconButton
-                    icon={<ViewIcon />}
-                    onClick={() => setComfortView(true)}
-                  />
-                </Tooltip>
-              </HStack>
             </VStack>
 
             <VStack w="70%">
@@ -1424,7 +1233,15 @@ export default function WithSubnavigation() {
                 >
                   Save
                 </Button>
-                <Tooltip label="Switch layout of web tool" placement="right">
+                <Button
+                  textColor="gray.600"
+                  bgColor="white"
+                  borderWidth={2}
+                  onClick={advancedModal.onOpen}
+                >
+                  Advanced
+                </Button>
+                <Tooltip label="Switch to narrow view" placement="right">
                   <IconButton
                     icon={<ViewIcon />}
                     onClick={() => setComfortView(false)}
@@ -1433,6 +1250,198 @@ export default function WithSubnavigation() {
               </HStack>
             </VStack>
           </>
+        )}
+        {!comfortView ? (
+          <HStack align="center" justifyContent="center">
+            <Button
+              backgroundColor={"#3ebced"}
+              textColor={"white"}
+              colorScheme="blue"
+              alignSelf="center"
+              onClick={async () => {
+                loadingModal.onOpen();
+                try {
+                  let phases = [];
+                  for (let i = 0; i < params.length; i++) {
+                    phases.push({
+                      exposure_duration: params[i].exposure_duration,
+                      met_activity_name: "Custom-defined Met Activity",
+                      ramp: params[i].ramp,
+                      met_activity_value: parseFloat(params[i].met_value),
+                      relative_humidity: params[i].relative_humidity.map(
+                        function (x) {
+                          return parseFloat(x) / 100;
+                        }
+                      ),
+                      air_speed: params[i].air_speed.map(Number),
+                      air_temperature: params[i].air_temperature.map(Number),
+                      radiant_temperature:
+                        params[i].radiant_temperature.map(Number),
+                      clo_ensemble_name:
+                        clo_correspondence[parseInt(params[i].clo_value)]
+                          .ensemble_name,
+                    });
+                  }
+                  let bodyb = bodybuilderObj;
+                  const metrics = await axios
+                    .post("/api/process", {
+                      // Chaining of data is intentional
+                      phases,
+                      bodyb,
+                    })
+                    .then((res) => {
+                      if ("success" in res.data) {
+                        loadingModal.onClose();
+                        alert("An error has occurred. Please try again.");
+                        return;
+                      }
+                      let tempArr = [];
+                      for (let j = 0; j < res.data.length; j++) {
+                        tempArr.push({
+                          ...res.data[j][numtoGraph],
+                          index: j,
+                        });
+                      }
+                      setData(tempArr);
+                      setFullData(res.data);
+                      setCache(params.slice());
+                      setGraph(decideGraph(tempArr));
+
+                      let totalDuration = 0;
+                      for (let i = 0; i < params.length; i++) {
+                        totalDuration += params[i].exposure_duration;
+                      }
+                      setSliderMaxVal(totalDuration);
+                      setSliderVal([0, totalDuration]);
+
+                      let colorsArr = [];
+                      for (let time = 0; time < res.data.length; time++) {
+                        let bodyPartsArr = [];
+                        for (let i = 0; i <= 17; i++) {
+                          bodyPartsArr.push(
+                            determineColor([
+                              res.data[time][places[i]].comfort,
+                              res.data[time][places[i]].sensation,
+                            ])
+                          );
+                        }
+                        colorsArr.push(bodyPartsArr);
+                      }
+                      setBodyColors(colorsArr);
+                      setCurrentColorArray(Array(18).fill("white"));
+                      let data = [];
+                      data.push(csvHeaderLine);
+                      for (let time = 0; time < res.data.length; time++) {
+                        let tempRow = [time];
+                        tempRow.push(
+                          ...convertResultToArrayForCSV(res.data[time][0])
+                        );
+                        for (let i = 0; i < signals.length; i++) {
+                          for (let j = 1; j < res.data[time].length; j++) {
+                            tempRow.push(
+                              res.data[time][j][signals[i].slice(0, -1)]
+                            );
+                          }
+                        }
+                        data.push(tempRow);
+                      }
+                      setCSVData(data);
+                      setComfortView(false);
+                      loadingModal.onClose();
+                    });
+                } catch (err) {
+                  loadingModal.onClose();
+                  alert("An error has occurred. Please try again.");
+                  console.log(err);
+                }
+              }}
+            >
+              Run
+            </Button>
+            <Button
+              backgroundColor={"#3ebced"}
+              textColor={"white"}
+              colorScheme="blue"
+              alignSelf="center"
+              onClick={() => {
+                uploadModal.onOpen();
+              }}
+            >
+              Open
+            </Button>
+            <Button
+              backgroundColor={"#3ebced"}
+              textColor={"white"}
+              colorScheme="blue"
+              alignSelf="center"
+              onClick={async () => {
+                let phases = [];
+                for (let i = 0; i < params.length; i++) {
+                  phases.push({
+                    exposure_duration: params[i].exposure_duration,
+                    met_activity_name: "Custom-defined Met Activity",
+                    ramp: params[i].ramp,
+                    met_activity_value: parseFloat(params[i].met_value),
+                    relative_humidity: params[i].relative_humidity.map(
+                      function (x) {
+                        return parseFloat(x) / 100;
+                      }
+                    ),
+                    air_speed: params[i].air_speed.map(Number),
+                    air_temperature: params[i].air_temperature.map(Number),
+                    radiant_temperature:
+                      params[i].radiant_temperature.map(Number),
+                    clo_ensemble_name:
+                      clo_correspondence[parseInt(params[i].clo_value)]
+                        .ensemble_name,
+                  });
+                }
+                const obj = {
+                  name: "CBE Interface Test",
+                  description: "Prototype testing requests",
+                  reference_time: new Date(),
+                  output_freq: 60,
+                  options: {
+                    csvOutput: false,
+                    sensation_adaptation: false,
+                    sensation_coredTdt: false,
+                    ignore_segments: false,
+                    ignore_physiology: false,
+                    neutralSimulationOutput: false,
+                  },
+                  phases: phases,
+                  clothing: clo_correspondence,
+                };
+                var dataStr =
+                  "data:text/json;charset=utf-8," +
+                  encodeURIComponent(JSON.stringify(obj));
+                var downloadAncharNode = document.createElement("a");
+                downloadAncharNode.setAttribute("href", dataStr);
+                downloadAncharNode.setAttribute("download", "Parameters.json");
+                document.body.appendChild(downloadAncharNode);
+                downloadAncharNode.click();
+                downloadAncharNode.remove();
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              textColor="gray.600"
+              bgColor="white"
+              borderWidth={2}
+              onClick={advancedModal.onOpen}
+            >
+              Advanced
+            </Button>
+            <Tooltip label="Switch to wide view" placement="right">
+              <IconButton
+                icon={<ViewIcon />}
+                onClick={() => setComfortView(true)}
+              />
+            </Tooltip>
+          </HStack>
+        ) : (
+          <></>
         )}
       </Fade>
     </Box>

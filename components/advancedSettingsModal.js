@@ -34,35 +34,122 @@ export default function AdvancedSettingsModal({
   params,
   setParams,
 }) {
-  let [componentArr, setCompArr] = useState([BodyBuilderChanger()]);
+  const [componentArr, setCompArr] = useState([<BodyBuilderChanger />]);
 
   function BodyBuilderChanger() {
+    const isValidHeight = (height) => !isNaN(parseFloat(height)) && height > 0;
+    const isValidWeight = (weight) => !isNaN(parseFloat(weight)) && weight > 0;
+    const isValidAge = (age) => !isNaN(parseInt(age)) && age > 0;
+    const isValidGender = (gender) => gender == "male" || gender == "female";
+    const isValidBf = (bf) => !isNaN(parseInt(bf)) && bf > 0 && bf < 1;
+    const isValidSkinColor = (sk) =>
+      sk == "white" || sk == "brown" || sk == "black";
+
+    const isValidChangeToParams = (params) => {
+      let { height, weight, age, gender, body_fat, skin_color } = params;
+      return (
+        isValidHeight(height) &&
+        isValidWeight(weight) &&
+        isValidAge(age) &&
+        isValidGender(gender) &&
+        isValidBf(body_fat) &&
+        isValidSkinColor(skin_color)
+      );
+    };
+
+    const prospectiveParams = bbParams;
+
     return (
-      <VStack alignItems={"left"} margin={"15px"}>
+      <VStack alignItems={"left"} margin={"15px"} spacing={2}>
+        <Text>Please do not include units when you enter values.</Text>
         <HStack spacing={2}>
-          <Text fontWeight="bold">Height: </Text>
-          <Input value={bbParams.height} />
+          <Text fontWeight="bold" w="100px">
+            Height:{" "}
+          </Text>
+          <Input
+            w="300px"
+            placeholder={bbParams.height + " m"}
+            onChange={(e) => {
+              prospectiveParams.height = parseFloat(e.target.value);
+            }}
+          />
         </HStack>
         <HStack spacing={2}>
-          <Text fontWeight="bold">Weight: </Text>
-          <Text>Hello</Text>
+          <Text fontWeight="bold" w="100px">
+            Weight:{" "}
+          </Text>
+          <Input
+            w="300px"
+            placeholder={bbParams.weight + " kg"}
+            onChange={(e) => {
+              prospectiveParams.weight = parseFloat(e.target.value);
+            }}
+          />
         </HStack>
         <HStack spacing={2}>
-          <Text fontWeight="bold">Age: </Text>
-          <Text>Hello</Text>
+          <Text fontWeight="bold" w="100px">
+            Age:{" "}
+          </Text>
+          <Input
+            w="300px"
+            placeholder={bbParams.age + " years old"}
+            onChange={(e) => {
+              prospectiveParams.age = parseInt(e.target.value);
+            }}
+          />
         </HStack>
         <HStack spacing={2}>
-          <Text fontWeight="bold">Gender: </Text>
-          <Text>Hello</Text>
+          <Text fontWeight="bold" w="100px">
+            Gender:{" "}
+          </Text>
+          <Input
+            w="300px"
+            placeholder={bbParams.gender}
+            onChange={(e) => {
+              prospectiveParams.gender = e.target.value.trim().toLowerCase();
+            }}
+          />
         </HStack>
         <HStack spacing={2}>
-          <Text fontWeight="bold">Body fat: </Text>
-          <Text>Hello</Text>
+          <Text fontWeight="bold" w="100px">
+            Body fat:{" "}
+          </Text>
+          <Input
+            w="300px"
+            placeholder={bbParams.body_fat}
+            onChange={(e) => {
+              prospectiveParams.body_fat = parseFloat(e.target.value);
+            }}
+          />
         </HStack>
         <HStack spacing={2}>
-          <Text fontWeight="bold">Skin color: </Text>
-          <Text>Hello</Text>
+          <Text fontWeight="bold" w="100px">
+            Skin color:{" "}
+          </Text>
+          <Input
+            w="300px"
+            placeholder={bbParams.skin_color}
+            onChange={(e) => {
+              prospectiveParams.skin_color = e.target.value
+                .trim()
+                .toLowerCase();
+            }}
+          />
         </HStack>
+        <Button
+          maxW="200px"
+          onClick={() => {
+            if (isValidChangeToParams(prospectiveParams)) {
+              setbbParams(prospectiveParams);
+              alert("Successful save.");
+            } else {
+              alert("Invalid attempt to change parameters. Please try again.");
+            }
+          }}
+          colorScheme="green"
+        >
+          Save parameters
+        </Button>
       </VStack>
     );
   }
@@ -106,15 +193,19 @@ export default function AdvancedSettingsModal({
             </ModalBody>
             <ModalFooter>
               <HStack w="100%" justifyContent="center">
-                <Text fontWeight="bold">Changes are automatically saved.</Text>
+                <Text>
+                  Changes are NOT automatically saved. To save, click "Save."
+                </Text>
                 <Button
                   colorScheme="blue"
                   backgroundColor={"#3ebced"}
                   textColor={"white"}
                   ml={2}
-                  onClick={disclosure.onClose}
+                  onClick={() => {
+                    disclosure.onClose();
+                  }}
                 >
-                  Done
+                  Close
                 </Button>
               </HStack>
             </ModalFooter>

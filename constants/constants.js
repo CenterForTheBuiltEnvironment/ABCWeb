@@ -152,6 +152,18 @@ export const bodyBuildParams = () => {
   };
 };
 
+export const testBodyBuildParams = () => {
+  // strictly for testing
+  return {
+    height: 2.2,
+    weight: 20.4,
+    age: 15,
+    gender: "female",
+    body_fat: 0.11,
+    skin_color: "brown",
+  };
+};
+
 export const advancedSettingsArr = ["Body Builder"];
 
 export const listOfParameters = [
