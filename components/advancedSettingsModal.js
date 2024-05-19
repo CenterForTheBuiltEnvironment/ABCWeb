@@ -37,22 +37,24 @@ export default function AdvancedSettingsModal({
   const [componentArr, setCompArr] = useState([<BodyBuilderChanger />]);
 
   function BodyBuilderChanger() {
-    const isValidHeight = (height) => !isNaN(parseFloat(height)) && height > 0;
-    const isValidWeight = (weight) => !isNaN(parseFloat(weight)) && weight > 0;
-    const isValidAge = (age) => !isNaN(parseInt(age)) && age > 0;
+    const isValidHeight = (height) =>
+      !isNaN(height) && height >= 1 && height <= 3;
+    const isValidWeight = (weight) =>
+      !isNaN(weight) && weight >= 25 && weight <= 200;
+    const isValidAge = (age) => !isNaN(age) && age >= 5 && age <= 100;
     const isValidGender = (gender) => gender == "male" || gender == "female";
-    const isValidBf = (bf) => !isNaN(parseInt(bf)) && bf > 0 && bf < 1;
+    const isValidBf = (bf) => !isNaN(bf) && bf >= 0.01 && bf <= 0.9;
     const isValidSkinColor = (sk) =>
       sk == "white" || sk == "brown" || sk == "black";
 
     const isValidChangeToParams = (params) => {
       let { height, weight, age, gender, body_fat, skin_color } = params;
       return (
-        isValidHeight(height) &&
-        isValidWeight(weight) &&
-        isValidAge(age) &&
+        isValidHeight(parseFloat(height)) &&
+        isValidWeight(parseFloat(weight)) &&
+        isValidAge(parseInt(age)) &&
         isValidGender(gender) &&
-        isValidBf(body_fat) &&
+        isValidBf(parseFloat(body_fat)) &&
         isValidSkinColor(skin_color)
       );
     };

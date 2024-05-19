@@ -143,24 +143,12 @@ export const conditionParams = (num) => {
 
 export const bodyBuildParams = () => {
   return {
-    height: 1.8,
-    weight: 70.4,
+    height: 1.72,
+    weight: 74.4,
     age: 25,
     gender: "male",
-    body_fat: 0.15,
+    body_fat: 0.13,
     skin_color: "white",
-  };
-};
-
-export const testBodyBuildParams = () => {
-  // strictly for testing
-  return {
-    height: 2.2,
-    weight: 20.4,
-    age: 15,
-    gender: "female",
-    body_fat: 0.11,
-    skin_color: "brown",
   };
 };
 
