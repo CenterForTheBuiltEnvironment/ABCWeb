@@ -542,8 +542,8 @@ export default function WithSubnavigation() {
                     </VStack>
                   </HStack>
                   <Text>
-                    These values are averages. Click "Edit Data" to see your
-                    input data more accurately.
+                    These values are averages. Click &quot;Edit Data&quot; to
+                    see your input data more accurately.
                   </Text>
                 </>
               </VStack>
@@ -910,8 +910,8 @@ export default function WithSubnavigation() {
                     </VStack>
                   </HStack>
                   <Text textAlign="center" w="100%">
-                    These values are averages. Click "Edit Data" to see your
-                    input data more accurately.
+                    These values are averages. Click &quot;Edit Data&quot; to
+                    see your input data more accurately.
                   </Text>
                 </>
               </VStack>

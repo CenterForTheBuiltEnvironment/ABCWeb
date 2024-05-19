@@ -196,7 +196,8 @@ export default function AdvancedSettingsModal({
             <ModalFooter>
               <HStack w="100%" justifyContent="center">
                 <Text>
-                  Changes are NOT automatically saved. To save, click "Save."
+                  Changes are NOT automatically saved. To save, click
+                  &quot;Save.&quot;
                 </Text>
                 <Button
                   colorScheme="blue"
