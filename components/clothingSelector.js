@@ -17,7 +17,6 @@ export default function ClothingSelector({
           let newState = [...params];
           newState[ind].clo_value = e.target.value.toString();
           setParams(newState);
-          console.log(params);
         }}
         value={params[ind].clo_value}
       >

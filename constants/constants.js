@@ -146,7 +146,7 @@ export const bodyBuildParams = () => {
     height: 1.72,
     weight: 74.4,
     age: 25,
-    gender: "male",
+    sex: "male",
     body_fat: 0.13,
     skin_color: "white",
   };

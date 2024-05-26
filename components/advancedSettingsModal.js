@@ -8,6 +8,10 @@ import {
   HStack,
   Heading,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalContent,
@@ -19,11 +23,13 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Select,
   Text,
   VStack,
 } from "@chakra-ui/react";
 import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 export default function AdvancedSettingsModal({
   disclosure,
@@ -44,101 +50,169 @@ export default function AdvancedSettingsModal({
     const isValidWeight = (weight) =>
       !isNaN(weight) && weight >= 25 && weight <= 200;
     const isValidAge = (age) => !isNaN(age) && age >= 5 && age <= 100;
-    const isValidGender = (gender) => gender == "male" || gender == "female";
-    const isValidBf = (bf) => !isNaN(bf) && bf >= 0.01 && bf <= 0.9;
+    const isValidSex = (sex) => sex == "male" || sex == "female";
+    const isValidBf = (bf) => !isNaN(bf) && bf >= 0.01 && bf <= 0.7;
     const isValidSkinColor = (sk) =>
       sk == "white" || sk == "brown" || sk == "black";
 
     const isValidChangeToParams = (params) => {
-      let { height, weight, age, gender, body_fat, skin_color } = params;
+      let { height, weight, age, sex, body_fat, skin_color } = params;
       return (
         isValidHeight(parseFloat(height)) &&
         isValidWeight(parseFloat(weight)) &&
         isValidAge(parseInt(age)) &&
-        isValidGender(gender) &&
+        isValidSex(sex) &&
         isValidBf(parseFloat(body_fat)) &&
         isValidSkinColor(skin_color)
       );
     };
 
-    const prospectiveParams = bbParams;
+    let prospectiveParams = bbParams;
 
     return (
       <VStack alignItems={"left"} margin={"15px"} spacing={2}>
-        <Text>Please do not include units when you enter values.</Text>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
             Height:{" "}
           </Text>
-          <Input
+          <NumberInput
             w="300px"
-            placeholder={bbParams.height + " m"}
+            allowMouseWheel
+            backgroundColor="white"
+            type="number"
+            textAlign="right"
+            defaultValue={prospectiveParams.height}
             onChange={(e) => {
-              prospectiveParams.height = parseFloat(e.target.value);
+              prospectiveParams.height = parseFloat(e);
             }}
-          />
+            min={1}
+            max={3}
+            precision={2}
+            step={0.01}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Text> m</Text>
         </HStack>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
             Weight:{" "}
           </Text>
-          <Input
+          <NumberInput
             w="300px"
-            placeholder={bbParams.weight + " kg"}
+            allowMouseWheel
+            backgroundColor="white"
+            type="number"
+            textAlign="right"
+            defaultValue={prospectiveParams.weight}
             onChange={(e) => {
-              prospectiveParams.weight = parseFloat(e.target.value);
+              prospectiveParams.weight = parseFloat(e);
             }}
-          />
+            min={25}
+            max={200}
+            precision={1}
+            step={0.1}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Text> kg</Text>
         </HStack>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
             Age:{" "}
           </Text>
-          <Input
+          <NumberInput
             w="300px"
-            placeholder={bbParams.age + " years old"}
+            allowMouseWheel
+            backgroundColor="white"
+            type="number"
+            textAlign="right"
+            defaultValue={prospectiveParams.age}
             onChange={(e) => {
-              prospectiveParams.age = parseInt(e.target.value);
+              prospectiveParams.age = parseInt(e);
             }}
-          />
+            min={5}
+            max={100}
+            precision={0}
+            step={1}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Text> years old</Text>
         </HStack>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
-            Gender:{" "}
+            Sex:{" "}
           </Text>
-          <Input
+          <Select
             w="300px"
-            placeholder={bbParams.gender}
             onChange={(e) => {
-              prospectiveParams.gender = e.target.value.trim().toLowerCase();
+              prospectiveParams.sex = e.target.value.toString();
             }}
-          />
+          >
+            <option selected disabled>
+              Current: {prospectiveParams.sex}
+            </option>
+            <option value="male">male</option>
+            <option value="female">female</option>
+          </Select>
         </HStack>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
             Body fat:{" "}
           </Text>
-          <Input
+          <NumberInput
             w="300px"
-            placeholder={bbParams.body_fat}
+            allowMouseWheel
+            backgroundColor="white"
+            type="number"
+            textAlign="right"
+            defaultValue={prospectiveParams.body_fat}
             onChange={(e) => {
-              prospectiveParams.body_fat = parseFloat(e.target.value);
+              prospectiveParams.body_fat = parseFloat(e);
             }}
-          />
+            min={0}
+            max={0.7}
+            precision={2}
+            step={0.01}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <Text> fraction</Text>
         </HStack>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
             Skin color:{" "}
           </Text>
-          <Input
+          <Select
             w="300px"
-            placeholder={bbParams.skin_color}
             onChange={(e) => {
-              prospectiveParams.skin_color = e.target.value
-                .trim()
-                .toLowerCase();
+              prospectiveParams.skin_color = e.target.value.toString();
             }}
-          />
+          >
+            <option selected disabled>
+              Current: {prospectiveParams.skin_color}
+            </option>
+            <option value="white">white</option>
+            <option value="brown">brown</option>
+            <option value="black">black</option>
+          </Select>
         </HStack>
         <Button
           maxW="200px"
@@ -198,8 +272,8 @@ export default function AdvancedSettingsModal({
             <ModalFooter>
               <HStack w="100%" justifyContent="center">
                 <Text>
-                  Changes are NOT automatically saved. To save, click
-                  &quot;Save.&quot;
+                  Changes are NOT automatically saved. To save, click &quot;Save
+                  parameters.&quot;
                 </Text>
                 <Button
                   colorScheme="blue"
