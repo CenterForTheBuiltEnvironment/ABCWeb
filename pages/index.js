@@ -74,6 +74,8 @@ import {
   determineColor,
   getCurrentConditionName,
   convertResultToArrayForCSV,
+  findMin,
+  findMax,
 } from "@/constants/helperFunctions";
 
 import OptionRenderer from "@/components/optionRenderer";
@@ -243,9 +245,7 @@ export default function WithSubnavigation() {
       click: (params) => {
         let tempColorArr = [];
         for (let i = 0; i < bodyColors[params.dataIndex].length; i++) {
-          tempColorArr.push(
-            bodyColors[params.dataIndex][i][params.seriesIndex]
-          );
+          tempColorArr.push(bodyColors[params.dataIndex][i]);
         }
         setCurrentColorArray(tempColorArr);
         let curr = 0;
@@ -617,6 +617,31 @@ export default function WithSubnavigation() {
                               val.value
                             )
                           );
+
+                          let colorsArr = [];
+                          let mins = [],
+                            maxes = [];
+                          for (let i = 0; i <= 17; i++) {
+                            mins.push(findMin(fullData, places[i], val.value));
+                            maxes.push(findMax(fullData, places[i], val.value));
+                          }
+                          for (let time = 0; time < fullData.length; time++) {
+                            let bodyPartsArr = [];
+                            for (let i = 0; i <= 17; i++) {
+                              bodyPartsArr.push(
+                                determineColor(
+                                  fullData[time][places[i]],
+                                  val.value,
+                                  mins[i],
+                                  maxes[i]
+                                )
+                              );
+                            }
+                            colorsArr.push(bodyPartsArr);
+                          }
+                          setBodyColors(colorsArr);
+                          setCurrentColorArray(Array(18).fill("white"));
+
                           loadingModal.onClose();
                         }}
                       />
@@ -728,7 +753,7 @@ export default function WithSubnavigation() {
           </HStack>
         ) : (
           <>
-            <VStack w="100%" margin="20px">
+            <VStack w="100%" minH="70vh" margin="20px">
               <HStack padding={2} alignItems="flex-start">
                 <HStack w="100%" overflowY={"scroll"} spacing={3}>
                   {params.map((elem, indx) => {
@@ -983,10 +1008,7 @@ export default function WithSubnavigation() {
                             let bodyPartsArr = [];
                             for (let i = 0; i <= 17; i++) {
                               bodyPartsArr.push(
-                                determineColor([
-                                  res.data[time][places[i]].comfort,
-                                  res.data[time][places[i]].sensation,
-                                ])
+                                colorComfort(res.data[time][places[i]].comfort)
                               );
                             }
                             colorsArr.push(bodyPartsArr);
@@ -1319,10 +1341,7 @@ export default function WithSubnavigation() {
                         let bodyPartsArr = [];
                         for (let i = 0; i <= 17; i++) {
                           bodyPartsArr.push(
-                            determineColor([
-                              res.data[time][places[i]].comfort,
-                              res.data[time][places[i]].sensation,
-                            ])
+                            colorComfort(res.data[time][places[i]].comfort)
                           );
                         }
                         colorsArr.push(bodyPartsArr);

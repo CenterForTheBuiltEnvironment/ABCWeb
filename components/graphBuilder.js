@@ -22,9 +22,9 @@ export function comfBuilder(data) {
       fontFamily: "IBM Plex Sans",
     },
     title: {
-      text: data.title,
+      text: "Comfort vs. Time",
       left: "5%",
-      top: "8%",
+      top: "5%",
     },
     tooltip: {
       trigger: "axis",
@@ -104,7 +104,7 @@ export function sensBuilder(data) {
     title: {
       text: "Sensation vs. Time",
       left: "5%",
-      top: "8%",
+      top: "5%",
     },
     tooltip: {
       trigger: "axis",
@@ -185,7 +185,7 @@ export function tskinBuilder(data) {
     title: {
       text: "Skin Temperature vs. Time",
       left: "5%",
-      top: "8%",
+      top: "5%",
     },
     tooltip: {
       trigger: "axis",
@@ -270,7 +270,7 @@ export function tcoreBuilder(data) {
     title: {
       text: "Core Temperature vs. Time",
       left: "5%",
-      top: "8%",
+      top: "5%",
     },
     tooltip: {
       trigger: "axis",
@@ -355,7 +355,7 @@ export function hfluxBuilder(data) {
     title: {
       text: "Heat Flux Variables vs. Time",
       left: "5%",
-      top: "8%",
+      top: "5%",
     },
     tooltip: {
       trigger: "axis",
@@ -433,7 +433,7 @@ export function environmentBuilder(data) {
     title: {
       text: "Environment Variables vs. Time",
       left: "5%",
-      top: "8%",
+      top: "5%",
     },
     tooltip: {
       trigger: "axis",

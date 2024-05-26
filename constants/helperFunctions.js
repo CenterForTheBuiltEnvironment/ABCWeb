@@ -63,7 +63,20 @@ const colorHelper = (value, mn, mx) => {
   red = Math.max(0, Math.min(red, 255));
 
   // output final values
-  return "rgb(" + red + "," + green + "," + blue + ")";
+  return (
+    "rgb(" +
+    Math.round(red) +
+    "," +
+    Math.round(green) +
+    "," +
+    Math.round(blue) +
+    ")"
+  );
+};
+export const colorComfort = (comfort) => {
+  if (comfort < -1) return "black";
+  else if (comfort >= -1 && comfort <= 1) return "gray";
+  else return "white";
 };
 export const colorSensation = (sensation) => {
   return colorHelper(sensation, -4, 4);
@@ -80,10 +93,49 @@ export const colorHflux = (hflux, min, max) => {
 export const colorEnv = (env, min, max) => {
   return colorHelper(env, min, max);
 };
-export const colorComfort = (comfort) => {
-  if (comfort < -1) return "black";
-  else if (comfort >= -1 && comfort <= 1) return "gray";
-  else return "white";
+export const findMin = (data, ind, key) => {
+  let res = Number.MAX_SAFE_INTEGER;
+  for (let i = 0; i < data.length; i++) {
+    if (key == "tcore") {
+      if (ind == 0) {
+        res = Math.min(res, data[i][ind].tblood);
+      } else {
+        res = Math.min(res, data[i][ind][key]);
+      }
+    } else {
+      res = Math.min(res, data[i][ind][key]);
+    }
+  }
+  return res;
+};
+export const findMax = (data, ind, key) => {
+  let res = Number.MIN_SAFE_INTEGER;
+  for (let i = 0; i < data.length; i++) {
+    if (key == "tcore") {
+      if (ind == 0) {
+        res = Math.max(res, data[i][ind].tblood);
+      } else {
+        res = Math.max(res, data[i][ind][key]);
+      }
+    } else {
+      res = Math.max(res, data[i][ind][key]);
+    }
+  }
+  return res;
+};
+export const determineColor = (value, key, mn, mx) => {
+  switch (key) {
+    case "comfort":
+      return colorComfort(value[key]);
+    case "sensation":
+      return colorSensation(value[key]);
+    case "tskin":
+      return colorTskin(value[key], mn, mx);
+    case "tcore":
+      return colorTcore(value[key], mn, mx);
+    default:
+      return "white";
+  }
 };
 export const convertResultToArrayForCSV = (result) => {
   const {
@@ -140,18 +192,6 @@ export const convertResultToArrayForCSV = (result) => {
   ];
 };
 
-// for human body model color-rendering
-export const determineColor = (cs) => {
-  // cs = [comfort, sensation]
-  let f, s;
-  if (cs[0] < -1) f = "black";
-  else if (cs[0] >= -1 && cs[0] <= 1) f = "gray";
-  else f = "white";
-  if (cs[1] < -1) s = "blue";
-  else if (cs[1] >= -1 && cs[1] <= 1) s = "green";
-  else s = "pink";
-  return [f, s];
-};
 export const getCurrentConditionName = (time, params) => {
   let currParamTime = 0;
   for (let i = 0; i < params.length; i++) {
