@@ -4,7 +4,7 @@ numerical number,meaning,,numerical number,meaning
 -3,Cold,,-3,
 -2,Cool,,-2,Uncomofrtable
 -1,Slightly cool,,-1,
-0,Neutral,,0,Just comfortable/ just uncomfortable
+0,Neutral,,0,Just comfortable (+0) / just uncomfortable (-0)
 1,Slightly warm,,1,
 2,Warm,,2,Comfortable
 3,Hot,,3,
