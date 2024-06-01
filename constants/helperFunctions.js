@@ -200,3 +200,39 @@ export const getCurrentConditionName = (time, params) => {
   }
   return "Erroneous Condition";
 };
+
+export const formatComfDescriptor = (val) => {
+  if (val >= 4) {
+    return "very comfortable";
+  } else if (val >= 2) {
+    return "comfortable";
+  } else if (val >= 0.0001) {
+    return "just comfortable";
+  } else if (val > -0.0001) {
+    return "";
+  } else if (val > -2) {
+    return "just uncomfortable";
+  } else if (val > -4) {
+    return "uncomfortable";
+  } else return "very uncomfortable";
+};
+
+export const formatSensDescriptor = (val) => {
+  if (val >= 4) {
+    return "very hot";
+  } else if (val >= 3) {
+    return "hot";
+  } else if (val >= 2) {
+    return "warm";
+  } else if (val > 1) {
+    return "slightly warm";
+  } else if (val > -1) {
+    return "neutral";
+  } else if (val > -2) {
+    return "slightly cool";
+  } else if (val > -3) {
+    return "cool";
+  } else if (val > -4) {
+    return "cold";
+  } else return "very cold";
+};

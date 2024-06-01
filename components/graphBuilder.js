@@ -6,6 +6,8 @@ import {
   colorTcore,
   colorTskin,
   environmentMinimax,
+  formatComfDescriptor,
+  formatSensDescriptor,
   hfluxMinimax,
   miniMax,
 } from "@/constants/helperFunctions";
@@ -67,9 +69,14 @@ export function comfBuilder(data) {
       type: "value",
       name: "Value",
       nameLocation: "center",
-      nameTextStyle: { padding: 10 },
+      nameTextStyle: { padding: 30 },
       min: -4,
       max: 4,
+      axisLabel: {
+        formatter: function (val) {
+          return val + ": " + formatComfDescriptor(val);
+        },
+      },
     },
     dataZoom: [
       {
@@ -145,11 +152,16 @@ export function sensBuilder(data) {
     },
     yAxis: {
       type: "value",
-      name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
       min: -4,
       max: 4,
+      axisLabel: {
+        formatter: function (val) {
+          return val + ": " + formatSensDescriptor(val);
+        },
+      },
+      splitNumber: 10,
     },
     dataZoom: [
       {

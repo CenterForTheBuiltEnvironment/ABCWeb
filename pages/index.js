@@ -254,6 +254,9 @@ export default function WithSubnavigation() {
         for (let i = 0; i < bodyColors[params.dataIndex].length; i++) {
           tempColorArr.push(bodyColors[params.dataIndex][i]);
         }
+        console.log("yo " + params.dataIndex);
+        console.log(bodyColors);
+        console.log(tempColorArr);
         setCurrentColorArray(tempColorArr);
         let curr = 0;
         for (let i = 0; i < cache.length; i++) {
@@ -1015,11 +1018,26 @@ export default function WithSubnavigation() {
                           setSliderVal([0, totalDuration]);
 
                           let colorsArr = [];
+                          let mins = [],
+                            maxes = [];
+                          for (let i = 0; i <= 17; i++) {
+                            mins.push(
+                              findMin(res.data, places[i], currentChoiceToGraph)
+                            );
+                            maxes.push(
+                              findMax(res.data, places[i], currentChoiceToGraph)
+                            );
+                          }
                           for (let time = 0; time < res.data.length; time++) {
                             let bodyPartsArr = [];
                             for (let i = 0; i <= 17; i++) {
                               bodyPartsArr.push(
-                                colorComfort(res.data[time][places[i]].comfort)
+                                determineColor(
+                                  res.data[time][places[i]],
+                                  currentChoiceToGraph,
+                                  mins[i],
+                                  maxes[i]
+                                )
                               );
                             }
                             colorsArr.push(bodyPartsArr);
@@ -1350,11 +1368,26 @@ export default function WithSubnavigation() {
                       setSliderVal([0, totalDuration]);
 
                       let colorsArr = [];
+                      let mins = [],
+                        maxes = [];
+                      for (let i = 0; i <= 17; i++) {
+                        mins.push(
+                          findMin(res.data, places[i], currentChoiceToGraph)
+                        );
+                        maxes.push(
+                          findMax(res.data, places[i], currentChoiceToGraph)
+                        );
+                      }
                       for (let time = 0; time < res.data.length; time++) {
                         let bodyPartsArr = [];
                         for (let i = 0; i <= 17; i++) {
                           bodyPartsArr.push(
-                            colorComfort(res.data[time][places[i]].comfort)
+                            determineColor(
+                              res.data[time][places[i]],
+                              currentChoiceToGraph,
+                              mins[i],
+                              maxes[i]
+                            )
                           );
                         }
                         colorsArr.push(bodyPartsArr);
