@@ -1,4 +1,6 @@
+import { met_auto } from "@/constants/constants";
 import { Text } from "@chakra-ui/react";
+import { useEffect } from "react";
 import Creatable from "react-select/creatable";
 
 export default function MetSelector({
@@ -11,6 +13,7 @@ export default function MetSelector({
   ind,
   isHome = false,
 }) {
+  useEffect(() => {}, [params, metIndex]);
   return (
     <>
       <Text fontWeight="black">Metabolic rate</Text>
@@ -52,7 +55,11 @@ export default function MetSelector({
           ]);
           setMetIndex(metOptions.length);
         }}
-        value={metIndex != -1 ? metOptions[metIndex] : null}
+        value={
+          params[ind].met_value != -1
+            ? met_auto.find((e) => e.value == params[ind].met_value)
+            : null
+        }
         options={metOptions}
       />
       {params[ind].met_value != -1 ? (

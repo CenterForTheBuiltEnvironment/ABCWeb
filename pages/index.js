@@ -120,6 +120,7 @@ export default function WithSubnavigation() {
   const loadingModal = useDisclosure();
   const editModal = useDisclosure();
   const uploadModal = useDisclosure();
+  const [refreshKey, setRefreshKey] = useState(Math.random());
   const advancedModal = useDisclosure();
 
   const [bodyColors, setBodyColors] = useState([]);
@@ -238,7 +239,13 @@ export default function WithSubnavigation() {
 
   const toast = useToast();
 
-  useEffect(() => {}, [graphOptions, ind, numtoGraph, currentColorArray]);
+  useEffect(() => {}, [
+    metIndex,
+    graphOptions,
+    ind,
+    numtoGraph,
+    currentColorArray,
+  ]);
 
   const onEvents = useMemo(
     () => ({
@@ -280,8 +287,10 @@ export default function WithSubnavigation() {
         params={params}
         ind={ind}
         setParams={setParams}
+        setMetIndex={setMetIndex}
         conditionParams={conditionParams}
         toast={toast}
+        rKey={setRefreshKey}
       />
       <AdvancedSettingsModal
         disclosure={advancedModal}
@@ -486,6 +495,7 @@ export default function WithSubnavigation() {
                         setMetOptions={setMetOptions}
                         metOptions={metOptions}
                         ind={ind}
+                        key={refreshKey}
                       />
                       <ClothingSelector
                         params={params}
@@ -494,14 +504,15 @@ export default function WithSubnavigation() {
                         ind={ind}
                       />
                       <Text color="gray.600">
-                        {params[ind].clo_value} clo -{" "}
+                        {
+                          clo_correspondence[params[ind].clo_value].whole_body
+                            .iclo
+                        }{" "}
+                        clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
                           {
-                            clo_correspondence.find(
-                              (ensemble) =>
-                                ensemble.whole_body.iclo ===
-                                Number(params[ind].clo_value)
-                            ).description
+                            clo_correspondence[params[ind].clo_value]
+                              .description
                           }
                         </span>
                       </Text>
@@ -596,7 +607,6 @@ export default function WithSubnavigation() {
                       <RSelect
                         className="basic-single"
                         classNamePrefix="select"
-                        defaultValue={"comfort"}
                         isSearchable={true}
                         isClearable={false}
                         options={modes}
@@ -607,7 +617,7 @@ export default function WithSubnavigation() {
                             width: "20vw",
                           }),
                         }}
-                        placeholder="Select regimen to plot."
+                        placeholder={"Comfort"}
                         onChange={(val) => {
                           loadingModal.onOpen();
                           setCurrentChoiceToGraph(val.value);
@@ -872,14 +882,15 @@ export default function WithSubnavigation() {
                         isHome
                       />
                       <Text color="gray.600">
-                        {params[ind].clo_value} clo -{" "}
+                        {
+                          clo_correspondence[params[ind].clo_value].whole_body
+                            .iclo
+                        }{" "}
+                        clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
                           {
-                            clo_correspondence.find(
-                              (ensemble) =>
-                                ensemble.whole_body.iclo ===
-                                Number(params[ind].clo_value)
-                            ).description
+                            clo_correspondence[params[ind].clo_value]
+                              .description
                           }
                         </span>
                       </Text>
@@ -1064,6 +1075,7 @@ export default function WithSubnavigation() {
                     let phases = [];
                     let currTimer = 0;
                     for (let i = 0; i < params.length; i++) {
+                      let temp_condition_name = params[i].condition_name;
                       let temp_duration = params[i].exposure_duration;
                       let temp_met_activity_name =
                         "Custom-defined Met Activity";
@@ -1084,6 +1096,7 @@ export default function WithSubnavigation() {
                         clo_correspondence[parseInt(params[i].clo_value)]
                           .ensemble_name;
                       phases.push({
+                        condition_name: temp_condition_name,
                         start_time: currTimer,
                         time_units: "minutes",
                         ramp: params[i].ramp,
@@ -1395,25 +1408,170 @@ export default function WithSubnavigation() {
               alignSelf="center"
               onClick={async () => {
                 let phases = [];
+                let currTimer = 0;
                 for (let i = 0; i < params.length; i++) {
+                  let temp_condition_name = params[i].condition_name;
+                  let temp_duration = params[i].exposure_duration;
+                  let temp_met_activity_name = "Custom-defined Met Activity";
+                  let temp_met_activity_value = parseFloat(params[i].met_value);
+                  let temp_relative_humidity = params[i].relative_humidity.map(
+                    function (x) {
+                      return parseFloat(x) / 100;
+                    }
+                  );
+                  let temp_air_speed = params[i].air_speed.map(Number);
+                  let temp_air_temperature =
+                    params[i].air_temperature.map(Number);
+                  let temp_radiant_temperature =
+                    params[i].radiant_temperature.map(Number);
+                  let temp_clo_ensemble_name =
+                    clo_correspondence[
+                      clo_correspondence.find(
+                        (ensemble) =>
+                          parseInt(ensemble.iclo) ===
+                          parseFloat(params[i].clo_value)
+                      )
+                    ];
                   phases.push({
-                    exposure_duration: params[i].exposure_duration,
-                    met_activity_name: "Custom-defined Met Activity",
+                    condition_name: temp_condition_name,
+                    start_time: currTimer,
+                    time_units: "minutes",
                     ramp: params[i].ramp,
-                    met_activity_value: parseFloat(params[i].met_value),
-                    relative_humidity: params[i].relative_humidity.map(
-                      function (x) {
-                        return parseFloat(x) / 100;
-                      }
-                    ),
-                    air_speed: params[i].air_speed.map(Number),
-                    air_temperature: params[i].air_temperature.map(Number),
-                    radiant_temperature:
-                      params[i].radiant_temperature.map(Number),
-                    clo_ensemble_name:
-                      clo_correspondence[parseInt(params[i].clo_value)]
-                        .ensemble_name,
+                    end_time: currTimer + temp_duration,
+                    met_activity_name: temp_met_activity_name,
+                    met: temp_met_activity_value,
+                    default_data: {
+                      rh:
+                        temp_relative_humidity.reduce((a, b) => a + b) /
+                        (temp_relative_humidity.length * 100),
+                      v:
+                        temp_air_speed.reduce((a, b) => a + b) /
+                        temp_air_speed.length,
+                      solar: 0,
+                      ta:
+                        temp_air_temperature.reduce((a, b) => a + b) /
+                        temp_air_temperature.length,
+                      mrt:
+                        temp_radiant_temperature.reduce((a, b) => a + b) /
+                        temp_radiant_temperature.length,
+                    },
+                    clo_ensemble_name: temp_clo_ensemble_name,
+                    segment_data: {
+                      Head: {
+                        mrt: temp_radiant_temperature[0],
+                        rh: temp_relative_humidity[0],
+                        solar: 0,
+                        ta: temp_air_temperature[0],
+                        v: temp_air_speed[0],
+                      },
+                      Chest: {
+                        mrt: temp_radiant_temperature[1],
+                        rh: temp_relative_humidity[1],
+                        solar: 0,
+                        ta: temp_air_temperature[1],
+                        v: temp_air_speed[1],
+                      },
+                      Back: {
+                        mrt: temp_radiant_temperature[2],
+                        rh: temp_relative_humidity[2],
+                        solar: 0,
+                        ta: temp_air_temperature[2],
+                        v: temp_air_speed[2],
+                      },
+                      Pelvis: {
+                        mrt: temp_radiant_temperature[3],
+                        rh: temp_relative_humidity[3],
+                        solar: 0,
+                        ta: temp_air_temperature[3],
+                        v: temp_air_speed[3],
+                      },
+                      "Left Upper Arm": {
+                        mrt: temp_radiant_temperature[4],
+                        rh: temp_relative_humidity[4],
+                        solar: 0,
+                        ta: temp_air_temperature[4],
+                        v: temp_air_speed[4],
+                      },
+                      "Right Upper Arm": {
+                        mrt: temp_radiant_temperature[5],
+                        rh: temp_relative_humidity[5],
+                        solar: 0,
+                        ta: temp_air_temperature[5],
+                        v: temp_air_speed[5],
+                      },
+                      "Left Lower Arm": {
+                        mrt: temp_radiant_temperature[6],
+                        rh: temp_relative_humidity[6],
+                        solar: 0,
+                        ta: temp_air_temperature[6],
+                        v: temp_air_speed[6],
+                      },
+                      "Right Lower Arm": {
+                        mrt: temp_radiant_temperature[7],
+                        rh: temp_relative_humidity[7],
+                        solar: 0,
+                        ta: temp_air_temperature[7],
+                        v: temp_air_speed[7],
+                      },
+                      "Left Hand": {
+                        mrt: temp_radiant_temperature[8],
+                        rh: temp_relative_humidity[8],
+                        solar: 0,
+                        ta: temp_air_temperature[8],
+                        v: temp_air_speed[8],
+                      },
+                      "Right Hand": {
+                        mrt: temp_radiant_temperature[9],
+                        rh: temp_relative_humidity[9],
+                        solar: 0,
+                        ta: temp_air_temperature[9],
+                        v: temp_air_speed[9],
+                      },
+                      "Left Thigh": {
+                        mrt: temp_radiant_temperature[10],
+                        rh: temp_relative_humidity[10],
+                        solar: 0,
+                        ta: temp_air_temperature[10],
+                        v: temp_air_speed[10],
+                      },
+                      "Right Thigh": {
+                        mrt: temp_radiant_temperature[11],
+                        rh: temp_relative_humidity[11],
+                        solar: 0,
+                        ta: temp_air_temperature[11],
+                        v: temp_air_speed[11],
+                      },
+                      "Left Lower Leg": {
+                        mrt: temp_radiant_temperature[12],
+                        rh: temp_relative_humidity[12],
+                        solar: 0,
+                        ta: temp_air_temperature[12],
+                        v: temp_air_speed[12],
+                      },
+                      "Right Lower Leg": {
+                        mrt: temp_radiant_temperature[13],
+                        rh: temp_relative_humidity[13],
+                        solar: 0,
+                        ta: temp_air_temperature[13],
+                        v: temp_air_speed[13],
+                      },
+                      "Left Foot": {
+                        mrt: temp_radiant_temperature[14],
+                        rh: temp_relative_humidity[14],
+                        solar: 0,
+                        ta: temp_air_temperature[14],
+                        v: temp_air_speed[14],
+                      },
+                      "Right Foot": {
+                        mrt: temp_radiant_temperature[15],
+                        rh: temp_relative_humidity[15],
+                        solar: 0,
+                        ta: temp_air_temperature[15],
+                        v: temp_air_speed[15],
+                      },
+                    },
                   });
+                  currTimer += temp_duration;
                 }
                 const obj = {
                   name: "CBE Interface Test",

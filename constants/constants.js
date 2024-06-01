@@ -129,7 +129,7 @@ export const conditionParams = (num) => {
     air_speed: Array(16).fill("0.1"),
     relative_humidity: Array(16).fill("50"),
     met_value: 1,
-    clo_value: "0.52",
+    clo_value: 2,
     at_delta: "0",
     mr_delta: "0",
     as_delta: "0",

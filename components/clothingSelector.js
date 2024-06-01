@@ -15,7 +15,7 @@ export default function ClothingSelector({
         w={isHome ? "250px" : "200px"}
         onChange={(e) => {
           let newState = [...params];
-          newState[ind].clo_value = e.target.value.toString();
+          newState[ind].clo_value = e.target.value;
           setParams(newState);
         }}
         value={params[ind].clo_value}
@@ -25,7 +25,7 @@ export default function ClothingSelector({
             <option
               size="md"
               key={clo.description}
-              value={clo.whole_body.iclo}
+              value={index}
               style={{ backgroundColor: "white" }}
             >
               {clo.ensemble_name}
