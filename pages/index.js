@@ -76,6 +76,7 @@ import {
   convertResultToArrayForCSV,
   findMin,
   findMax,
+  getSaveFilePicker,
 } from "@/constants/helperFunctions";
 
 import OptionRenderer from "@/components/optionRenderer";
@@ -1270,18 +1271,17 @@ export default function WithSubnavigation() {
                       phases: phases,
                       clothing: clo_correspondence,
                     };
-                    var dataStr =
-                      "data:text/json;charset=utf-8," +
-                      encodeURIComponent(JSON.stringify(obj));
-                    var downloadAncharNode = document.createElement("a");
-                    downloadAncharNode.setAttribute("href", dataStr);
-                    downloadAncharNode.setAttribute(
-                      "download",
-                      "Parameters.json"
-                    );
-                    document.body.appendChild(downloadAncharNode);
-                    downloadAncharNode.click();
-                    downloadAncharNode.remove();
+                    try {
+                      const fh = await getSaveFilePicker();
+                      const writeable = await fh.createWritable();
+                      await writeable.write(
+                        new Blob([JSON.stringify(obj, undefined, 2)], {
+                          type: "application/json",
+                        })
+                      );
+                    } catch (e) {
+                      alert(e);
+                    }
                   }}
                 >
                   Save
@@ -1622,15 +1622,17 @@ export default function WithSubnavigation() {
                   phases: phases,
                   clothing: clo_correspondence,
                 };
-                var dataStr =
-                  "data:text/json;charset=utf-8," +
-                  encodeURIComponent(JSON.stringify(obj));
-                var downloadAncharNode = document.createElement("a");
-                downloadAncharNode.setAttribute("href", dataStr);
-                downloadAncharNode.setAttribute("download", "Parameters.json");
-                document.body.appendChild(downloadAncharNode);
-                downloadAncharNode.click();
-                downloadAncharNode.remove();
+                try {
+                  const fh = await getSaveFilePicker();
+                  const writeable = await fh.createWritable();
+                  await writeable.write(
+                    new Blob([JSON.stringify(obj, undefined, 2)], {
+                      type: "application/json",
+                    })
+                  );
+                } catch (e) {
+                  alert(e);
+                }
               }}
             >
               Save

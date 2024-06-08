@@ -9,6 +9,7 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalCloseButton,
+  Text,
 } from "@chakra-ui/react";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import styles from "../styles/Home.module.css";
@@ -92,9 +93,10 @@ export default function UploadModal({
       let temp_ensemble = clo_correspondence.findIndex(
         (ensemble) => ensemble.ensemble_name === phase[j].clo_ensemble_name
       );
-      const isEmpty = Object.values(newObj).every(
-        (x) => x === null || x === ""
-      );
+
+      const isEmpty =
+        temp_ensemble == -1 ||
+        Object.values(newObj).every((x) => x === null || x === "");
       if (isEmpty) {
         toast.closeAll();
         toast({
@@ -127,6 +129,10 @@ export default function UploadModal({
             name="parameterjson"
             accept=".json"
           />
+          <Text marginTop="10px">
+            (Running into an error? Check that your clothing ensemble name is
+            correct and that other fields are nonempty.)
+          </Text>
         </ModalBody>
         <ModalFooter>
           <Button

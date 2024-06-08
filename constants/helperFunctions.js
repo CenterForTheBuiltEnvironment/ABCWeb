@@ -224,7 +224,7 @@ export const formatSensDescriptor = (val) => {
     return "hot";
   } else if (val >= 2) {
     return "warm";
-  } else if (val > 1) {
+  } else if (val >= 1) {
     return "slightly warm";
   } else if (val > -1) {
     return "neutral";
@@ -235,4 +235,17 @@ export const formatSensDescriptor = (val) => {
   } else if (val > -4) {
     return "cold";
   } else return "very cold";
+};
+
+export const getSaveFilePicker = async () => {
+  const opts = {
+    suggestedName: "Parameters.json",
+    types: [
+      {
+        accept: { "application/json": [".json"] },
+      },
+    ],
+    startIn: "downloads",
+  };
+  return await window.showSaveFilePicker(opts);
 };
