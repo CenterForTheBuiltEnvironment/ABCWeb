@@ -9,7 +9,6 @@
 // clo_ensemble_name
 
 import axios from "axios";
-import clothing from "../../reference/local clo input/clothing_ensembles.json";
 
 const stand_fr = {
   Head: 1.0,
@@ -210,7 +209,7 @@ export default async function handler(req, res) {
         },
         bodybuilder: req.body.bodyb,
         phases: phases,
-        clothing: clothing,
+        clothing: req.body.clothing,
       };
       const interfaceResult = await axios
         .post(process.env.DB_URL, {

@@ -11,12 +11,13 @@ import {
   ModalCloseButton,
   Text,
 } from "@chakra-ui/react";
-import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import styles from "../styles/Home.module.css";
 
 export default function UploadModal({
   disclosure,
   setParams,
+  cloTable,
+  setCloTable,
   setMetIndex,
   toast,
   rKey,
@@ -52,7 +53,27 @@ export default function UploadModal({
 
   const handleParsedJson = (jsonData) => {
     let phase = jsonData.phases;
+    let clothing = jsonData.clothing;
     let updatedParams = [];
+
+    // check clothing ensembles
+    let newCloObj = cloTable;
+    let needToAppendLater = [];
+    for (let i = 0; i < clothing.length; i++) {
+      if (
+        cloTable.some((e) => JSON.stringify(e) == JSON.stringify(clothing[i]))
+      )
+        continue;
+      if (cloTable.some((e) => e.ensemble_name == clothing[i].ensemble_name)) {
+        // means need to append a new one
+        needToAppendLater.push(clothing[i].ensemble_name);
+        clothing[i].ensemble_name += "-asUploadedParameter";
+        newCloObj.push(clothing[i]);
+      }
+    }
+
+    setCloTable(newCloObj);
+
     for (let j = 0; j < phase.length; j++) {
       const format = [
         "Head",
@@ -90,9 +111,22 @@ export default function UploadModal({
       newObj.radiant_temperature = format.map((e) =>
         String(phase[j].segment_data[e].mrt)
       );
-      let temp_ensemble = clo_correspondence.findIndex(
-        (ensemble) => ensemble.ensemble_name === phase[j].clo_ensemble_name
-      );
+
+      let temp_ensemble = cloTable.findIndex((ensemble) => {
+        console.log(
+          JSON.stringify(ensemble) +
+            " " +
+            phase[j].clo_ensemble_name +
+            " " +
+            JSON.stringify(needToAppendLater)
+        );
+        if (needToAppendLater.includes(phase[j].clo_ensemble_name)) {
+          return (
+            ensemble.ensemble_name ===
+            phase[j].clo_ensemble_name + "-asUploadedParameter"
+          );
+        } else return ensemble.ensemble_name === phase[j].clo_ensemble_name;
+      });
 
       const isEmpty =
         temp_ensemble == -1 ||

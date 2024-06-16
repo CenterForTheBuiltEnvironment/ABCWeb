@@ -134,6 +134,8 @@ export default function WithSubnavigation() {
   const [sliderVal, setSliderVal] = useState([0, 0]);
   const [comfortView, setComfortView] = useState(true);
 
+  const [cloTable, setCloTable] = useState(clo_correspondence);
+
   const decideGraph = (tempArr, choice = "") => {
     let graphedChoice = choice;
     if (graphedChoice == "") graphedChoice = currentChoiceToGraph;
@@ -292,6 +294,8 @@ export default function WithSubnavigation() {
         ind={ind}
         setParams={setParams}
         setMetIndex={setMetIndex}
+        cloTable={cloTable}
+        setCloTable={setCloTable}
         conditionParams={conditionParams}
         toast={toast}
         rKey={setRefreshKey}
@@ -504,20 +508,13 @@ export default function WithSubnavigation() {
                       <ClothingSelector
                         params={params}
                         setParams={setParams}
-                        clo_correspondence={clo_correspondence}
+                        clo_correspondence={cloTable}
                         ind={ind}
                       />
                       <Text color="gray.600">
-                        {
-                          clo_correspondence[params[ind].clo_value].whole_body
-                            .iclo
-                        }{" "}
-                        clo -{" "}
+                        {cloTable[params[ind].clo_value].whole_body.iclo} clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
-                          {
-                            clo_correspondence[params[ind].clo_value]
-                              .description
-                          }
+                          {cloTable[params[ind].clo_value].description}
                         </span>
                       </Text>
                       <Menu>
@@ -881,21 +878,14 @@ export default function WithSubnavigation() {
                       <ClothingSelector
                         params={params}
                         setParams={setParams}
-                        clo_correspondence={clo_correspondence}
+                        clo_correspondence={cloTable}
                         ind={ind}
                         isHome
                       />
                       <Text color="gray.600">
-                        {
-                          clo_correspondence[params[ind].clo_value].whole_body
-                            .iclo
-                        }{" "}
-                        clo -{" "}
+                        {cloTable[params[ind].clo_value].whole_body.iclo} clo -{" "}
                         <span style={{ fontSize: "13px", color: "gray.600" }}>
-                          {
-                            clo_correspondence[params[ind].clo_value]
-                              .description
-                          }
+                          {cloTable[params[ind].clo_value].description}
                         </span>
                       </Text>
                       <Checkbox
@@ -981,16 +971,18 @@ export default function WithSubnavigation() {
                           radiant_temperature:
                             params[i].radiant_temperature.map(Number),
                           clo_ensemble_name:
-                            clo_correspondence[parseInt(params[i].clo_value)]
+                            cloTable[parseInt(params[i].clo_value)]
                               .ensemble_name,
                         });
                       }
                       let bodyb = bodybuilderObj;
+                      let clothing = cloTable;
                       const metrics = await axios
                         .post("/api/process", {
                           // Chaining of data is intentional
                           phases,
                           bodyb,
+                          clothing,
                         })
                         .then((res) => {
                           if ("success" in res.data) {
@@ -1112,8 +1104,7 @@ export default function WithSubnavigation() {
                       let temp_radiant_temperature =
                         params[i].radiant_temperature.map(Number);
                       let temp_clo_ensemble_name =
-                        clo_correspondence[parseInt(params[i].clo_value)]
-                          .ensemble_name;
+                        cloTable[parseInt(params[i].clo_value)].ensemble_name;
                       phases.push({
                         condition_name: temp_condition_name,
                         start_time: currTimer,
@@ -1269,7 +1260,7 @@ export default function WithSubnavigation() {
                         neutralSimulationOutput: false,
                       },
                       phases: phases,
-                      clothing: clo_correspondence,
+                      clothing: cloTable,
                     };
                     try {
                       const fh = await getSaveFilePicker();
@@ -1331,16 +1322,17 @@ export default function WithSubnavigation() {
                       radiant_temperature:
                         params[i].radiant_temperature.map(Number),
                       clo_ensemble_name:
-                        clo_correspondence[parseInt(params[i].clo_value)]
-                          .ensemble_name,
+                        cloTable[parseInt(params[i].clo_value)].ensemble_name,
                     });
                   }
                   let bodyb = bodybuilderObj;
+                  let clothing = cloTable;
                   const metrics = await axios
                     .post("/api/process", {
                       // Chaining of data is intentional
                       phases,
                       bodyb,
+                      clothing,
                     })
                     .then((res) => {
                       if ("success" in res.data) {
@@ -1458,8 +1450,8 @@ export default function WithSubnavigation() {
                   let temp_radiant_temperature =
                     params[i].radiant_temperature.map(Number);
                   let temp_clo_ensemble_name =
-                    clo_correspondence[
-                      clo_correspondence.find(
+                    cloTable[
+                      cloTable.find(
                         (ensemble) =>
                           parseInt(ensemble.iclo) ===
                           parseFloat(params[i].clo_value)
@@ -1620,7 +1612,7 @@ export default function WithSubnavigation() {
                     neutralSimulationOutput: false,
                   },
                   phases: phases,
-                  clothing: clo_correspondence,
+                  clothing: cloTable,
                 };
                 try {
                   const fh = await getSaveFilePicker();

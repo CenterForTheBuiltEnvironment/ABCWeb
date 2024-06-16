@@ -88,7 +88,7 @@
     {
       "ensemble_name": "Nude",
       "description": "nude",
-      "whole_body": { "fclo": 1, "iclo": 0 },
+      "whole_body": { "fclo": 1.11, "iclo": 0.123 },
       "segment_data": {
         "Head": { "fclo": 1, "iclo": 0 },
         "Neck": { "fclo": 1, "iclo": 0 },
@@ -112,7 +112,7 @@
     {
       "ensemble_name": "Summer light",
       "description": "bra+panty, tank top, skirt, sandals",
-      "whole_body": { "fclo": 1.09, "iclo": 0.31 },
+      "whole_body": { "fclo": 1.101, "iclo": 0.323 },
       "segment_data": {
         "Head": { "fclo": 1, "iclo": 0 },
         "Neck": { "fclo": 1, "iclo": 0 },
@@ -136,25 +136,25 @@
     {
       "ensemble_name": "Summer casual",
       "description": "bra+panty, T-shirt, long pants, socks, sneakers",
-      "whole_body": { "fclo": 1.16, "iclo": 0.52 },
+      "whole_body": { "fclo": 3.5, "iclo": 3.5 },
       "segment_data": {
-        "Head": { "fclo": 1, "iclo": 0 },
-        "Neck": { "fclo": 1, "iclo": 0 },
-        "Chest": { "fclo": 1.34, "iclo": 1.14 },
-        "Back": { "fclo": 1.25, "iclo": 0.84 },
-        "Pelvis": { "fclo": 1.31, "iclo": 1.04 },
-        "Left Upper Arm": { "fclo": 1.13, "iclo": 0.42 },
-        "Left Lower Arm": { "fclo": 1, "iclo": 0 },
-        "Left Hand": { "fclo": 1, "iclo": 0 },
-        "Right Upper Arm": { "fclo": 1.13, "iclo": 0.42 },
-        "Right Lower Arm": { "fclo": 1, "iclo": 0 },
-        "Right Hand": { "fclo": 1, "iclo": 0 },
-        "Left Thigh": { "fclo": 1.17, "iclo": 0.58 },
-        "Left Lower Leg": { "fclo": 1.19, "iclo": 0.62 },
-        "Left Foot": { "fclo": 1.25, "iclo": 0.82 },
-        "Right Thigh": { "fclo": 1.17, "iclo": 0.58 },
-        "Right Lower Leg": { "fclo": 1.19, "iclo": 0.62 },
-        "Right Foot": { "fclo": 1.25, "iclo": 0.82 }
+        "Head": { "fclo": 3.5, "iclo": 3.5 },
+        "Neck": { "fclo": 3.5, "iclo": 3.5 },
+        "Chest": { "fclo": 3.5, "iclo": 3.5 },
+        "Back": { "fclo": 3.5, "iclo": 3.5 },
+        "Pelvis": { "fclo": 3.5, "iclo": 3.5 },
+        "Left Upper Arm": { "fclo": 3.5, "iclo": 3.5 },
+        "Left Lower Arm": { "fclo": 3.5, "iclo": 3.5 },
+        "Left Hand": { "fclo": 3.5, "iclo": 3.5 },
+        "Right Upper Arm": { "fclo": 3.5, "iclo": 3.5 },
+        "Right Lower Arm": { "fclo": 3.5, "iclo": 3.5 },
+        "Right Hand": { "fclo": 3.5, "iclo": 3.5 },
+        "Left Thigh": { "fclo": 3.5, "iclo": 3.5 },
+        "Left Lower Leg": { "fclo": 3.5, "iclo": 3.5 },
+        "Left Foot": { "fclo": 3.5, "iclo": 3.5 },
+        "Right Thigh": { "fclo": 3.5, "iclo": 3.5 },
+        "Right Lower Leg": { "fclo": 3.5, "iclo": 3.5 },
+        "Right Foot": { "fclo": 3.5, "iclo": 3.5 }
       }
     },
     {
