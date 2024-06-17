@@ -1270,6 +1270,7 @@ export default function WithSubnavigation() {
                           type: "application/json",
                         })
                       );
+                      await writeable.close();
                     } catch (e) {
                       alert(e);
                     }
@@ -1622,6 +1623,7 @@ export default function WithSubnavigation() {
                       type: "application/json",
                     })
                   );
+                  await writeable.close();
                 } catch (e) {
                   alert(e);
                 }
