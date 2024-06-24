@@ -31,13 +31,6 @@ import {
   RangeSliderThumb,
   RangeSliderMark,
   Tooltip,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
 } from "@chakra-ui/react";
 import RSelect from "react-select";
 import {
@@ -51,7 +44,7 @@ import {
 } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import Head from "next/head";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import dynamic from "next/dynamic";
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
@@ -77,6 +70,7 @@ import {
   findMin,
   findMax,
   getSaveFilePicker,
+  determineColorFunction,
 } from "@/constants/helperFunctions";
 
 import OptionRenderer from "@/components/optionRenderer";
@@ -128,6 +122,7 @@ export default function WithSubnavigation() {
   const [currentColorArray, setCurrentColorArray] = useState(
     Array(18).fill("white")
   );
+
   const [csvData, setCSVData] = useState();
   const [currentChoiceToGraph, setCurrentChoiceToGraph] = useState("comfort");
   const [sliderMaxVal, setSliderMaxVal] = useState(0);
@@ -136,7 +131,7 @@ export default function WithSubnavigation() {
 
   const [cloTable, setCloTable] = useState(clo_correspondence);
 
-  const decideGraph = (tempArr, choice = "") => {
+  const decideGraph = (tempArr, value, choice = "") => {
     let graphedChoice = choice;
     if (graphedChoice == "") graphedChoice = currentChoiceToGraph;
     if (graphedChoice == "sensation") {
@@ -156,7 +151,7 @@ export default function WithSubnavigation() {
       });
     } else if (graphedChoice == "tcore") {
       let tcoreArr = [...tempArr];
-      if (numtoGraph == 0) {
+      if (value == 0) {
         // overall
         for (let i = 0; i < tcoreArr.length; i++) {
           tcoreArr[i]["tcore"] = tcoreArr[i].tblood;
@@ -167,7 +162,7 @@ export default function WithSubnavigation() {
         legends: ["Core Temperature"],
       });
     } else if (graphedChoice == "hflux") {
-      if (numtoGraph == 0) {
+      if (value == 0) {
         // overall
         return hfluxBuilder({
           data: tempArr,
@@ -257,9 +252,6 @@ export default function WithSubnavigation() {
         for (let i = 0; i < bodyColors[params.dataIndex].length; i++) {
           tempColorArr.push(bodyColors[params.dataIndex][i]);
         }
-        console.log("yo " + params.dataIndex);
-        console.log(bodyColors);
-        console.log(tempColorArr);
         setCurrentColorArray(tempColorArr);
         let curr = 0;
         for (let i = 0; i < cache.length; i++) {
@@ -601,7 +593,7 @@ export default function WithSubnavigation() {
                             });
                           }
                           setData(changedArr);
-                          setGraph(decideGraph(changedArr));
+                          setGraph(decideGraph(changedArr, val.value));
                           loadingModal.onClose();
                         }}
                       />
@@ -625,6 +617,7 @@ export default function WithSubnavigation() {
                           setGraph(
                             decideGraph(
                               graphData.slice(sliderVal[0], sliderVal[1]),
+                              numtoGraph,
                               val.value
                             )
                           );
@@ -698,7 +691,7 @@ export default function WithSubnavigation() {
                                   index: j,
                                 });
                               }
-                              setGraph(decideGraph(tempArr));
+                              setGraph(decideGraph(tempArr, numtoGraph));
                             }}
                           >
                             <RangeSliderTrack height="10px" bg="#3ebced">
@@ -748,7 +741,11 @@ export default function WithSubnavigation() {
                             {currIndex[1]} mins{" "}
                           </span>
                         </Text>
+                        <Text textAlign="center" w="100%">
+                          Click a data point to visualize on manikin.
+                        </Text>
                         <Canvass currentColorArray={currentColorArray} />
+                        {determineColorFunction(currentChoiceToGraph)}
                         <Text>Drag to rotate model.</Text>
                       </VStack>
                     </HStack>
@@ -983,6 +980,7 @@ export default function WithSubnavigation() {
                           phases,
                           bodyb,
                           clothing,
+                          raw: false,
                         })
                         .then((res) => {
                           if ("success" in res.data) {
@@ -1001,7 +999,7 @@ export default function WithSubnavigation() {
                           setData(tempArr);
                           setFullData(res.data);
                           setCache(params.slice());
-                          setGraph(decideGraph(tempArr));
+                          setGraph(decideGraph(tempArr, numtoGraph));
 
                           let totalDuration = 0;
                           for (let i = 0; i < params.length; i++) {
@@ -1246,6 +1244,40 @@ export default function WithSubnavigation() {
                       });
                       currTimer += temp_duration;
                     }
+
+                    let phasesToPass = [];
+                    for (let i = 0; i < params.length; i++) {
+                      phasesToPass.push({
+                        exposure_duration: params[i].exposure_duration,
+                        met_activity_name: "Custom-defined Met Activity",
+                        ramp: params[i].ramp,
+                        met_activity_value: parseFloat(params[i].met_value),
+                        relative_humidity: params[i].relative_humidity.map(
+                          function (x) {
+                            return parseFloat(x) / 100;
+                          }
+                        ),
+                        air_speed: params[i].air_speed.map(Number),
+                        air_temperature: params[i].air_temperature.map(Number),
+                        radiant_temperature:
+                          params[i].radiant_temperature.map(Number),
+                        clo_ensemble_name:
+                          cloTable[parseInt(params[i].clo_value)].ensemble_name,
+                      });
+                    }
+                    let bodyb = bodybuilderObj;
+                    let clothing = cloTable;
+                    const resultsToPass = await axios
+                      .post("/api/process", {
+                        // Chaining of data is intentional
+                        phases: phasesToPass,
+                        bodyb,
+                        clothing,
+                        raw: true,
+                      })
+                      .then((res) => {
+                        return res.data;
+                      });
                     const obj = {
                       name: "CBE Interface Test",
                       description: "Prototype testing requests",
@@ -1261,6 +1293,7 @@ export default function WithSubnavigation() {
                       },
                       phases: phases,
                       clothing: cloTable,
+                      results: resultsToPass,
                     };
                     try {
                       const fh = await getSaveFilePicker();
@@ -1334,6 +1367,7 @@ export default function WithSubnavigation() {
                       phases,
                       bodyb,
                       clothing,
+                      raw: false,
                     })
                     .then((res) => {
                       if ("success" in res.data) {
@@ -1351,7 +1385,7 @@ export default function WithSubnavigation() {
                       setData(tempArr);
                       setFullData(res.data);
                       setCache(params.slice());
-                      setGraph(decideGraph(tempArr));
+                      setGraph(decideGraph(tempArr, numtoGraph));
 
                       let totalDuration = 0;
                       for (let i = 0; i < params.length; i++) {

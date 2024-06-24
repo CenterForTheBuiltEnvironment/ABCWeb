@@ -1,3 +1,5 @@
+import { HStack, Text } from "@chakra-ui/react";
+
 export const miniMax = (value, data, label) => {
   // 0 for finding min, 1 for finding max
   let curr = 0;
@@ -135,6 +137,65 @@ export const determineColor = (value, key, mn, mx) => {
       return colorTcore(value[key], mn, mx);
     default:
       return "white";
+  }
+};
+export const determineColorFunction = (key) => {
+  switch (key) {
+    case "comfort":
+      return (
+        <HStack w="100%" spacing={0}>
+          <div
+            style={{
+              width: "33%",
+              height: "20px",
+              backgroundColor: "black",
+            }}
+          />
+          <div
+            style={{
+              width: "33%",
+              height: "20px",
+              backgroundColor: "gray",
+            }}
+          />
+          <div
+            style={{
+              width: "33%",
+              height: "20px",
+              backgroundColor: "white",
+            }}
+          />
+        </HStack>
+      );
+    case "sensation":
+    case "tskin":
+    case "tcore":
+      return (
+        <HStack w="100%" spacing={0}>
+          <div
+            style={{
+              width: "50%",
+              height: "20px",
+              backgroundImage: "linear-gradient(to right, blue, green)",
+            }}
+          />
+          <div
+            style={{
+              width: "50%",
+              height: "20px",
+              backgroundImage: "linear-gradient(to right, green, red)",
+            }}
+          />
+        </HStack>
+      );
+    default:
+      return (
+        <HStack w="100%" spacing={0}>
+          <Text textAlign="center" w="100%">
+            No color scheme.
+          </Text>
+        </HStack>
+      );
   }
 };
 export const convertResultToArrayForCSV = (result) => {

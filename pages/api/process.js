@@ -216,6 +216,9 @@ export default async function handler(req, res) {
           ...obj,
         })
         .then((result) => {
+          if (req.body.raw) {
+            return res.json(result.data);
+          }
           let graphObject = [],
             ctr = 0;
           for (let i = 0; i < req.body.phases.length; i++) {
