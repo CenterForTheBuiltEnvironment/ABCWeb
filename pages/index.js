@@ -1485,13 +1485,7 @@ export default function WithSubnavigation() {
                   let temp_radiant_temperature =
                     params[i].radiant_temperature.map(Number);
                   let temp_clo_ensemble_name =
-                    cloTable[
-                      cloTable.find(
-                        (ensemble) =>
-                          parseInt(ensemble.iclo) ===
-                          parseFloat(params[i].clo_value)
-                      )
-                    ];
+                    cloTable[parseInt(params[i].clo_value)].ensemble_name;
                   phases.push({
                     condition_name: temp_condition_name,
                     start_time: currTimer,
@@ -1633,6 +1627,39 @@ export default function WithSubnavigation() {
                   });
                   currTimer += temp_duration;
                 }
+                let phasesToPass = [];
+                for (let i = 0; i < params.length; i++) {
+                  phasesToPass.push({
+                    exposure_duration: params[i].exposure_duration,
+                    met_activity_name: "Custom-defined Met Activity",
+                    ramp: params[i].ramp,
+                    met_activity_value: parseFloat(params[i].met_value),
+                    relative_humidity: params[i].relative_humidity.map(
+                      function (x) {
+                        return parseFloat(x) / 100;
+                      }
+                    ),
+                    air_speed: params[i].air_speed.map(Number),
+                    air_temperature: params[i].air_temperature.map(Number),
+                    radiant_temperature:
+                      params[i].radiant_temperature.map(Number),
+                    clo_ensemble_name:
+                      cloTable[parseInt(params[i].clo_value)].ensemble_name,
+                  });
+                }
+                let bodyb = bodybuilderObj;
+                let clothing = cloTable;
+                const resultsToPass = await axios
+                  .post("/api/process", {
+                    // Chaining of data is intentional
+                    phases: phasesToPass,
+                    bodyb,
+                    clothing,
+                    raw: true,
+                  })
+                  .then((res) => {
+                    return res.data;
+                  });
                 const obj = {
                   name: "CBE Interface Test",
                   description: "Prototype testing requests",
@@ -1648,6 +1675,7 @@ export default function WithSubnavigation() {
                   },
                   phases: phases,
                   clothing: cloTable,
+                  results: resultsToPass,
                 };
                 try {
                   const fh = await getSaveFilePicker();
