@@ -667,70 +667,78 @@ export default function WithSubnavigation() {
                     </HStack>
                     <HStack w="100%">
                       <VStack w="75%">
-                        <Box width="100%" height="45vh">
-                          <ReactECharts
-                            notMerge={true}
-                            option={graphOptions}
-                            onEvents={onEvents}
-                            style={{ height: "100%" }}
-                          />
-                          <RangeSlider
-                            left="5%"
-                            top="10px"
-                            w="90%"
-                            value={sliderVal}
-                            min={0}
-                            max={sliderMaxVal}
-                            step={1}
-                            onChange={(e) => {
-                              setSliderVal([e[0], e[1]]);
-                              let tempArr = [];
-                              for (let j = e[0]; j < e[1]; j++) {
-                                tempArr.push({
-                                  ...fullData[j][numtoGraph],
-                                  index: j,
-                                });
-                              }
-                              setGraph(decideGraph(tempArr, numtoGraph));
-                            }}
-                          >
-                            <RangeSliderTrack height="10px" bg="#3ebced">
-                              <RangeSliderFilledTrack bg="#1b75bc" />
-                            </RangeSliderTrack>
-                            <Tooltip
-                              label={`${sliderVal[0]} mins`}
-                              placement="top"
-                            >
-                              <RangeSliderThumb
-                                borderWidth="7px"
-                                boxSize={3}
-                                index={0}
+                        <Box width="100%">
+                          <HStack w="100%" h="45vh">
+                            <VStack w="98.5%" h="100%">
+                              <ReactECharts
+                                notMerge={true}
+                                option={graphOptions}
+                                onEvents={onEvents}
+                                style={{ height: "100%", width: "100%" }}
                               />
-                            </Tooltip>
-                            <Tooltip
-                              label={`${sliderVal[1]} mins`}
-                              placement="top"
-                            >
-                              <RangeSliderThumb
-                                borderWidth="7px"
-                                boxSize={3}
-                                index={1}
-                              />
-                            </Tooltip>
-                            <div style={{ marginTop: "10px" }}>
-                              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                                <RangeSliderMark
-                                  key={i}
-                                  value={(sliderMaxVal / 6) * i}
-                                  mt="1"
-                                  ml="-2.5"
-                                  fontSize="sm"
+                              <RangeSlider
+                                left="5%"
+                                right="5%"
+                                top="10px"
+                                w="80%"
+                                value={sliderVal}
+                                min={1}
+                                max={sliderMaxVal}
+                                step={1}
+                                onChange={(e) => {
+                                  setSliderVal([e[0], e[1]]);
+                                  let tempArr = [];
+                                  for (let j = e[0]; j < e[1]; j++) {
+                                    tempArr.push({
+                                      ...fullData[j][numtoGraph],
+                                      index: j,
+                                    });
+                                  }
+                                  setGraph(decideGraph(tempArr, numtoGraph));
+                                }}
+                              >
+                                <RangeSliderTrack height="10px" bg="#3ebced">
+                                  <RangeSliderFilledTrack bg="#1b75bc" />
+                                </RangeSliderTrack>
+                                <Tooltip
+                                  label={`${sliderVal[0]} mins`}
+                                  placement="top"
                                 >
-                                  {Math.round((sliderMaxVal / 6) * i)}
-                                </RangeSliderMark>
-                              ))}
-                            </div>
-                          </RangeSlider>
+                                  <RangeSliderThumb
+                                    borderWidth="7px"
+                                    boxSize={3}
+                                    index={0}
+                                  />
+                                </Tooltip>
+                                <Tooltip
+                                  label={`${sliderVal[1]} mins`}
+                                  placement="top"
+                                >
+                                  <RangeSliderThumb
+                                    borderWidth="7px"
+                                    boxSize={3}
+                                    index={1}
+                                  />
+                                </Tooltip>
+                                <div style={{ marginTop: "10px" }}>
+                                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                                    <RangeSliderMark
+                                      key={i}
+                                      value={(sliderMaxVal / 6) * i}
+                                      mt="1"
+                                      ml="-2.5"
+                                      fontSize="sm"
+                                    >
+                                      {Math.round((sliderMaxVal / 6) * i)}
+                                    </RangeSliderMark>
+                                  ))}
+                                </div>
+                              </RangeSlider>
+                            </VStack>
+                            <Box w="1.5%" h="45vh">
+                              {determineColorFunction(currentChoiceToGraph)}
+                            </Box>
+                          </HStack>
                         </Box>
                       </VStack>
                       <VStack w="25%">
@@ -745,7 +753,12 @@ export default function WithSubnavigation() {
                           Click a data point to visualize on manikin.
                         </Text>
                         <Canvass currentColorArray={currentColorArray} />
-                        {determineColorFunction(currentChoiceToGraph)}
+                        {currentChoiceToGraph == "hflux" ||
+                        currentChoiceToGraph == "environment" ? (
+                          <Text>No color scheme for this variable.</Text>
+                        ) : (
+                          <></>
+                        )}
                         <Text>Drag to rotate model.</Text>
                       </VStack>
                     </HStack>
@@ -1006,7 +1019,7 @@ export default function WithSubnavigation() {
                             totalDuration += params[i].exposure_duration;
                           }
                           setSliderMaxVal(totalDuration);
-                          setSliderVal([0, totalDuration]);
+                          setSliderVal([1, totalDuration]);
 
                           let colorsArr = [];
                           let mins = [],
@@ -1392,7 +1405,7 @@ export default function WithSubnavigation() {
                         totalDuration += params[i].exposure_duration;
                       }
                       setSliderMaxVal(totalDuration);
-                      setSliderVal([0, totalDuration]);
+                      setSliderVal([1, totalDuration]);
 
                       let colorsArr = [];
                       let mins = [],

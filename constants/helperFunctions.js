@@ -1,4 +1,4 @@
-import { HStack, Text } from "@chakra-ui/react";
+import { HStack, Text, VStack } from "@chakra-ui/react";
 
 export const miniMax = (value, data, label) => {
   // 0 for finding min, 1 for finding max
@@ -89,11 +89,37 @@ export const colorTskin = (tskin, min, max) => {
 export const colorTcore = (tcore, min, max) => {
   return colorHelper(tcore, min, max);
 };
-export const colorHflux = (hflux, min, max) => {
-  return colorHelper(hflux, min, max);
+export const colorHflux = (elem) => {
+  switch (elem) {
+    case "q_met":
+      return "blue";
+    case "q_conv":
+      return "lightgreen";
+    case "q_rad":
+      return "orange";
+    case "q_solar":
+      return "red";
+    case "q_resp":
+      return "skyblue";
+    case "q_sweat":
+      return "green";
+  }
 };
-export const colorEnv = (env, min, max) => {
-  return colorHelper(env, min, max);
+export const colorEnv = (elem) => {
+  switch (elem) {
+    case "ta":
+      return "blue";
+    case "mrt":
+      return "lightgreen";
+    case "solar":
+      return "orange";
+    case "eht":
+      return "red";
+    case "rh":
+      return "skyblue";
+    case "v":
+      return "green";
+  }
 };
 export const findMin = (data, ind, key) => {
   let res = Number.MAX_SAFE_INTEGER;
@@ -143,59 +169,53 @@ export const determineColorFunction = (key) => {
   switch (key) {
     case "comfort":
       return (
-        <HStack w="100%" spacing={0}>
+        <VStack w="100%" h="100%" spacing={0}>
           <div
             style={{
-              width: "33%",
-              height: "20px",
-              backgroundColor: "black",
+              width: "100%",
+              height: "33%",
+              backgroundColor: "white",
             }}
           />
           <div
             style={{
-              width: "33%",
-              height: "20px",
+              width: "100%",
+              height: "33%",
               backgroundColor: "gray",
             }}
           />
           <div
             style={{
-              width: "33%",
-              height: "20px",
-              backgroundColor: "white",
+              width: "100%",
+              height: "33%",
+              backgroundColor: "black",
             }}
           />
-        </HStack>
+        </VStack>
       );
     case "sensation":
     case "tskin":
     case "tcore":
       return (
-        <HStack w="100%" spacing={0}>
+        <VStack w="100%" h="100%" spacing={0}>
           <div
             style={{
-              width: "50%",
-              height: "20px",
-              backgroundImage: "linear-gradient(to right, blue, green)",
+              width: "100%",
+              height: "50%",
+              backgroundImage: "linear-gradient(to top, green, red)",
             }}
           />
           <div
             style={{
-              width: "50%",
-              height: "20px",
-              backgroundImage: "linear-gradient(to right, green, red)",
+              width: "100%",
+              height: "50%",
+              backgroundImage: "linear-gradient(to top, blue, green)",
             }}
           />
-        </HStack>
+        </VStack>
       );
     default:
-      return (
-        <HStack w="100%" spacing={0}>
-          <Text textAlign="center" w="100%">
-            No color scheme.
-          </Text>
-        </HStack>
-      );
+      return <></>;
   }
 };
 export const convertResultToArrayForCSV = (result) => {

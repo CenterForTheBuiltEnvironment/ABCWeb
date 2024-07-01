@@ -67,7 +67,16 @@ export default function UploadModal({
       if (cloTable.some((e) => e.ensemble_name == clothing[i].ensemble_name)) {
         // means need to append a new one
         needToAppendLater.push(clothing[i].ensemble_name);
+        // now add that to all of the clo_ensemble_names in user-uploaded phases
+        for (let j = 0; j < phase.length; j++) {
+          if (phase[j].clo_ensemble_name == clothing[i].ensemble_name) {
+            phase[j].clo_ensemble_name += "-asUploadedParameter";
+          }
+        }
         clothing[i].ensemble_name += "-asUploadedParameter";
+        newCloObj.push(clothing[i]);
+      } else {
+        // just create a new clothing and add it to cloTable
         newCloObj.push(clothing[i]);
       }
     }
@@ -112,20 +121,9 @@ export default function UploadModal({
         String(phase[j].segment_data[e].mrt)
       );
 
-      let temp_ensemble = cloTable.findIndex((ensemble) => {
-        console.log(
-          JSON.stringify(ensemble) +
-            " " +
-            phase[j].clo_ensemble_name +
-            " " +
-            JSON.stringify(needToAppendLater)
-        );
-        if (needToAppendLater.includes(phase[j].clo_ensemble_name)) {
-          return (
-            ensemble.ensemble_name ===
-            phase[j].clo_ensemble_name + "-asUploadedParameter"
-          );
-        } else return ensemble.ensemble_name === phase[j].clo_ensemble_name;
+      console.log(newCloObj);
+      let temp_ensemble = newCloObj.findIndex((ensemble) => {
+        return ensemble.ensemble_name === phase[j].clo_ensemble_name;
       });
 
       const isEmpty =

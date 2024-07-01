@@ -32,7 +32,7 @@ export function comfBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex
+          params[0].dataIndex + 1
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)}</span>`;
@@ -117,7 +117,7 @@ export function sensBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex
+          params[0].dataIndex + 1
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)}</span>`;
@@ -203,7 +203,7 @@ export function tskinBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex
+          params[0].dataIndex + 1
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)} C</span>`;
@@ -288,7 +288,7 @@ export function tcoreBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex
+          params[0].dataIndex + 1
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)} C</span>`;
@@ -421,11 +421,7 @@ export function hfluxBuilder(data) {
             value: item[elem],
             itemStyle: {
               normal: {
-                color: colorHflux(
-                  item[elem],
-                  hfluxMinimax(0, data.data, [elem]).toFixed(5),
-                  hfluxMinimax(1, data.data, [elem]).toFixed(5)
-                ),
+                color: colorHflux(elem),
               },
             },
           };
@@ -521,7 +517,7 @@ export function environmentBuilder(data) {
               value: item[elem],
               itemStyle: {
                 normal: {
-                  color: colorEnv(item[elem], 0, 2),
+                  color: colorEnv(elem),
                 },
               },
             };
@@ -536,11 +532,7 @@ export function environmentBuilder(data) {
               value: item[elem],
               itemStyle: {
                 normal: {
-                  color: colorEnv(
-                    item[elem],
-                    environmentMinimax(0, data.data, [elem]).toFixed(5),
-                    environmentMinimax(1, data.data, [elem]).toFixed(5)
-                  ),
+                  color: colorEnv(elem),
                 },
               },
             };
