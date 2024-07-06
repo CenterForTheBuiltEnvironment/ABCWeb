@@ -1,4 +1,5 @@
 import { SpinnerIcon, StarIcon, SunIcon, TimeIcon } from "@chakra-ui/icons";
+import { HStack } from "@chakra-ui/react";
 import { ImDroplet } from "react-icons/im";
 
 export const met_auto = [
@@ -26,6 +27,69 @@ export const met_auto = [
 
 export const places = [
   1, 3, 4, 2, 2, 2, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5,
+];
+
+export const personalComfortSystem = [
+  {
+    name: "Desk fan",
+    v: [
+      0.7, 0.2, 0.0, 0.0, 0.4, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0,
+    ],
+    ta: new Array(16).fill(0.0),
+    mrt: new Array(16).fill(0.0),
+    icons: <SpinnerIcon color="gray.400" />,
+  },
+  {
+    name: "Chair fan",
+    v: [
+      0.0, 0.0, 0.2, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.0, 0.0, 0.0,
+      0.0,
+    ],
+    ta: new Array(16).fill(0.0),
+    mrt: new Array(16).fill(0.0),
+    icons: <SpinnerIcon color="gray.400" />,
+  },
+  {
+    name: "Standing fan",
+    v: [
+      0.0, 0.3, 0.3, 0.4, 0.4, 0.4, 0.2, 0.2, 0.0, 0.0, 0.4, 0.4, 0.2, 0.2, 0.0,
+      0.0,
+    ],
+    ta: new Array(16).fill(0.0),
+    mrt: new Array(16).fill(0.0),
+    icons: <SpinnerIcon color="gray.400" />,
+  },
+  {
+    name: "Foot warmer",
+    v: new Array(16).fill(0.0),
+    ta: [...new Array(14).fill(0.0), 1.5, 1.5],
+    mrt: [...new Array(14).fill(0.0), 6.0, 6.0],
+    icons: (
+      <HStack>
+        <SunIcon color="gray.400" />
+        <StarIcon color="gray.400" />
+      </HStack>
+    ),
+  },
+  {
+    name: "Chair warmer",
+    v: new Array(16).fill(0.0),
+    ta: [
+      0.0, 0.0, 1.5, 1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 1.5, 0.0, 0.0, 0.0,
+      0.0,
+    ],
+    mrt: [
+      0.0, 0.0, 6.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.0, 6.0, 0.5, 0.5, 0.0,
+      0.0,
+    ],
+    icons: (
+      <HStack>
+        <SunIcon color="gray.400" />
+        <StarIcon color="gray.400" />
+      </HStack>
+    ),
+  },
 ];
 
 export const modes = [
@@ -138,6 +202,7 @@ export const conditionParams = (num) => {
     rt_d: "25.0",
     ai_d: "0.1",
     rh_d: "50.0",
+    personal_comfort_system: new Set([]),
   };
 };
 
@@ -165,6 +230,7 @@ export const listOfParameters = [
     key: "time",
     step: 1,
     precision: 0,
+    pcsKey: "",
   },
   {
     title: "Ambient temp",
@@ -178,6 +244,7 @@ export const listOfParameters = [
     precision: 1,
     deltaKey: "at_delta",
     tempKey: "at_d",
+    pcsKey: "ta",
   },
   {
     title: "Mean rad temp",
@@ -191,6 +258,7 @@ export const listOfParameters = [
     precision: 1,
     deltaKey: "mr_delta",
     tempKey: "rt_d",
+    pcsKey: "mrt",
   },
   {
     title: "Air speed",
@@ -204,6 +272,7 @@ export const listOfParameters = [
     precision: 1,
     deltaKey: "as_delta",
     tempKey: "ai_d",
+    pcsKey: "v",
   },
   {
     title: "Rel humidity",
@@ -217,5 +286,6 @@ export const listOfParameters = [
     precision: 0,
     deltaKey: "rh_delta",
     tempKey: "rh_d",
+    pcsKey: "",
   },
 ];

@@ -31,6 +31,8 @@ import {
   RangeSliderThumb,
   RangeSliderMark,
   Tooltip,
+  MenuOptionGroup,
+  MenuItemOption,
 } from "@chakra-ui/react";
 import RSelect from "react-select";
 import {
@@ -59,6 +61,7 @@ import {
   signals,
   modes,
   bodyBuildParams,
+  personalComfortSystem,
 } from "@/constants/constants";
 
 import {
@@ -373,8 +376,8 @@ export default function WithSubnavigation() {
         transition={{ enter: { duration: 0.5 } }}
       >
         {!comfortView ? (
-          <HStack margin="20px" alignItems="flex-start" spacing={5}>
-            <VStack w="30%">
+          <HStack margin="20px" h="100%" alignItems="flex-start" spacing={5}>
+            <VStack w="30%" h="100%">
               <HStack w="100%" padding={2} alignItems="flex-start">
                 <HStack w="90%" overflowY={"scroll"} spacing={3}>
                   {params.map((elem, indx) => {
@@ -509,7 +512,44 @@ export default function WithSubnavigation() {
                           {cloTable[params[ind].clo_value].description}
                         </span>
                       </Text>
-                      <Menu>
+                      <Menu placement="top" closeOnSelect={false}>
+                        <MenuButton
+                          as={Button}
+                          rightIcon={<ChevronDownIcon />}
+                          w="200px"
+                          colorScheme="gray"
+                          variant="outline"
+                        >
+                          Personal comfort
+                        </MenuButton>
+                        <MenuList>
+                          <MenuOptionGroup
+                            title="Select all that apply."
+                            type="checkbox"
+                            onChange={(el) => {
+                              let tempParams = [...params];
+                              tempParams[ind].personal_comfort_system = new Set(
+                                el
+                              );
+                              setParams(tempParams);
+                            }}
+                          >
+                            {personalComfortSystem.map((e, ind) => {
+                              return (
+                                <MenuItemOption value={ind} key={e.name}>
+                                  <HStack spacing={0}>
+                                    <Text mr={2} verticalAlign={"center"}>
+                                      {e.name}
+                                    </Text>
+                                    {e.icons}
+                                  </HStack>
+                                </MenuItemOption>
+                              );
+                            })}
+                          </MenuOptionGroup>
+                        </MenuList>
+                      </Menu>
+                      <Menu placement="top">
                         <MenuButton
                           as={Button}
                           rightIcon={<ChevronDownIcon />}
@@ -546,7 +586,7 @@ export default function WithSubnavigation() {
                     </VStack>
                   </HStack>
                   <Text>
-                    These values are averages. Click &quot;Edit Data&quot; to
+                    These values are averages. Click &quot;Edit data&quot; to
                     see your input data more accurately.
                   </Text>
                 </>
@@ -898,7 +938,7 @@ export default function WithSubnavigation() {
                           {cloTable[params[ind].clo_value].description}
                         </span>
                       </Text>
-                      <Checkbox
+                      {/* <Checkbox
                         size="lg"
                         colorScheme="blue"
                         defaultChecked={false}
@@ -912,8 +952,45 @@ export default function WithSubnavigation() {
                         }}
                       >
                         Ramp
-                      </Checkbox>
-                      <Menu>
+                      </Checkbox> */}
+                      <Menu placement="top" closeOnSelect={false}>
+                        <MenuButton
+                          as={Button}
+                          rightIcon={<ChevronDownIcon />}
+                          w="60%"
+                          colorScheme="gray"
+                          variant="outline"
+                        >
+                          Personal comfort system
+                        </MenuButton>
+                        <MenuList>
+                          <MenuOptionGroup
+                            title="Select all that apply."
+                            type="checkbox"
+                            onChange={(el) => {
+                              let tempParams = [...params];
+                              tempParams[ind].personal_comfort_system = new Set(
+                                el
+                              );
+                              setParams(tempParams);
+                            }}
+                          >
+                            {personalComfortSystem.map((e, ind) => {
+                              return (
+                                <MenuItemOption value={ind} key={e.name}>
+                                  <HStack spacing={0}>
+                                    <Text mr={2} verticalAlign={"center"}>
+                                      {e.name}
+                                    </Text>
+                                    {e.icons}
+                                  </HStack>
+                                </MenuItemOption>
+                              );
+                            })}
+                          </MenuOptionGroup>
+                        </MenuList>
+                      </Menu>
+                      <Menu placement="top">
                         <MenuButton
                           as={Button}
                           rightIcon={<ChevronDownIcon />}
@@ -950,8 +1027,8 @@ export default function WithSubnavigation() {
                     </VStack>
                   </HStack>
                   <Text textAlign="center" w="100%">
-                    These values are averages. Click &quot;Edit Data&quot; to
-                    see your input data more accurately.
+                    These values are averages. Click &quot;Edit variable
+                    data&quot; to see your input data more accurately.
                   </Text>
                 </>
               </VStack>
@@ -965,6 +1042,25 @@ export default function WithSubnavigation() {
                     try {
                       let phases = [];
                       for (let i = 0; i < params.length; i++) {
+                        let new_air_speed = params[i].air_speed.map(Number);
+                        let new_air_temperature =
+                          params[i].air_temperature.map(Number);
+                        let new_radiant_temperature =
+                          params[i].radiant_temperature.map(Number);
+
+                        params[i].personal_comfort_system.forEach(
+                          (elemIndex) => {
+                            for (let j = 0; j < 16; j++) {
+                              new_air_speed[j] +=
+                                personalComfortSystem[elemIndex]["v"][j];
+                              new_air_temperature[j] +=
+                                personalComfortSystem[elemIndex]["ta"][j];
+                              new_radiant_temperature[j] +=
+                                personalComfortSystem[elemIndex]["mrt"][j];
+                            }
+                          }
+                        );
+
                         phases.push({
                           exposure_duration: params[i].exposure_duration,
                           met_activity_name: "Custom-defined Met Activity",
@@ -975,11 +1071,9 @@ export default function WithSubnavigation() {
                               return parseFloat(x) / 100;
                             }
                           ),
-                          air_speed: params[i].air_speed.map(Number),
-                          air_temperature:
-                            params[i].air_temperature.map(Number),
-                          radiant_temperature:
-                            params[i].radiant_temperature.map(Number),
+                          air_speed: new_air_speed,
+                          air_temperature: new_air_temperature,
+                          radiant_temperature: new_radiant_temperature,
                           clo_ensemble_name:
                             cloTable[parseInt(params[i].clo_value)]
                               .ensemble_name,
@@ -1354,6 +1448,23 @@ export default function WithSubnavigation() {
                 try {
                   let phases = [];
                   for (let i = 0; i < params.length; i++) {
+                    let new_air_speed = params[i].air_speed.map(Number);
+                    let new_air_temperature =
+                      params[i].air_temperature.map(Number);
+                    let new_radiant_temperature =
+                      params[i].radiant_temperature.map(Number);
+
+                    params[i].personal_comfort_system.forEach((elemIndex) => {
+                      for (let j = 0; j < 16; j++) {
+                        new_air_speed[j] +=
+                          personalComfortSystem[elemIndex]["v"][j];
+                        new_air_temperature[j] +=
+                          personalComfortSystem[elemIndex]["ta"][j];
+                        new_radiant_temperature[j] +=
+                          personalComfortSystem[elemIndex]["mrt"][j];
+                      }
+                    });
+
                     phases.push({
                       exposure_duration: params[i].exposure_duration,
                       met_activity_name: "Custom-defined Met Activity",
@@ -1364,10 +1475,9 @@ export default function WithSubnavigation() {
                           return parseFloat(x) / 100;
                         }
                       ),
-                      air_speed: params[i].air_speed.map(Number),
-                      air_temperature: params[i].air_temperature.map(Number),
-                      radiant_temperature:
-                        params[i].radiant_temperature.map(Number),
+                      air_speed: new_air_speed,
+                      air_temperature: new_air_temperature,
+                      radiant_temperature: new_radiant_temperature,
                       clo_ensemble_name:
                         cloTable[parseInt(params[i].clo_value)].ensemble_name,
                     });
