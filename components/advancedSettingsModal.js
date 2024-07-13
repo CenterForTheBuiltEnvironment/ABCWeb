@@ -262,13 +262,13 @@ export default function AdvancedSettingsModal({
               objProp = "mrt";
             }
             return (
-              <VStack w="33%">
+              <VStack w="33%" key={elemTypeInd + "offsetTextMapping"}>
                 <Text fontWeight="bold" w="100%" textAlign="center">
                   {elemType} ({tempPcsParams[currPcsInd].name})
                 </Text>
                 {graphsVals.slice(1).map((bodyPart, bodyPartInd) => {
                   return (
-                    <HStack w="100%">
+                    <HStack w="100%" key={bodyPartInd + "graphValsMapping"}>
                       <Text w="70%">{bodyPart.label}</Text>
                       <NumberInput
                         w="30%"
