@@ -217,7 +217,7 @@ export const bodyBuildParams = () => {
   };
 };
 
-export const advancedSettingsArr = ["Body Builder"];
+export const advancedSettingsArr = ["Body Builder", "Personal Comfort System"];
 
 export const listOfParameters = [
   {

@@ -65,10 +65,7 @@ import {
 } from "@/constants/constants";
 
 import {
-  colorSensation,
-  colorComfort,
   determineColor,
-  getCurrentConditionName,
   convertResultToArrayForCSV,
   findMin,
   findMax,
@@ -99,7 +96,9 @@ import AdvancedSettingsModal from "@/components/advancedSettingsModal";
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
   const [params, setParams] = useState([conditionParams(1)]);
+
   const [bodybuilderObj, setBodyBuilderObj] = useState(bodyBuildParams);
+  const [pcsParams, setPcsParams] = useState(personalComfortSystem);
 
   const [metIndex, setMetIndex] = useState(1);
   const [currentlyEditing, setCurrentlyEditing] = useState(1);
@@ -298,11 +297,13 @@ export default function WithSubnavigation() {
       <AdvancedSettingsModal
         disclosure={advancedModal}
         bbParams={bodybuilderObj}
+        pcsParams={pcsParams}
         ind={advInd}
         setAdvIndex={setAdvIndex}
         setbbParams={setBodyBuilderObj}
         params={params}
         setParams={setParams}
+        setPcsParams={setPcsParams}
       />
       <Spinner loadingModal={loadingModal} />
       <Flex
@@ -523,30 +524,53 @@ export default function WithSubnavigation() {
                           Personal comfort
                         </MenuButton>
                         <MenuList>
-                          <MenuOptionGroup
-                            title="Select all that apply."
-                            type="checkbox"
-                            onChange={(el) => {
-                              let tempParams = [...params];
-                              tempParams[ind].personal_comfort_system = new Set(
-                                el
-                              );
-                              setParams(tempParams);
-                            }}
-                          >
-                            {personalComfortSystem.map((e, ind) => {
+                          {pcsParams.map((e, index) => {
+                            if (params) {
                               return (
-                                <MenuItemOption value={ind} key={e.name}>
+                                <MenuItem
+                                  key={e.name}
+                                  onClick={() => {
+                                    let tempParams = [...params];
+                                    if (
+                                      params[ind].personal_comfort_system.has(
+                                        index
+                                      )
+                                    ) {
+                                      tempParams[
+                                        ind
+                                      ].personal_comfort_system.delete(index);
+                                    } else {
+                                      tempParams[
+                                        ind
+                                      ].personal_comfort_system.add(index);
+                                    }
+                                    setParams(tempParams);
+                                  }}
+                                >
                                   <HStack spacing={0}>
+                                    <div
+                                      style={{
+                                        height: "100%",
+                                        width: "25px",
+                                      }}
+                                    >
+                                      {params[ind].personal_comfort_system.has(
+                                        index
+                                      ) ? (
+                                        <CheckIcon />
+                                      ) : (
+                                        <></>
+                                      )}
+                                    </div>
                                     <Text mr={2} verticalAlign={"center"}>
                                       {e.name}
                                     </Text>
                                     {e.icons}
                                   </HStack>
-                                </MenuItemOption>
+                                </MenuItem>
                               );
-                            })}
-                          </MenuOptionGroup>
+                            } else return <></>;
+                          })}
                         </MenuList>
                       </Menu>
                       <Menu placement="top">
@@ -964,28 +988,53 @@ export default function WithSubnavigation() {
                           Personal comfort system
                         </MenuButton>
                         <MenuList>
-                          <MenuOptionGroup
-                            title="Select all that apply."
-                            type="checkbox"
-                            onChange={(el) => {
-                              let tempParams = [...params];
-                              tempParams[ind].personal_comfort_system = new Set(
-                                el
-                              );
-                              setParams(tempParams);
-                            }}
-                          >
-                            {personalComfortSystem.map((e, ind) => {
-                              return (
-                                <MenuItemOption value={ind} key={e.name}>
-                                  <HStack spacing={0}>
-                                    <Text mr={2} verticalAlign={"center"}>
-                                      {e.name}
-                                    </Text>
-                                    {e.icons}
-                                  </HStack>
-                                </MenuItemOption>
-                              );
+                          <MenuOptionGroup title="Select all that apply.">
+                            {pcsParams.map((e, index) => {
+                              if (params) {
+                                return (
+                                  <MenuItem
+                                    key={e.name}
+                                    onClick={() => {
+                                      let tempParams = [...params];
+                                      if (
+                                        params[ind].personal_comfort_system.has(
+                                          index
+                                        )
+                                      ) {
+                                        tempParams[
+                                          ind
+                                        ].personal_comfort_system.delete(index);
+                                      } else {
+                                        tempParams[
+                                          ind
+                                        ].personal_comfort_system.add(index);
+                                      }
+                                      setParams(tempParams);
+                                    }}
+                                  >
+                                    <HStack spacing={0}>
+                                      <div
+                                        style={{
+                                          height: "100%",
+                                          width: "25px",
+                                        }}
+                                      >
+                                        {params[
+                                          ind
+                                        ].personal_comfort_system.has(index) ? (
+                                          <CheckIcon />
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </div>
+                                      <Text mr={2} verticalAlign={"center"}>
+                                        {e.name}
+                                      </Text>
+                                      {e.icons}
+                                    </HStack>
+                                  </MenuItem>
+                                );
+                              } else return <></>;
                             })}
                           </MenuOptionGroup>
                         </MenuList>
@@ -1051,12 +1100,11 @@ export default function WithSubnavigation() {
                         params[i].personal_comfort_system.forEach(
                           (elemIndex) => {
                             for (let j = 0; j < 16; j++) {
-                              new_air_speed[j] +=
-                                personalComfortSystem[elemIndex]["v"][j];
+                              new_air_speed[j] += pcsParams[elemIndex]["v"][j];
                               new_air_temperature[j] +=
-                                personalComfortSystem[elemIndex]["ta"][j];
+                                pcsParams[elemIndex]["ta"][j];
                               new_radiant_temperature[j] +=
-                                personalComfortSystem[elemIndex]["mrt"][j];
+                                pcsParams[elemIndex]["mrt"][j];
                             }
                           }
                         );
@@ -1456,12 +1504,10 @@ export default function WithSubnavigation() {
 
                     params[i].personal_comfort_system.forEach((elemIndex) => {
                       for (let j = 0; j < 16; j++) {
-                        new_air_speed[j] +=
-                          personalComfortSystem[elemIndex]["v"][j];
-                        new_air_temperature[j] +=
-                          personalComfortSystem[elemIndex]["ta"][j];
+                        new_air_speed[j] += pcsParams[elemIndex]["v"][j];
+                        new_air_temperature[j] += pcsParams[elemIndex]["ta"][j];
                         new_radiant_temperature[j] +=
-                          personalComfortSystem[elemIndex]["mrt"][j];
+                          pcsParams[elemIndex]["mrt"][j];
                       }
                     });
 

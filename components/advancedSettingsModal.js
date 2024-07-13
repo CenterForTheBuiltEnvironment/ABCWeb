@@ -1,17 +1,7 @@
-import {
-  advancedSettingsArr,
-  graphsVals,
-  listOfParameters,
-} from "@/constants/constants";
+import { advancedSettingsArr, graphsVals } from "@/constants/constants";
 import {
   Button,
   HStack,
-  Heading,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Modal,
   ModalBody,
   ModalContent,
@@ -27,21 +17,20 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
 
 export default function AdvancedSettingsModal({
   disclosure,
   bbParams,
+  pcsParams,
   ind,
   setAdvIndex,
   setbbParams,
-  params,
-  setParams,
+  setPcsParams,
 }) {
   const [componentArr, setCompArr] = useState([
     <BodyBuilderChanger key={"bodybuilder"} />,
+    <PersonalComfortSystemChanger key={"pcs"} />,
   ]);
 
   function BodyBuilderChanger() {
@@ -223,6 +212,99 @@ export default function AdvancedSettingsModal({
             } else {
               alert("Invalid attempt to change parameters. Please try again.");
             }
+          }}
+          colorScheme="green"
+        >
+          Save parameters
+        </Button>
+      </VStack>
+    );
+  }
+
+  function PersonalComfortSystemChanger() {
+    const [tempPcsParams, setTempPcsParmas] = useState(pcsParams);
+    const [currPcsInd, setCurrPcsInd] = useState(0);
+
+    useEffect(() => {}, [tempPcsParams]);
+
+    return (
+      <VStack alignItems={"left"} margin={"15px"} spacing={2}>
+        <HStack marginLeft="-15px">
+          {pcsParams.map((pcsElem, ind) => {
+            return (
+              <Button
+                key={ind}
+                minW="110px"
+                backgroundColor={currPcsInd == ind ? "#1b75bc" : "#3ebced"}
+                textColor="white"
+                colorScheme="blue"
+                onClick={() => {
+                  setCurrPcsInd(ind);
+                }}
+              >
+                {pcsElem.name}
+              </Button>
+            );
+          })}
+        </HStack>
+        <HStack spacing={2} w="100%">
+          {[
+            "Air speed offset",
+            "Ambient temp offset",
+            "Mean radiant temp offset",
+          ].map((elemType, elemTypeInd) => {
+            let objProp;
+            if (elemTypeInd == 0) {
+              objProp = "v";
+            } else if (elemTypeInd == 1) {
+              objProp = "ta";
+            } else {
+              objProp = "mrt";
+            }
+            return (
+              <VStack w="33%">
+                <Text fontWeight="bold" w="100%" textAlign="center">
+                  {elemType} ({tempPcsParams[currPcsInd].name})
+                </Text>
+                {graphsVals.slice(1).map((bodyPart, bodyPartInd) => {
+                  return (
+                    <HStack w="100%">
+                      <Text w="70%">{bodyPart.label}</Text>
+                      <NumberInput
+                        w="30%"
+                        allowMouseWheel
+                        backgroundColor="white"
+                        type="number"
+                        textAlign="right"
+                        value={tempPcsParams[currPcsInd][objProp][bodyPartInd]}
+                        onChange={(e) => {
+                          let nwState = [...tempPcsParams];
+                          nwState[currPcsInd][objProp][bodyPartInd] =
+                            parseFloat(e);
+                          setTempPcsParmas(nwState);
+                        }}
+                        min={0}
+                        precision={1}
+                        step={0.1}
+                      >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                    </HStack>
+                  );
+                })}
+              </VStack>
+            );
+          })}
+        </HStack>
+        <Button
+          maxW="200px"
+          onClick={() => {
+            setPcsParams(tempPcsParams);
+            alert("Successful save.");
           }}
           colorScheme="green"
         >
