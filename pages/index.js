@@ -337,8 +337,7 @@ export default function WithSubnavigation() {
             fontFamily={"heading"}
             style={{ fontWeight: "800", fontSize: 35 }}
           >
-            <span style={{ color: "#1b76bc" }}>Berkeley CBE</span>{" "}
-            <span style={{ color: "#3ebced" }}>Comfort Tool</span>
+            <span style={{ color: "#1b76bc" }}>Advanced Berkeley Comfort (ABC) model</span>{" "}
           </Text>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}></Flex>
