@@ -20,13 +20,14 @@ export default function OptionRenderer({
   isHome = false,
 }) {
   return (
-    <VStack>
-      <Text fontWeight="black" w="100%" textAlign={isHome ? "center" : ""}>
+    <VStack alignItems="flex-start" w="100%">
+      <Text fontWeight="bold" w="100%" textAlign="left">
         {title}
       </Text>
+      {/* Input items except 'exposure_duration' */}
       {val != "exposure_duration" ? (
         <>
-          <HStack width="100%" justify={isHome ? "center" : ""}>
+          <HStack width="100%" justifyContent="flex-start">
             {icon}
             <Text>
               {(
@@ -42,8 +43,9 @@ export default function OptionRenderer({
       ) : (
         <></>
       )}
+      {/* 'exposure_duration' */}
       {val == "exposure_duration" ? (
-        <HStack w="100%" justify={isHome ? "center" : ""}>
+        <HStack w="100%" justifyContent="flex-start">
           <InputGroup w="8vw">
             <InputLeftElement>{icon}</InputLeftElement>
             <Input

@@ -271,723 +271,304 @@ export default function WithSubnavigation() {
   );
 
   return (
-    <Box>
+    <Box minH="100vh" display="flex" flexDirection="column">
       <Head>
-        <title>Berkeley CBE Comfort Tool</title>
+        <title>Advanced Berkeley Comfort (ABC) model</title>
       </Head>
-      <EditModal
-        disclosure={editModal}
-        currentlyEditing={currentlyEditing}
-        params={params}
-        ind={ind}
-        setParams={setParams}
-      />
-      <UploadModal
-        disclosure={uploadModal}
-        params={params}
-        ind={ind}
-        setParams={setParams}
-        setMetIndex={setMetIndex}
-        cloTable={cloTable}
-        setCloTable={setCloTable}
-        conditionParams={conditionParams}
-        toast={toast}
-        rKey={setRefreshKey}
-      />
-      <AdvancedSettingsModal
-        disclosure={advancedModal}
-        bbParams={bodybuilderObj}
-        pcsParams={pcsParams}
-        ind={advInd}
-        setAdvIndex={setAdvIndex}
-        setbbParams={setBodyBuilderObj}
-        params={params}
-        setParams={setParams}
-        setPcsParams={setPcsParams}
-      />
-      <Spinner loadingModal={loadingModal} />
-      <Flex
-        bg={useColorModeValue("white", "gray.800")}
-        color={useColorModeValue("gray.600", "white")}
-        minH={"60px"}
-        py={{ base: 2 }}
-        px={{ base: 4 }}
-        borderBottom={1}
-        borderStyle={"solid"}
-        borderColor={useColorModeValue("gray.200", "gray.900")}
-        align={"center"}
-      >
+      <Flex flex="1" flexDirection="column">
+        <EditModal
+          disclosure={editModal}
+          currentlyEditing={currentlyEditing}
+          params={params}
+          ind={ind}
+          setParams={setParams}
+        />
+        <UploadModal
+          disclosure={uploadModal}
+          params={params}
+          ind={ind}
+          setParams={setParams}
+          setMetIndex={setMetIndex}
+          cloTable={cloTable}
+          setCloTable={setCloTable}
+          conditionParams={conditionParams}
+          toast={toast}
+          rKey={setRefreshKey}
+        />
+        <AdvancedSettingsModal
+          disclosure={advancedModal}
+          bbParams={bodybuilderObj}
+          pcsParams={pcsParams}
+          ind={advInd}
+          setAdvIndex={setAdvIndex}
+          setbbParams={setBodyBuilderObj}
+          params={params}
+          setParams={setParams}
+          setPcsParams={setPcsParams}
+        />
+        <Spinner loadingModal={loadingModal} />
         <Flex
-          flex={{ base: 1, md: "auto" }}
-          ml={{ base: -2 }}
-          display={{ base: "flex", md: "none" }}
+          bg={useColorModeValue("white", "gray.800")}
+          color={useColorModeValue("gray.600", "white")}
+          minH={"60px"}
+          py={{ base: 2 }}
+          px={{ base: 4 }}
+          borderBottom={1}
+          borderStyle={"solid"}
+          borderColor={useColorModeValue("gray.200", "gray.900")}
+          align={"center"}
         >
-          <IconButton
-            onClick={onToggle}
-            icon={
-              isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
-            }
-            variant={"ghost"}
-            aria-label={"Toggle Navigation"}
-          />
-        </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <Text
-            textAlign={useBreakpointValue({ base: "center", md: "left" })}
-            fontFamily={"heading"}
-            style={{ fontWeight: "800", fontSize: 35 }}
+          <Flex
+            flex={{ base: 1, md: "auto" }}
+            ml={{ base: -2 }}
+            display={{ base: "flex", md: "none" }}
           >
-            <span style={{ color: "#1b76bc" }}>Advanced Berkeley Comfort (ABC) model</span>{" "}
-          </Text>
+            <IconButton
+              onClick={onToggle}
+              icon={
+                isOpen ? (
+                  <CloseIcon w={3} h={3} />
+                ) : (
+                  <HamburgerIcon w={5} h={5} />
+                )
+              }
+              variant={"ghost"}
+              aria-label={"Toggle Navigation"}
+            />
+          </Flex>
+          <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
+            <Text
+              textAlign={useBreakpointValue({ base: "center", md: "left" })}
+              fontFamily={"heading"}
+              style={{ fontWeight: "bold", fontSize: 35 }}
+            >
+              <span style={{ color: "#1b76bc" }}>
+                Advanced Berkeley Comfort Tool
+              </span>{" "}
+            </Text>
 
-          <Flex display={{ base: "none", md: "flex" }} ml={10}></Flex>
+            <Flex display={{ base: "none", md: "flex" }} ml={10}></Flex>
+          </Flex>
+          <Stack
+            flex={{ base: 1, md: 0 }}
+            justify={"flex-end"}
+            direction={"row"}
+            spacing={2}
+            alignItems={"center"}
+            style={{ fontWeight: "bold", color: "#1b76bc" }}
+          >
+            <Text mr={5}>About</Text>
+            <a
+              href="https://cbe-berkeley.gitbook.io/advanced-berkeley-comfort-abc-model"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Text as="span" mr={5}>
+                Documentation
+              </Text>
+            </a>
+            <a
+              href="https://cbe.berkeley.edu/resources/tools/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Text as="span" mr={5} whiteSpace="nowrap">
+                More CBE Tools
+              </Text>
+            </a>
+            <Text style={{ color: "gray" }}>SI</Text>
+            <Switch
+              size="lg"
+              isChecked={false}
+              onMouseEnter={() => {
+                toast.closeAll();
+                toast({
+                  title: "To be implemented soon!",
+                  status: "warning",
+                  duration: 2000,
+                  isClosable: true,
+                  position: "top",
+                });
+              }}
+            />
+            <Text mr={5} style={{ color: "gray" }}>
+              IP
+            </Text>
+            {/* <Image
+    src="/img/CBE-logo-2018-blue.webp"
+    width={300}
+    height={0}
+    alt="CBE Logo"
+  /> */}
+          </Stack>
         </Flex>
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={"flex-end"}
-          direction={"row"}
-          spacing={2}
-          alignItems={"center"}
+        <Collapse in={isOpen} animateOpacity></Collapse>
+        <Fade
+          in={true}
+          style={{ width: "100%" }}
+          transition={{ enter: { duration: 0.5 } }}
         >
-          <Text>SI</Text>
-          <Switch
-            size="lg"
-            isChecked={false}
-            onMouseEnter={() => {
-              toast.closeAll();
-              toast({
-                title: "To be implemented soon!",
-                status: "warning",
-                duration: 2000,
-                isClosable: true,
-                position: "top",
-              });
-            }}
-          />
-          <Text mr={5}>IP</Text>
-          <Image src="/logo.png" width={300} height={0} alt="CBE Logo" />
-        </Stack>
-      </Flex>
-
-      <Collapse in={isOpen} animateOpacity></Collapse>
-      <Fade
-        in={true}
-        style={{ width: "100%" }}
-        transition={{ enter: { duration: 0.5 } }}
-      >
-        {!comfortView ? (
-          <HStack margin="20px" h="100%" alignItems="flex-start" spacing={5}>
-            <VStack w="30%" h="100%">
-              <HStack w="100%" padding={2} alignItems="flex-start">
-                <HStack w="90%" overflowY={"scroll"} spacing={3}>
-                  {params.map((elem, indx) => {
-                    return (
-                      <Button
-                        key={indx}
-                        minW="110px"
-                        backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
-                        textColor="white"
-                        colorScheme="blue"
-                        onClick={() => {
-                          if (ind == indx) return false;
-                          else setIndex(indx);
-                        }}
-                      >
-                        {params[indx].condition_name.length > 13
-                          ? params[indx].condition_name.substring(0, 13) + "..."
-                          : params[indx].condition_name}
-                      </Button>
-                    );
-                  })}
-                </HStack>
-                <IconButton
-                  w="5%"
-                  colorScheme="blue"
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  icon={<AddIcon />}
-                  onClick={() => {
-                    setParams([...params, conditionParams(params.length + 1)]);
-                    setIndex(ind + 1);
-                  }}
-                ></IconButton>
-              </HStack>
-              <VStack
-                w="100%"
-                borderColor="#1b75bc"
-                borderWidth="1px"
-                borderRadius="10px"
-                padding={5}
-                spacing={1}
-                alignItems="flex-start"
-              >
-                <>
-                  <Flex w="100%" alignItems="center">
-                    <Editable
-                      value={params[ind].condition_name}
-                      fontSize="2xl"
-                      fontWeight="bold"
-                      isPreviewFocusable={false}
-                    >
-                      <EditablePreview mr="10px" />
-                      <Input
-                        as={EditableInput}
-                        onChange={(e) => {
-                          let tempParams = [...params];
-                          tempParams[ind].condition_name = e.target.value;
-                          if (e.target.value.length == 0) {
-                            tempParams[ind].condition_name =
-                              "Condition #" + ind.toString();
-                          }
-                          setParams(tempParams);
-                        }}
-                        width="200px"
-                        mr="10px"
-                      />
-                      <EditableControls />
-                    </Editable>
-                    <Spacer />
-                    <IconButton
-                      w="5%"
-                      colorScheme="red"
-                      icon={<CloseIcon />}
-                      isDisabled={params.length == 1}
-                      onClick={() => {
-                        let tempParams = [...params];
-                        tempParams.splice(ind, 1);
-                        setParams(tempParams);
-                        setIndex(Math.max(0, ind - 1));
-                      }}
-                    ></IconButton>
-                  </Flex>
-                  <HStack w="100%" alignItems="flex-start">
-                    <VStack w="45%" alignItems="flex-start">
-                      {listOfParameters.map((option) => {
-                        return (
-                          <div key={option.title}>
-                            <OptionRenderer
-                              {...{
-                                params: params,
-                                setParams: setParams,
-                                ind: ind,
-                                setIndex: ind,
-                                title: option.title,
-                                icon: option.icon,
-                                unit: option.unit,
-                                val: option.val,
-                                comp: option.comp,
-                                step: option.step,
-                                deltaKey: option.deltaKey,
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
-                    </VStack>
-                    <VStack
-                      pl={0}
-                      w="55%"
-                      alignItems="flex-start"
-                      justifyContent={"center"}
-                    >
-                      <MetSelector
-                        params={params}
-                        setParams={setParams}
-                        setMetIndex={setMetIndex}
-                        metIndex={metIndex}
-                        setMetOptions={setMetOptions}
-                        metOptions={metOptions}
-                        ind={ind}
-                        key={refreshKey}
-                      />
-                      <ClothingSelector
-                        params={params}
-                        setParams={setParams}
-                        clo_correspondence={cloTable}
-                        ind={ind}
-                      />
-                      <Text color="gray.600">
-                        {cloTable[params[ind].clo_value].whole_body.iclo} clo -{" "}
-                        <span style={{ fontSize: "13px", color: "gray.600" }}>
-                          {cloTable[params[ind].clo_value].description}
-                        </span>
-                      </Text>
-                      <Menu placement="top" closeOnSelect={false}>
-                        <MenuButton
-                          as={Button}
-                          rightIcon={<ChevronDownIcon />}
-                          w="200px"
-                          colorScheme="gray"
-                          variant="outline"
-                        >
-                          Personal comfort
-                        </MenuButton>
-                        <MenuList>
-                          {pcsParams.map((e, index) => {
-                            if (params) {
-                              return (
-                                <MenuItem
-                                  key={e.name}
-                                  onClick={() => {
-                                    let tempParams = [...params];
-                                    if (
-                                      params[ind].personal_comfort_system.has(
-                                        index
-                                      )
-                                    ) {
-                                      tempParams[
-                                        ind
-                                      ].personal_comfort_system.delete(index);
-                                    } else {
-                                      tempParams[
-                                        ind
-                                      ].personal_comfort_system.add(index);
-                                    }
-                                    setParams(tempParams);
-                                  }}
-                                >
-                                  <HStack spacing={0}>
-                                    <div
-                                      style={{
-                                        height: "100%",
-                                        width: "25px",
-                                      }}
-                                    >
-                                      {params[ind].personal_comfort_system.has(
-                                        index
-                                      ) ? (
-                                        <CheckIcon />
-                                      ) : (
-                                        <></>
-                                      )}
-                                    </div>
-                                    <Text mr={2} verticalAlign={"center"}>
-                                      {e.name}
-                                    </Text>
-                                    {e.icons}
-                                  </HStack>
-                                </MenuItem>
-                              );
-                            } else return <></>;
-                          })}
-                        </MenuList>
-                      </Menu>
-                      <Menu placement="top">
-                        <MenuButton
-                          as={Button}
-                          rightIcon={<ChevronDownIcon />}
-                          w="200px"
-                          backgroundColor={"#3ebced"}
-                          textColor={"white"}
+          {!comfortView ? (
+            <HStack margin="20px" h="100%" alignItems="flex-start" spacing={5}>
+              <VStack w="30%" h="100%">
+                <HStack w="100%" padding={2} alignItems="flex-start">
+                  <HStack w="90%" overflowY={"scroll"} spacing={3}>
+                    {params.map((elem, indx) => {
+                      return (
+                        <Button
+                          key={indx}
+                          minW="110px"
+                          backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
+                          textColor="white"
                           colorScheme="blue"
+                          onClick={() => {
+                            if (ind == indx) return false;
+                            else setIndex(indx);
+                          }}
                         >
-                          Edit data
-                        </MenuButton>
-                        <MenuList>
-                          {listOfParameters.map((e, ind) => {
-                            if (ind >= 1)
-                              return (
-                                <MenuItem
-                                  key={e.key}
-                                  onClick={() => {
-                                    setCurrentlyEditing(ind);
-                                    editModal.onOpen();
-                                  }}
-                                >
-                                  <Text mr={2}>
-                                    Edit{" "}
-                                    <span style={{ fontWeight: "bold" }}>
-                                      {e.key}
-                                    </span>
-                                  </Text>
-                                  {e.icon}
-                                </MenuItem>
-                              );
-                          })}
-                        </MenuList>
-                      </Menu>
-                    </VStack>
+                          {params[indx].condition_name.length > 13
+                            ? params[indx].condition_name.substring(0, 13) +
+                              "..."
+                            : params[indx].condition_name}
+                        </Button>
+                      );
+                    })}
                   </HStack>
-                  <Text>
-                    These values are averages. Click &quot;Edit data&quot; to
-                    see your input data more accurately.
-                  </Text>
-                </>
-              </VStack>
-            </VStack>
-
-            <VStack w="70%">
-              {graphOptions ? (
-                <>
-                  <VStack
-                    alignSelf="center"
-                    borderColor="#1b75bc"
-                    bgColor="gray.200"
-                    borderWidth="1px"
-                    padding={5}
-                    spacing={8}
-                    w="100%"
-                    borderRadius="10px"
-                  >
-                    <HStack>
-                      <RSelect
-                        className="basic-single"
-                        classNamePrefix="select"
-                        defaultValue={graphsVals[numtoGraph]}
-                        isSearchable={true}
-                        isClearable={false}
-                        options={graphsVals}
-                        instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
-                        styles={{
-                          control: (baseStyles, state) => ({
-                            ...baseStyles,
-                            width: "20vw",
-                          }),
-                        }}
-                        placeholder="Input body part to graph."
-                        onChange={(val) => {
-                          loadingModal.onOpen();
-                          setNumToGraph(val.value);
-                          let changedArr = [];
-                          for (let j = 0; j < fullData.length; j++) {
-                            changedArr.push({
-                              ...fullData[j][val.value],
-                              index: j,
-                            });
-                          }
-                          setData(changedArr);
-                          setGraph(decideGraph(changedArr, val.value));
-                          loadingModal.onClose();
-                        }}
-                      />
-                      <RSelect
-                        className="basic-single"
-                        classNamePrefix="select"
-                        isSearchable={true}
-                        isClearable={false}
-                        options={modes}
-                        instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
-                        styles={{
-                          control: (baseStyles, state) => ({
-                            ...baseStyles,
-                            width: "20vw",
-                          }),
-                        }}
-                        placeholder={"Comfort"}
-                        onChange={(val) => {
-                          loadingModal.onOpen();
-                          setCurrentChoiceToGraph(val.value);
-                          setGraph(
-                            decideGraph(
-                              graphData.slice(sliderVal[0], sliderVal[1]),
-                              numtoGraph,
-                              val.value
-                            )
-                          );
-
-                          let colorsArr = [];
-                          let mins = [],
-                            maxes = [];
-                          for (let i = 0; i <= 17; i++) {
-                            mins.push(findMin(fullData, places[i], val.value));
-                            maxes.push(findMax(fullData, places[i], val.value));
-                          }
-                          for (let time = 0; time < fullData.length; time++) {
-                            let bodyPartsArr = [];
-                            for (let i = 0; i <= 17; i++) {
-                              bodyPartsArr.push(
-                                determineColor(
-                                  fullData[time][places[i]],
-                                  val.value,
-                                  mins[i],
-                                  maxes[i]
-                                )
-                              );
+                  <IconButton
+                    w="5%"
+                    colorScheme="red"
+                    backgroundColor={"red.300"}
+                    // border="2px solid gray"
+                    textColor={"white"}
+                    icon={<AddIcon />}
+                    onClick={() => {
+                      setParams([
+                        ...params,
+                        conditionParams(params.length + 1),
+                      ]);
+                      setIndex(ind + 1);
+                    }}
+                  ></IconButton>
+                </HStack>
+                <VStack
+                  w="100%"
+                  // borderColor="#1b75bc"
+                  // borderWidth="1px"
+                  background={"gray.100"}
+                  borderRadius="10px"
+                  padding={5}
+                  spacing={1}
+                  alignItems="flex-start"
+                >
+                  <>
+                    {/* Editable input for condition name */}
+                    <Flex w="100%" alignItems="center">
+                      <Editable
+                        value={params[ind].condition_name}
+                        fontSize="2xl"
+                        fontWeight="bold"
+                        isPreviewFocusable={false}
+                      >
+                        <EditablePreview mr="10px" />
+                        <Input
+                          as={EditableInput}
+                          onChange={(e) => {
+                            let tempParams = [...params];
+                            tempParams[ind].condition_name = e.target.value;
+                            if (e.target.value.length == 0) {
+                              tempParams[ind].condition_name =
+                                "Condition #" + ind.toString();
                             }
-                            colorsArr.push(bodyPartsArr);
-                          }
-                          setBodyColors(colorsArr);
-                          setCurrentColorArray(Array(18).fill("white"));
-
-                          loadingModal.onClose();
+                            setParams(tempParams);
+                          }}
+                          width="200px"
+                          mr="10px"
+                        />
+                        <EditableControls />
+                      </Editable>
+                      <Spacer />
+                      <IconButton
+                        w="5%"
+                        colorScheme="red"
+                        backgroundColor={"red.300"}
+                        icon={<CloseIcon />}
+                        isDisabled={params.length == 1}
+                        onClick={() => {
+                          let tempParams = [...params];
+                          tempParams.splice(ind, 1);
+                          setParams(tempParams);
+                          setIndex(Math.max(0, ind - 1));
                         }}
-                      />
-                      <Button colorScheme="blue" variant="outline">
-                        <CSVLink
-                          data={csvData}
-                          filename={`ABCWEB_${new Date().toDateString({
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                          })}-${new Date()
-                            .toTimeString()
-                            .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
-                          target="_blank"
-                        >
-                          Export to CSV file
-                        </CSVLink>
-                      </Button>
-                    </HStack>
-                    <HStack w="100%">
-                      <VStack w="75%">
-                        <Box width="100%">
-                          <HStack w="100%" h="45vh">
-                            <VStack w="98.5%" h="100%">
-                              <ReactECharts
-                                notMerge={true}
-                                option={graphOptions}
-                                onEvents={onEvents}
-                                style={{ height: "100%", width: "100%" }}
-                              />
-                              <RangeSlider
-                                left="5%"
-                                right="5%"
-                                top="10px"
-                                w="80%"
-                                value={sliderVal}
-                                min={1}
-                                max={sliderMaxVal}
-                                step={1}
-                                onChange={(e) => {
-                                  setSliderVal([e[0], e[1]]);
-                                  let tempArr = [];
-                                  for (let j = e[0]; j < e[1]; j++) {
-                                    tempArr.push({
-                                      ...fullData[j][numtoGraph],
-                                      index: j,
-                                    });
-                                  }
-                                  setGraph(decideGraph(tempArr, numtoGraph));
+                      ></IconButton>
+                    </Flex>
+                    {/* Input parameters */}
+                    <HStack w="100%" alignItems="flex-start">
+                      {/* Left side */}
+                      <VStack w="45%" alignItems="flex-start">
+                        {listOfParameters.map((option) => {
+                          return (
+                            <div key={option.title}>
+                              <OptionRenderer
+                                {...{
+                                  params: params,
+                                  setParams: setParams,
+                                  ind: ind,
+                                  setIndex: ind,
+                                  title: option.title,
+                                  icon: option.icon,
+                                  unit: option.unit,
+                                  val: option.val,
+                                  comp: option.comp,
+                                  step: option.step,
+                                  deltaKey: option.deltaKey,
                                 }}
-                              >
-                                <RangeSliderTrack height="10px" bg="#3ebced">
-                                  <RangeSliderFilledTrack bg="#1b75bc" />
-                                </RangeSliderTrack>
-                                <Tooltip
-                                  label={`${sliderVal[0]} mins`}
-                                  placement="top"
-                                >
-                                  <RangeSliderThumb
-                                    borderWidth="7px"
-                                    boxSize={3}
-                                    index={0}
-                                  />
-                                </Tooltip>
-                                <Tooltip
-                                  label={`${sliderVal[1]} mins`}
-                                  placement="top"
-                                >
-                                  <RangeSliderThumb
-                                    borderWidth="7px"
-                                    boxSize={3}
-                                    index={1}
-                                  />
-                                </Tooltip>
-                                <div style={{ marginTop: "10px" }}>
-                                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                                    <RangeSliderMark
-                                      key={i}
-                                      value={(sliderMaxVal / 6) * i}
-                                      mt="1"
-                                      ml="-2.5"
-                                      fontSize="sm"
-                                    >
-                                      {Math.round((sliderMaxVal / 6) * i)}
-                                    </RangeSliderMark>
-                                  ))}
-                                </div>
-                              </RangeSlider>
-                            </VStack>
-                            <Box w="1.5%" h="45vh">
-                              {determineColorFunction(currentChoiceToGraph)}
-                            </Box>
-                          </HStack>
-                        </Box>
+                              />
+                            </div>
+                          );
+                        })}
                       </VStack>
-                      <VStack w="25%">
-                        <Text fontWeight="bold">
-                          {params[currIndex[0]].condition_name}{" "}
-                          <span style={{ color: "#3ebced", marginLeft: "5px" }}>
-                            {" "}
-                            {currIndex[1]} mins{" "}
+                      {/* Right side */}
+                      <VStack
+                        pl={0}
+                        w="55%"
+                        alignItems="flex-start"
+                        justifyContent={"center"}
+                      >
+                        <MetSelector
+                          params={params}
+                          setParams={setParams}
+                          setMetIndex={setMetIndex}
+                          metIndex={metIndex}
+                          setMetOptions={setMetOptions}
+                          metOptions={metOptions}
+                          ind={ind}
+                          key={refreshKey}
+                        />
+                        <ClothingSelector
+                          params={params}
+                          setParams={setParams}
+                          clo_correspondence={cloTable}
+                          ind={ind}
+                        />
+                        <Text color="gray.600">
+                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
+                          -{" "}
+                          <span style={{ fontSize: "13px", color: "gray.600" }}>
+                            {cloTable[params[ind].clo_value].description}
                           </span>
                         </Text>
-                        <Text textAlign="center" w="100%">
-                          Click a data point to visualize on manikin.
-                        </Text>
-                        <Canvass currentColorArray={currentColorArray} />
-                        {currentChoiceToGraph == "hflux" ||
-                        currentChoiceToGraph == "environment" ? (
-                          <Text>No color scheme for this variable.</Text>
-                        ) : (
-                          <></>
-                        )}
-                        <Text>Drag to rotate model.</Text>
-                      </VStack>
-                    </HStack>
-                  </VStack>
-                </>
-              ) : (
-                <Text>
-                  No simulation run yet. Please input data and{" "}
-                  <span style={{ fontWeight: "bold" }}>Run simulation</span>.
-                </Text>
-              )}
-            </VStack>
-          </HStack>
-        ) : (
-          <>
-            <VStack w="100%" minH="70vh" margin="20px">
-              <HStack padding={2} alignItems="flex-start">
-                <HStack w="100%" overflowY={"scroll"} spacing={3}>
-                  {params.map((elem, indx) => {
-                    return (
-                      <Button
-                        key={indx}
-                        minW="110px"
-                        backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
-                        textColor="white"
-                        colorScheme="blue"
-                        onClick={() => {
-                          if (ind == indx) return false;
-                          else setIndex(indx);
-                        }}
-                      >
-                        {params[indx].condition_name.length > 13
-                          ? params[indx].condition_name.substring(0, 13) + "..."
-                          : params[indx].condition_name}
-                      </Button>
-                    );
-                  })}
-                </HStack>
-                <IconButton
-                  w="5%"
-                  colorScheme="blue"
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  icon={<AddIcon />}
-                  onClick={() => {
-                    setParams([...params, conditionParams(params.length + 1)]);
-                    setIndex(ind + 1);
-                  }}
-                ></IconButton>
-              </HStack>
-              <VStack
-                minW="60%"
-                borderColor="#1b75bc"
-                borderWidth="3px"
-                borderRadius="10px"
-                padding={5}
-                spacing={1}
-                alignItems="flex-start"
-              >
-                <>
-                  <Flex w="100%" alignItems="center" justifyContent="center">
-                    <Editable
-                      value={params[ind].condition_name}
-                      fontSize="2xl"
-                      fontWeight="bold"
-                      isPreviewFocusable={false}
-                    >
-                      <EditablePreview mr="10px" />
-                      <Input
-                        as={EditableInput}
-                        onChange={(e) => {
-                          let tempParams = [...params];
-                          tempParams[ind].condition_name = e.target.value;
-                          if (e.target.value.length == 0) {
-                            tempParams[ind].condition_name =
-                              "Condition #" + ind.toString();
-                          }
-                          setParams(tempParams);
-                        }}
-                        width="200px"
-                        mr="10px"
-                      />
-                      <EditableControls isHome />
-                    </Editable>
-                  </Flex>
-                  <HStack w="100%" alignItems="center">
-                    <VStack w="50%" alignItems="center">
-                      {listOfParameters.map((option) => {
-                        return (
-                          <div key={option.title}>
-                            <OptionRenderer
-                              {...{
-                                params: params,
-                                setParams: setParams,
-                                ind: ind,
-                                setIndex: ind,
-                                title: option.fullTitle,
-                                icon: option.icon,
-                                unit: option.fullUnit,
-                                val: option.val,
-                                comp: option.comp,
-                                step: option.step,
-                                deltaKey: option.deltaKey,
-                                isHome: true,
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
-                    </VStack>
-                    <VStack
-                      pl={0}
-                      w="50%"
-                      alignItems="center"
-                      justifyContent={"center"}
-                    >
-                      <MetSelector
-                        params={params}
-                        setParams={setParams}
-                        setMetIndex={setMetIndex}
-                        metIndex={metIndex}
-                        setMetOptions={setMetOptions}
-                        metOptions={metOptions}
-                        ind={ind}
-                        isHome
-                      />
-                      <ClothingSelector
-                        params={params}
-                        setParams={setParams}
-                        clo_correspondence={cloTable}
-                        ind={ind}
-                        isHome
-                      />
-                      <Text color="gray.600">
-                        {cloTable[params[ind].clo_value].whole_body.iclo} clo -{" "}
-                        <span style={{ fontSize: "13px", color: "gray.600" }}>
-                          {cloTable[params[ind].clo_value].description}
-                        </span>
-                      </Text>
-                      {/* <Checkbox
-                        size="lg"
-                        colorScheme="blue"
-                        defaultChecked={false}
-                        isChecked={params[ind].ramp}
-                        onChange={(e) => {
-                          setParams((prevParams) => {
-                            const updatedParams = [...prevParams];
-                            updatedParams[ind].ramp = e.target.checked;
-                            return updatedParams;
-                          });
-                        }}
-                      >
-                        Ramp
-                      </Checkbox> */}
-                      <Menu placement="top" closeOnSelect={false}>
-                        <MenuButton
-                          as={Button}
-                          rightIcon={<ChevronDownIcon />}
-                          w="60%"
-                          colorScheme="gray"
-                          variant="outline"
-                        >
-                          Personal comfort system
-                        </MenuButton>
-                        <MenuList>
-                          <MenuOptionGroup title="Select all that apply.">
+                        <Menu placement="top" closeOnSelect={false}>
+                          <MenuButton
+                            as={Button}
+                            rightIcon={<ChevronDownIcon />}
+                            w="200px"
+                            background={"white"}
+                            colorScheme="gray"
+                            variant="outline"
+                          >
+                            Personal comfort
+                          </MenuButton>
+                          <MenuList>
                             {pcsParams.map((e, index) => {
                               if (params) {
                                 return (
@@ -1035,80 +616,897 @@ export default function WithSubnavigation() {
                                 );
                               } else return <></>;
                             })}
-                          </MenuOptionGroup>
-                        </MenuList>
-                      </Menu>
-                      <Menu placement="top">
-                        <MenuButton
-                          as={Button}
-                          rightIcon={<ChevronDownIcon />}
-                          w="60%"
-                          backgroundColor={"#3ebced"}
-                          textColor={"white"}
-                          colorScheme="blue"
-                        >
-                          Edit variable data
-                        </MenuButton>
-                        <MenuList>
-                          {listOfParameters.map((e, ind) => {
-                            if (ind >= 1)
-                              return (
-                                <MenuItem
-                                  key={e.key}
-                                  onClick={() => {
-                                    setCurrentlyEditing(ind);
-                                    editModal.onOpen();
+                          </MenuList>
+                        </Menu>
+                        <Menu placement="top">
+                          <MenuButton
+                            as={Button}
+                            rightIcon={<ChevronDownIcon />}
+                            w="200px"
+                            backgroundColor={"cbe.100"}
+                            textColor={"white"}
+                            colorScheme="blue"
+                          >
+                            Edit data
+                          </MenuButton>
+                          <MenuList>
+                            {listOfParameters.map((e, ind) => {
+                              if (ind >= 1)
+                                return (
+                                  <MenuItem
+                                    key={e.key}
+                                    onClick={() => {
+                                      setCurrentlyEditing(ind);
+                                      editModal.onOpen();
+                                    }}
+                                  >
+                                    <Text mr={2}>
+                                      Edit{" "}
+                                      <span style={{ fontWeight: "bold" }}>
+                                        {e.key}
+                                      </span>
+                                    </Text>
+                                    {e.icon}
+                                  </MenuItem>
+                                );
+                            })}
+                          </MenuList>
+                        </Menu>
+                      </VStack>
+                    </HStack>
+                    <Text>
+                      These values are averages. Click &quot;Edit data&quot; to
+                      see your input data more accurately.
+                    </Text>
+                  </>
+                </VStack>
+              </VStack>
+
+              {/* Result section */}
+              <VStack w="70%">
+                {graphOptions ? (
+                  <>
+                    <VStack
+                      alignSelf="center"
+                      // borderColor="#1b75bc"
+                      bgColor="gray.200"
+                      // borderWidth="1px"
+                      padding={5}
+                      spacing={8}
+                      w="100%"
+                      borderRadius="10px"
+                    >
+                      <HStack>
+                        {/* Body segment selection*/}
+                        <RSelect
+                          className="basic-single"
+                          classNamePrefix="select"
+                          defaultValue={graphsVals[numtoGraph]}
+                          isSearchable={true}
+                          isClearable={false}
+                          options={graphsVals}
+                          instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
+                          styles={{
+                            control: (baseStyles, state) => ({
+                              ...baseStyles,
+                              width: "20vw",
+                            }),
+                          }}
+                          placeholder="Input body part to graph."
+                          onChange={(val) => {
+                            loadingModal.onOpen();
+                            setNumToGraph(val.value);
+                            let changedArr = [];
+                            for (let j = 0; j < fullData.length; j++) {
+                              changedArr.push({
+                                ...fullData[j][val.value],
+                                index: j,
+                              });
+                            }
+                            setData(changedArr);
+                            setGraph(decideGraph(changedArr, val.value));
+                            loadingModal.onClose();
+                          }}
+                        />
+                        {/* Result veriable to display*/}
+                        <RSelect
+                          className="basic-single"
+                          classNamePrefix="select"
+                          isSearchable={true}
+                          isClearable={false}
+                          options={modes}
+                          instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
+                          styles={{
+                            control: (baseStyles, state) => ({
+                              ...baseStyles,
+                              width: "20vw",
+                            }),
+                          }}
+                          placeholder={"Comfort"}
+                          onChange={(val) => {
+                            loadingModal.onOpen();
+                            setCurrentChoiceToGraph(val.value);
+                            setGraph(
+                              decideGraph(
+                                graphData.slice(sliderVal[0], sliderVal[1]),
+                                numtoGraph,
+                                val.value
+                              )
+                            );
+
+                            let colorsArr = [];
+                            let mins = [],
+                              maxes = [];
+                            for (let i = 0; i <= 17; i++) {
+                              mins.push(
+                                findMin(fullData, places[i], val.value)
+                              );
+                              maxes.push(
+                                findMax(fullData, places[i], val.value)
+                              );
+                            }
+                            for (let time = 0; time < fullData.length; time++) {
+                              let bodyPartsArr = [];
+                              for (let i = 0; i <= 17; i++) {
+                                bodyPartsArr.push(
+                                  determineColor(
+                                    fullData[time][places[i]],
+                                    val.value,
+                                    mins[i],
+                                    maxes[i]
+                                  )
+                                );
+                              }
+                              colorsArr.push(bodyPartsArr);
+                            }
+                            setBodyColors(colorsArr);
+                            setCurrentColorArray(Array(18).fill("white"));
+
+                            loadingModal.onClose();
+                          }}
+                        />
+                        {/* CSV output */}
+                        <Button colorScheme="green" background={"green.500"}>
+                          <CSVLink
+                            data={csvData}
+                            filename={`ABCWEB_${new Date().toDateString({
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                            })}-${new Date()
+                              .toTimeString()
+                              .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
+                            target="_blank"
+                          >
+                            Export to CSV file
+                          </CSVLink>
+                        </Button>
+                      </HStack>
+                      {/* Timeseries results and manikin */}
+                      <HStack w="100%">
+                        {/* Timeseries results */}
+                        <VStack w="75%" alignItems="flex-start">
+                          <Box width="100%">
+                            <HStack w="100%" h="45vh">
+                              <VStack w="98.5%" h="100%">
+                                {/* Graph */}
+                                <ReactECharts
+                                  notMerge={true}
+                                  option={graphOptions}
+                                  onEvents={onEvents}
+                                  style={{ height: "100%", width: "100%" }}
+                                />
+                                {/* Slider */}
+                                <RangeSlider
+                                  left="5%"
+                                  right="5%"
+                                  top="10px"
+                                  w="95%"
+                                  value={sliderVal}
+                                  min={1}
+                                  max={sliderMaxVal}
+                                  step={1}
+                                  onChange={(e) => {
+                                    setSliderVal([e[0], e[1]]);
+                                    let tempArr = [];
+                                    for (let j = e[0]; j < e[1]; j++) {
+                                      tempArr.push({
+                                        ...fullData[j][numtoGraph],
+                                        index: j,
+                                      });
+                                    }
+                                    setGraph(decideGraph(tempArr, numtoGraph));
                                   }}
                                 >
-                                  <Text mr={2}>
-                                    Edit{" "}
-                                    <span style={{ fontWeight: "bold" }}>
-                                      {e.key}
-                                    </span>
-                                  </Text>
-                                  {e.icon}
-                                </MenuItem>
-                              );
-                          })}
-                        </MenuList>
-                      </Menu>
+                                  <RangeSliderTrack height="10px" bg="#3ebced">
+                                    <RangeSliderFilledTrack bg="#1b75bc" />
+                                  </RangeSliderTrack>
+                                  <Tooltip
+                                    label={`${sliderVal[0]} mins`}
+                                    placement="top"
+                                  >
+                                    <RangeSliderThumb
+                                      borderWidth="7px"
+                                      boxSize={3}
+                                      index={0}
+                                    />
+                                  </Tooltip>
+                                  <Tooltip
+                                    label={`${sliderVal[1]} mins`}
+                                    placement="top"
+                                  >
+                                    <RangeSliderThumb
+                                      borderWidth="7px"
+                                      boxSize={3}
+                                      index={1}
+                                    />
+                                  </Tooltip>
+                                  <div style={{ marginTop: "10px" }}>
+                                    {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                                      <RangeSliderMark
+                                        key={i}
+                                        value={(sliderMaxVal / 6) * i}
+                                        mt="1"
+                                        ml="-2.5"
+                                        fontSize="sm"
+                                      >
+                                        {Math.round((sliderMaxVal / 6) * i)}
+                                      </RangeSliderMark>
+                                    ))}
+                                  </div>
+                                </RangeSlider>
+                              </VStack>
+                              {/* Color bar */}
+                              <Box w="1.5%" h="32vh" style={{ opacity: 0.8 }}>
+                                {determineColorFunction(currentChoiceToGraph)}
+                              </Box>
+                            </HStack>
+                          </Box>
+                        </VStack>
+                        {/* Manikn visualization */}
+                        <VStack w="25%">
+                          <Text fontWeight="bold">
+                            {params[currIndex[0]].condition_name}{" "}
+                            <span
+                              style={{ color: "#3ebced", marginLeft: "5px" }}
+                            >
+                              {" "}
+                              {currIndex[1]} mins{" "}
+                            </span>
+                          </Text>
+                          <Text textAlign="center" w="100%">
+                            Click a data point to visualize on manikin.
+                          </Text>
+                          {/* There is no color shema for heat flux and envirnmental variables */}
+                          <Canvass currentColorArray={currentColorArray} />
+                          {currentChoiceToGraph == "hflux" ||
+                          currentChoiceToGraph == "environment" ? (
+                            <Text>No color scheme for this variable.</Text>
+                          ) : (
+                            <></>
+                          )}
+                          <Text>Drag to rotate model.</Text>
+                        </VStack>
+                      </HStack>
                     </VStack>
-                  </HStack>
-                  <Text textAlign="center" w="100%">
-                    These values are averages. Click &quot;Edit variable
-                    data&quot; to see your input data more accurately.
+                  </>
+                ) : (
+                  <Text>
+                    No simulation run yet. Please input data and{" "}
+                    <span style={{ fontWeight: "bold" }}>Run simulation</span>.
                   </Text>
-                </>
+                )}
               </VStack>
-              <HStack align="center" justifyContent="center">
-                <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  onClick={async () => {
-                    loadingModal.onOpen();
-                    try {
-                      let phases = [];
-                      for (let i = 0; i < params.length; i++) {
-                        let new_air_speed = params[i].air_speed.map(Number);
-                        let new_air_temperature =
-                          params[i].air_temperature.map(Number);
-                        let new_radiant_temperature =
-                          params[i].radiant_temperature.map(Number);
-
-                        params[i].personal_comfort_system.forEach(
-                          (elemIndex) => {
-                            for (let j = 0; j < 16; j++) {
-                              new_air_speed[j] += pcsParams[elemIndex]["v"][j];
-                              new_air_temperature[j] +=
-                                pcsParams[elemIndex]["ta"][j];
-                              new_radiant_temperature[j] +=
-                                pcsParams[elemIndex]["mrt"][j];
+            </HStack>
+          ) : (
+            <>
+              {/* Wide view mode */}
+              <VStack
+                w="100%"
+                minH="70vh"
+                margin="50px"
+                alignItems="center"
+                justifyContent="center"
+              >
+                {/* Adding conditions at the top*/}
+                <HStack padding={2} alignItems="flex-start">
+                  {/* A condition botton */}
+                  <HStack w="100%" overflowY={"scroll"} spacing={3}>
+                    {params.map((elem, indx) => {
+                      return (
+                        <Button
+                          key={indx}
+                          minW="110px"
+                          backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
+                          textColor="white"
+                          colorScheme="blue"
+                          onClick={() => {
+                            if (ind == indx) return false;
+                            else setIndex(indx);
+                          }}
+                        >
+                          {params[indx].condition_name.length > 13
+                            ? params[indx].condition_name.substring(0, 13) +
+                              "..."
+                            : params[indx].condition_name}
+                        </Button>
+                      );
+                    })}
+                  </HStack>
+                  {/* + Botton for adding conditions */}
+                  <IconButton
+                    w="5%"
+                    colorScheme="red"
+                    backgroundColor={"red.300"}
+                    textColor={"white"}
+                    icon={<AddIcon />}
+                    onClick={() => {
+                      setParams([
+                        ...params,
+                        conditionParams(params.length + 1),
+                      ]);
+                      setIndex(ind + 1);
+                    }}
+                  ></IconButton>
+                </HStack>
+                {/* Main condition section*/}
+                <VStack
+                  minW="60%"
+                  background={"gray.100"}
+                  // borderColor="gray"
+                  // borderWidth="3px"
+                  borderRadius="10px"
+                  padding={5}
+                  spacing={1}
+                  alignItems="flex-start"
+                >
+                  <>
+                    {/* Condition title */}
+                    <Flex w="100%" alignItems="center" justifyContent="center">
+                      <Editable
+                        value={params[ind].condition_name}
+                        fontSize="2xl"
+                        fontWeight="bold"
+                        isPreviewFocusable={false}
+                      >
+                        <EditablePreview mr="10px" />
+                        <Input
+                          as={EditableInput}
+                          onChange={(e) => {
+                            let tempParams = [...params];
+                            tempParams[ind].condition_name = e.target.value;
+                            if (e.target.value.length == 0) {
+                              tempParams[ind].condition_name =
+                                "Condition #" + ind.toString();
                             }
-                          }
-                        );
+                            setParams(tempParams);
+                          }}
+                          width="200px"
+                          mr="10px"
+                        />
+                        <EditableControls isHome />
+                      </Editable>
+                    </Flex>
+                    {/* Contents */}
+                    <HStack w="100%" alignItems="flex-start" spacing={5}>
+                      {/* Left side input items */}
+                      <VStack pl={200} w="50%" alignItems="flex-start">
+                        {listOfParameters.map((option) => {
+                          return (
+                            <div key={option.title}>
+                              <OptionRenderer
+                                {...{
+                                  params: params,
+                                  setParams: setParams,
+                                  ind: ind,
+                                  setIndex: ind,
+                                  title: option.fullTitle,
+                                  icon: option.icon,
+                                  unit: option.fullUnit,
+                                  val: option.val,
+                                  comp: option.comp,
+                                  step: option.step,
+                                  deltaKey: option.deltaKey,
+                                  isHome: true,
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
+                      </VStack>
+                      {/* Right side input items */}
+                      <VStack
+                        pl={0}
+                        w="50%"
+                        alignItems="flex-start"
+                        justifyContent={"center"}
+                      >
+                        <MetSelector
+                          params={params}
+                          setParams={setParams}
+                          setMetIndex={setMetIndex}
+                          metIndex={metIndex}
+                          setMetOptions={setMetOptions}
+                          metOptions={metOptions}
+                          ind={ind}
+                          isHome
+                        />
+                        <ClothingSelector
+                          params={params}
+                          setParams={setParams}
+                          clo_correspondence={cloTable}
+                          ind={ind}
+                          isHome
+                        />
+                        <Text color="gray.600">
+                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
+                          -{" "}
+                          <span style={{ fontSize: "13px", color: "gray.600" }}>
+                            {cloTable[params[ind].clo_value].description}
+                          </span>
+                        </Text>
+                        {/* Ramp function is not working correctly on the backend now */}
+                        {/* <Checkbox
+                        size="lg"
+                        colorScheme="blue"
+                        defaultChecked={false}
+                        isChecked={params[ind].ramp}
+                        onChange={(e) => {
+                          setParams((prevParams) => {
+                            const updatedParams = [...prevParams];
+                            updatedParams[ind].ramp = e.target.checked;
+                            return updatedParams;
+                          });
+                        }}
+                      >
+                        Ramp
+                      </Checkbox> */}
+                        <Menu placement="top" closeOnSelect={false}>
+                          <MenuButton
+                            as={Button}
+                            rightIcon={<ChevronDownIcon />}
+                            w="60%"
+                            colorScheme="gray"
+                            background={"white"}
+                            variant="outline"
+                          >
+                            Personal comfort system
+                          </MenuButton>
+                          <MenuList>
+                            <MenuOptionGroup title="Select all that apply.">
+                              {pcsParams.map((e, index) => {
+                                if (params) {
+                                  return (
+                                    <MenuItem
+                                      key={e.name}
+                                      onClick={() => {
+                                        let tempParams = [...params];
+                                        if (
+                                          params[
+                                            ind
+                                          ].personal_comfort_system.has(index)
+                                        ) {
+                                          tempParams[
+                                            ind
+                                          ].personal_comfort_system.delete(
+                                            index
+                                          );
+                                        } else {
+                                          tempParams[
+                                            ind
+                                          ].personal_comfort_system.add(index);
+                                        }
+                                        setParams(tempParams);
+                                      }}
+                                    >
+                                      <HStack spacing={0}>
+                                        <div
+                                          style={{
+                                            height: "100%",
+                                            width: "25px",
+                                          }}
+                                        >
+                                          {params[
+                                            ind
+                                          ].personal_comfort_system.has(
+                                            index
+                                          ) ? (
+                                            <CheckIcon />
+                                          ) : (
+                                            <></>
+                                          )}
+                                        </div>
+                                        <Text mr={2} verticalAlign={"center"}>
+                                          {e.name}
+                                        </Text>
+                                        {e.icons}
+                                      </HStack>
+                                    </MenuItem>
+                                  );
+                                } else return <></>;
+                              })}
+                            </MenuOptionGroup>
+                          </MenuList>
+                        </Menu>
+                        <Menu placement="top">
+                          <MenuButton
+                            as={Button}
+                            rightIcon={<ChevronDownIcon />}
+                            w="60%"
+                            backgroundColor={"cbe.100"}
+                            textColor={"white"}
+                            colorScheme="blue"
+                          >
+                            Edit variable data
+                          </MenuButton>
+                          <MenuList>
+                            {listOfParameters.map((e, ind) => {
+                              if (ind >= 1)
+                                return (
+                                  <MenuItem
+                                    key={e.key}
+                                    onClick={() => {
+                                      setCurrentlyEditing(ind);
+                                      editModal.onOpen();
+                                    }}
+                                  >
+                                    <Text mr={2}>
+                                      Edit{" "}
+                                      <span style={{ fontWeight: "bold" }}>
+                                        {e.key}
+                                      </span>
+                                    </Text>
+                                    {e.icon}
+                                  </MenuItem>
+                                );
+                            })}
+                          </MenuList>
+                        </Menu>
+                      </VStack>
+                    </HStack>
+                    <Text textAlign="center" w="100%">
+                      These values are averages. Click &quot;Edit variable
+                      data&quot; to see your input data more accurately.
+                    </Text>
+                  </>
+                </VStack>
+                <HStack align="center" justifyContent="center">
+                  <Button
+                    backgroundColor={"#3ebced"}
+                    textColor={"white"}
+                    colorScheme="blue"
+                    onClick={async () => {
+                      loadingModal.onOpen();
+                      try {
+                        let phases = [];
+                        for (let i = 0; i < params.length; i++) {
+                          let new_air_speed = params[i].air_speed.map(Number);
+                          let new_air_temperature =
+                            params[i].air_temperature.map(Number);
+                          let new_radiant_temperature =
+                            params[i].radiant_temperature.map(Number);
 
+                          params[i].personal_comfort_system.forEach(
+                            (elemIndex) => {
+                              for (let j = 0; j < 16; j++) {
+                                new_air_speed[j] +=
+                                  pcsParams[elemIndex]["v"][j];
+                                new_air_temperature[j] +=
+                                  pcsParams[elemIndex]["ta"][j];
+                                new_radiant_temperature[j] +=
+                                  pcsParams[elemIndex]["mrt"][j];
+                              }
+                            }
+                          );
+
+                          phases.push({
+                            exposure_duration: params[i].exposure_duration,
+                            met_activity_name: "Custom-defined Met Activity",
+                            ramp: params[i].ramp,
+                            met_activity_value: parseFloat(params[i].met_value),
+                            relative_humidity: params[i].relative_humidity.map(
+                              function (x) {
+                                return parseFloat(x) / 100;
+                              }
+                            ),
+                            air_speed: new_air_speed,
+                            air_temperature: new_air_temperature,
+                            radiant_temperature: new_radiant_temperature,
+                            clo_ensemble_name:
+                              cloTable[parseInt(params[i].clo_value)]
+                                .ensemble_name,
+                          });
+                        }
+                        let bodyb = bodybuilderObj;
+                        let clothing = cloTable;
+                        const metrics = await axios
+                          .post("/api/process", {
+                            // Chaining of data is intentional
+                            phases,
+                            bodyb,
+                            clothing,
+                            raw: false,
+                          })
+                          .then((res) => {
+                            if ("success" in res.data) {
+                              loadingModal.onClose();
+                              alert("An error has occurred. Please try again.");
+                              return;
+                            }
+
+                            let tempArr = [];
+                            for (let j = 0; j < res.data.length; j++) {
+                              tempArr.push({
+                                ...res.data[j][numtoGraph],
+                                index: j,
+                              });
+                            }
+                            setData(tempArr);
+                            setFullData(res.data);
+                            setCache(params.slice());
+                            setGraph(decideGraph(tempArr, numtoGraph));
+
+                            let totalDuration = 0;
+                            for (let i = 0; i < params.length; i++) {
+                              totalDuration += params[i].exposure_duration;
+                            }
+                            setSliderMaxVal(totalDuration);
+                            setSliderVal([1, totalDuration]);
+
+                            let colorsArr = [];
+                            let mins = [],
+                              maxes = [];
+                            for (let i = 0; i <= 17; i++) {
+                              mins.push(
+                                findMin(
+                                  res.data,
+                                  places[i],
+                                  currentChoiceToGraph
+                                )
+                              );
+                              maxes.push(
+                                findMax(
+                                  res.data,
+                                  places[i],
+                                  currentChoiceToGraph
+                                )
+                              );
+                            }
+                            for (let time = 0; time < res.data.length; time++) {
+                              let bodyPartsArr = [];
+                              for (let i = 0; i <= 17; i++) {
+                                bodyPartsArr.push(
+                                  determineColor(
+                                    res.data[time][places[i]],
+                                    currentChoiceToGraph,
+                                    mins[i],
+                                    maxes[i]
+                                  )
+                                );
+                              }
+                              colorsArr.push(bodyPartsArr);
+                            }
+                            setBodyColors(colorsArr);
+                            setCurrentColorArray(Array(18).fill("white"));
+                            let data = [];
+                            data.push(csvHeaderLine);
+                            for (let time = 0; time < res.data.length; time++) {
+                              let tempRow = [time];
+                              tempRow.push(
+                                ...convertResultToArrayForCSV(res.data[time][0])
+                              );
+                              for (let i = 0; i < signals.length; i++) {
+                                for (
+                                  let j = 1;
+                                  j < res.data[time].length;
+                                  j++
+                                ) {
+                                  tempRow.push(
+                                    res.data[time][j][signals[i].slice(0, -1)]
+                                  );
+                                }
+                              }
+                              data.push(tempRow);
+                            }
+                            setCSVData(data);
+                            setComfortView(false);
+                            loadingModal.onClose();
+                          });
+                      } catch (err) {
+                        loadingModal.onClose();
+                        alert("An error has occurred. Please try again.");
+                        console.log(err);
+                      }
+                    }}
+                  >
+                    Simulate
+                  </Button>
+                  <Button
+                    textColor="gray.600"
+                    bgColor="white"
+                    borderWidth={2}
+                    colorScheme="gray"
+                    alignSelf="center"
+                    onClick={() => {
+                      uploadModal.onOpen();
+                    }}
+                  >
+                    Open
+                  </Button>
+                  <Button
+                    textColor="gray.600"
+                    bgColor="white"
+                    borderWidth={2}
+                    colorScheme="gray"
+                    alignSelf="center"
+                    onClick={async () => {
+                      let phases = [];
+                      let currTimer = 0;
+                      for (let i = 0; i < params.length; i++) {
+                        let temp_condition_name = params[i].condition_name;
+                        let temp_duration = params[i].exposure_duration;
+                        let temp_met_activity_name =
+                          "Custom-defined Met Activity";
+                        let temp_met_activity_value = parseFloat(
+                          params[i].met_value
+                        );
+                        let temp_relative_humidity = params[
+                          i
+                        ].relative_humidity.map(function (x) {
+                          return parseFloat(x) / 100;
+                        });
+                        let temp_air_speed = params[i].air_speed.map(Number);
+                        let temp_air_temperature =
+                          params[i].air_temperature.map(Number);
+                        let temp_radiant_temperature =
+                          params[i].radiant_temperature.map(Number);
+                        let temp_clo_ensemble_name =
+                          cloTable[parseInt(params[i].clo_value)].ensemble_name;
                         phases.push({
+                          condition_name: temp_condition_name,
+                          start_time: currTimer,
+                          time_units: "minutes",
+                          ramp: params[i].ramp,
+                          end_time: currTimer + temp_duration,
+                          met_activity_name: temp_met_activity_name,
+                          met: temp_met_activity_value,
+                          default_data: {
+                            rh:
+                              temp_relative_humidity.reduce((a, b) => a + b) /
+                              (temp_relative_humidity.length * 100),
+                            v:
+                              temp_air_speed.reduce((a, b) => a + b) /
+                              temp_air_speed.length,
+                            solar: 0,
+                            ta:
+                              temp_air_temperature.reduce((a, b) => a + b) /
+                              temp_air_temperature.length,
+                            mrt:
+                              temp_radiant_temperature.reduce((a, b) => a + b) /
+                              temp_radiant_temperature.length,
+                          },
+                          clo_ensemble_name: temp_clo_ensemble_name,
+                          segment_data: {
+                            Head: {
+                              mrt: temp_radiant_temperature[0],
+                              rh: temp_relative_humidity[0],
+                              solar: 0,
+                              ta: temp_air_temperature[0],
+                              v: temp_air_speed[0],
+                            },
+                            Chest: {
+                              mrt: temp_radiant_temperature[1],
+                              rh: temp_relative_humidity[1],
+                              solar: 0,
+                              ta: temp_air_temperature[1],
+                              v: temp_air_speed[1],
+                            },
+                            Back: {
+                              mrt: temp_radiant_temperature[2],
+                              rh: temp_relative_humidity[2],
+                              solar: 0,
+                              ta: temp_air_temperature[2],
+                              v: temp_air_speed[2],
+                            },
+                            Pelvis: {
+                              mrt: temp_radiant_temperature[3],
+                              rh: temp_relative_humidity[3],
+                              solar: 0,
+                              ta: temp_air_temperature[3],
+                              v: temp_air_speed[3],
+                            },
+                            "Left Upper Arm": {
+                              mrt: temp_radiant_temperature[4],
+                              rh: temp_relative_humidity[4],
+                              solar: 0,
+                              ta: temp_air_temperature[4],
+                              v: temp_air_speed[4],
+                            },
+                            "Right Upper Arm": {
+                              mrt: temp_radiant_temperature[5],
+                              rh: temp_relative_humidity[5],
+                              solar: 0,
+                              ta: temp_air_temperature[5],
+                              v: temp_air_speed[5],
+                            },
+                            "Left Lower Arm": {
+                              mrt: temp_radiant_temperature[6],
+                              rh: temp_relative_humidity[6],
+                              solar: 0,
+                              ta: temp_air_temperature[6],
+                              v: temp_air_speed[6],
+                            },
+                            "Right Lower Arm": {
+                              mrt: temp_radiant_temperature[7],
+                              rh: temp_relative_humidity[7],
+                              solar: 0,
+                              ta: temp_air_temperature[7],
+                              v: temp_air_speed[7],
+                            },
+                            "Left Hand": {
+                              mrt: temp_radiant_temperature[8],
+                              rh: temp_relative_humidity[8],
+                              solar: 0,
+                              ta: temp_air_temperature[8],
+                              v: temp_air_speed[8],
+                            },
+                            "Right Hand": {
+                              mrt: temp_radiant_temperature[9],
+                              rh: temp_relative_humidity[9],
+                              solar: 0,
+                              ta: temp_air_temperature[9],
+                              v: temp_air_speed[9],
+                            },
+                            "Left Thigh": {
+                              mrt: temp_radiant_temperature[10],
+                              rh: temp_relative_humidity[10],
+                              solar: 0,
+                              ta: temp_air_temperature[10],
+                              v: temp_air_speed[10],
+                            },
+                            "Right Thigh": {
+                              mrt: temp_radiant_temperature[11],
+                              rh: temp_relative_humidity[11],
+                              solar: 0,
+                              ta: temp_air_temperature[11],
+                              v: temp_air_speed[11],
+                            },
+                            "Left Lower Leg": {
+                              mrt: temp_radiant_temperature[12],
+                              rh: temp_relative_humidity[12],
+                              solar: 0,
+                              ta: temp_air_temperature[12],
+                              v: temp_air_speed[12],
+                            },
+                            "Right Lower Leg": {
+                              mrt: temp_radiant_temperature[13],
+                              rh: temp_relative_humidity[13],
+                              solar: 0,
+                              ta: temp_air_temperature[13],
+                              v: temp_air_speed[13],
+                            },
+                            "Left Foot": {
+                              mrt: temp_radiant_temperature[14],
+                              rh: temp_relative_humidity[14],
+                              solar: 0,
+                              ta: temp_air_temperature[14],
+                              v: temp_air_speed[14],
+                            },
+                            "Right Foot": {
+                              mrt: temp_radiant_temperature[15],
+                              rh: temp_relative_humidity[15],
+                              solar: 0,
+                              ta: temp_air_temperature[15],
+                              v: temp_air_speed[15],
+                            },
+                          },
+                        });
+                        currTimer += temp_duration;
+                      }
+
+                      let phasesToPass = [];
+                      for (let i = 0; i < params.length; i++) {
+                        phasesToPass.push({
                           exposure_duration: params[i].exposure_duration,
                           met_activity_name: "Custom-defined Met Activity",
                           ramp: params[i].ramp,
@@ -1118,9 +1516,11 @@ export default function WithSubnavigation() {
                               return parseFloat(x) / 100;
                             }
                           ),
-                          air_speed: new_air_speed,
-                          air_temperature: new_air_temperature,
-                          radiant_temperature: new_radiant_temperature,
+                          air_speed: params[i].air_speed.map(Number),
+                          air_temperature:
+                            params[i].air_temperature.map(Number),
+                          radiant_temperature:
+                            params[i].radiant_temperature.map(Number),
                           clo_ensemble_name:
                             cloTable[parseInt(params[i].clo_value)]
                               .ensemble_name,
@@ -1128,280 +1528,98 @@ export default function WithSubnavigation() {
                       }
                       let bodyb = bodybuilderObj;
                       let clothing = cloTable;
-                      const metrics = await axios
+                      const resultsToPass = await axios
                         .post("/api/process", {
                           // Chaining of data is intentional
-                          phases,
+                          phases: phasesToPass,
                           bodyb,
                           clothing,
-                          raw: false,
+                          raw: true,
                         })
                         .then((res) => {
-                          if ("success" in res.data) {
-                            loadingModal.onClose();
-                            alert("An error has occurred. Please try again.");
-                            return;
-                          }
-
-                          let tempArr = [];
-                          for (let j = 0; j < res.data.length; j++) {
-                            tempArr.push({
-                              ...res.data[j][numtoGraph],
-                              index: j,
-                            });
-                          }
-                          setData(tempArr);
-                          setFullData(res.data);
-                          setCache(params.slice());
-                          setGraph(decideGraph(tempArr, numtoGraph));
-
-                          let totalDuration = 0;
-                          for (let i = 0; i < params.length; i++) {
-                            totalDuration += params[i].exposure_duration;
-                          }
-                          setSliderMaxVal(totalDuration);
-                          setSliderVal([1, totalDuration]);
-
-                          let colorsArr = [];
-                          let mins = [],
-                            maxes = [];
-                          for (let i = 0; i <= 17; i++) {
-                            mins.push(
-                              findMin(res.data, places[i], currentChoiceToGraph)
-                            );
-                            maxes.push(
-                              findMax(res.data, places[i], currentChoiceToGraph)
-                            );
-                          }
-                          for (let time = 0; time < res.data.length; time++) {
-                            let bodyPartsArr = [];
-                            for (let i = 0; i <= 17; i++) {
-                              bodyPartsArr.push(
-                                determineColor(
-                                  res.data[time][places[i]],
-                                  currentChoiceToGraph,
-                                  mins[i],
-                                  maxes[i]
-                                )
-                              );
-                            }
-                            colorsArr.push(bodyPartsArr);
-                          }
-                          setBodyColors(colorsArr);
-                          setCurrentColorArray(Array(18).fill("white"));
-                          let data = [];
-                          data.push(csvHeaderLine);
-                          for (let time = 0; time < res.data.length; time++) {
-                            let tempRow = [time];
-                            tempRow.push(
-                              ...convertResultToArrayForCSV(res.data[time][0])
-                            );
-                            for (let i = 0; i < signals.length; i++) {
-                              for (let j = 1; j < res.data[time].length; j++) {
-                                tempRow.push(
-                                  res.data[time][j][signals[i].slice(0, -1)]
-                                );
-                              }
-                            }
-                            data.push(tempRow);
-                          }
-                          setCSVData(data);
-                          setComfortView(false);
-                          loadingModal.onClose();
+                          return res.data;
                         });
-                    } catch (err) {
-                      loadingModal.onClose();
-                      alert("An error has occurred. Please try again.");
-                      console.log(err);
-                    }
-                  }}
-                >
-                  Run
-                </Button>
-                <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  alignSelf="center"
-                  onClick={() => {
-                    uploadModal.onOpen();
-                  }}
-                >
-                  Open
-                </Button>
-                <Button
-                  backgroundColor={"#3ebced"}
-                  textColor={"white"}
-                  colorScheme="blue"
-                  alignSelf="center"
-                  onClick={async () => {
+                      const obj = {
+                        name: "CBE Interface Test",
+                        description: "Prototype testing requests",
+                        reference_time: new Date(),
+                        output_freq: 60,
+                        options: {
+                          csvOutput: false,
+                          sensation_adaptation: false,
+                          sensation_coredTdt: false,
+                          ignore_segments: false,
+                          ignore_physiology: false,
+                          neutralSimulationOutput: false,
+                        },
+                        phases: phases,
+                        clothing: cloTable,
+                        results: resultsToPass,
+                      };
+                      try {
+                        const fh = await getSaveFilePicker();
+                        const writeable = await fh.createWritable();
+                        await writeable.write(
+                          new Blob([JSON.stringify(obj, undefined, 2)], {
+                            type: "application/json",
+                          })
+                        );
+                        await writeable.close();
+                      } catch (e) {
+                        alert(e);
+                      }
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    textColor="gray.600"
+                    bgColor="white"
+                    borderWidth={2}
+                    onClick={advancedModal.onOpen}
+                  >
+                    Advanced
+                  </Button>
+                  <Tooltip label="Switch to narrow view" placement="right">
+                    <IconButton
+                      icon={<ViewIcon />}
+                      onClick={() => setComfortView(false)}
+                    />
+                  </Tooltip>
+                </HStack>
+              </VStack>
+            </>
+          )}
+          {/* When narrow view mode */}
+          {!comfortView ? (
+            <HStack align="center" justifyContent="center">
+              <Button
+                backgroundColor={"#3ebced"}
+                textColor={"white"}
+                colorScheme="blue"
+                alignSelf="center"
+                onClick={async () => {
+                  loadingModal.onOpen();
+                  try {
                     let phases = [];
-                    let currTimer = 0;
                     for (let i = 0; i < params.length; i++) {
-                      let temp_condition_name = params[i].condition_name;
-                      let temp_duration = params[i].exposure_duration;
-                      let temp_met_activity_name =
-                        "Custom-defined Met Activity";
-                      let temp_met_activity_value = parseFloat(
-                        params[i].met_value
-                      );
-                      let temp_relative_humidity = params[
-                        i
-                      ].relative_humidity.map(function (x) {
-                        return parseFloat(x) / 100;
-                      });
-                      let temp_air_speed = params[i].air_speed.map(Number);
-                      let temp_air_temperature =
+                      let new_air_speed = params[i].air_speed.map(Number);
+                      let new_air_temperature =
                         params[i].air_temperature.map(Number);
-                      let temp_radiant_temperature =
+                      let new_radiant_temperature =
                         params[i].radiant_temperature.map(Number);
-                      let temp_clo_ensemble_name =
-                        cloTable[parseInt(params[i].clo_value)].ensemble_name;
-                      phases.push({
-                        condition_name: temp_condition_name,
-                        start_time: currTimer,
-                        time_units: "minutes",
-                        ramp: params[i].ramp,
-                        end_time: currTimer + temp_duration,
-                        met_activity_name: temp_met_activity_name,
-                        met: temp_met_activity_value,
-                        default_data: {
-                          rh:
-                            temp_relative_humidity.reduce((a, b) => a + b) /
-                            (temp_relative_humidity.length * 100),
-                          v:
-                            temp_air_speed.reduce((a, b) => a + b) /
-                            temp_air_speed.length,
-                          solar: 0,
-                          ta:
-                            temp_air_temperature.reduce((a, b) => a + b) /
-                            temp_air_temperature.length,
-                          mrt:
-                            temp_radiant_temperature.reduce((a, b) => a + b) /
-                            temp_radiant_temperature.length,
-                        },
-                        clo_ensemble_name: temp_clo_ensemble_name,
-                        segment_data: {
-                          Head: {
-                            mrt: temp_radiant_temperature[0],
-                            rh: temp_relative_humidity[0],
-                            solar: 0,
-                            ta: temp_air_temperature[0],
-                            v: temp_air_speed[0],
-                          },
-                          Chest: {
-                            mrt: temp_radiant_temperature[1],
-                            rh: temp_relative_humidity[1],
-                            solar: 0,
-                            ta: temp_air_temperature[1],
-                            v: temp_air_speed[1],
-                          },
-                          Back: {
-                            mrt: temp_radiant_temperature[2],
-                            rh: temp_relative_humidity[2],
-                            solar: 0,
-                            ta: temp_air_temperature[2],
-                            v: temp_air_speed[2],
-                          },
-                          Pelvis: {
-                            mrt: temp_radiant_temperature[3],
-                            rh: temp_relative_humidity[3],
-                            solar: 0,
-                            ta: temp_air_temperature[3],
-                            v: temp_air_speed[3],
-                          },
-                          "Left Upper Arm": {
-                            mrt: temp_radiant_temperature[4],
-                            rh: temp_relative_humidity[4],
-                            solar: 0,
-                            ta: temp_air_temperature[4],
-                            v: temp_air_speed[4],
-                          },
-                          "Right Upper Arm": {
-                            mrt: temp_radiant_temperature[5],
-                            rh: temp_relative_humidity[5],
-                            solar: 0,
-                            ta: temp_air_temperature[5],
-                            v: temp_air_speed[5],
-                          },
-                          "Left Lower Arm": {
-                            mrt: temp_radiant_temperature[6],
-                            rh: temp_relative_humidity[6],
-                            solar: 0,
-                            ta: temp_air_temperature[6],
-                            v: temp_air_speed[6],
-                          },
-                          "Right Lower Arm": {
-                            mrt: temp_radiant_temperature[7],
-                            rh: temp_relative_humidity[7],
-                            solar: 0,
-                            ta: temp_air_temperature[7],
-                            v: temp_air_speed[7],
-                          },
-                          "Left Hand": {
-                            mrt: temp_radiant_temperature[8],
-                            rh: temp_relative_humidity[8],
-                            solar: 0,
-                            ta: temp_air_temperature[8],
-                            v: temp_air_speed[8],
-                          },
-                          "Right Hand": {
-                            mrt: temp_radiant_temperature[9],
-                            rh: temp_relative_humidity[9],
-                            solar: 0,
-                            ta: temp_air_temperature[9],
-                            v: temp_air_speed[9],
-                          },
-                          "Left Thigh": {
-                            mrt: temp_radiant_temperature[10],
-                            rh: temp_relative_humidity[10],
-                            solar: 0,
-                            ta: temp_air_temperature[10],
-                            v: temp_air_speed[10],
-                          },
-                          "Right Thigh": {
-                            mrt: temp_radiant_temperature[11],
-                            rh: temp_relative_humidity[11],
-                            solar: 0,
-                            ta: temp_air_temperature[11],
-                            v: temp_air_speed[11],
-                          },
-                          "Left Lower Leg": {
-                            mrt: temp_radiant_temperature[12],
-                            rh: temp_relative_humidity[12],
-                            solar: 0,
-                            ta: temp_air_temperature[12],
-                            v: temp_air_speed[12],
-                          },
-                          "Right Lower Leg": {
-                            mrt: temp_radiant_temperature[13],
-                            rh: temp_relative_humidity[13],
-                            solar: 0,
-                            ta: temp_air_temperature[13],
-                            v: temp_air_speed[13],
-                          },
-                          "Left Foot": {
-                            mrt: temp_radiant_temperature[14],
-                            rh: temp_relative_humidity[14],
-                            solar: 0,
-                            ta: temp_air_temperature[14],
-                            v: temp_air_speed[14],
-                          },
-                          "Right Foot": {
-                            mrt: temp_radiant_temperature[15],
-                            rh: temp_relative_humidity[15],
-                            solar: 0,
-                            ta: temp_air_temperature[15],
-                            v: temp_air_speed[15],
-                          },
-                        },
-                      });
-                      currTimer += temp_duration;
-                    }
 
-                    let phasesToPass = [];
-                    for (let i = 0; i < params.length; i++) {
-                      phasesToPass.push({
+                      params[i].personal_comfort_system.forEach((elemIndex) => {
+                        for (let j = 0; j < 16; j++) {
+                          new_air_speed[j] += pcsParams[elemIndex]["v"][j];
+                          new_air_temperature[j] +=
+                            pcsParams[elemIndex]["ta"][j];
+                          new_radiant_temperature[j] +=
+                            pcsParams[elemIndex]["mrt"][j];
+                        }
+                      });
+
+                      phases.push({
                         exposure_duration: params[i].exposure_duration,
                         met_activity_name: "Custom-defined Met Activity",
                         ramp: params[i].ramp,
@@ -1411,106 +1629,286 @@ export default function WithSubnavigation() {
                             return parseFloat(x) / 100;
                           }
                         ),
-                        air_speed: params[i].air_speed.map(Number),
-                        air_temperature: params[i].air_temperature.map(Number),
-                        radiant_temperature:
-                          params[i].radiant_temperature.map(Number),
+                        air_speed: new_air_speed,
+                        air_temperature: new_air_temperature,
+                        radiant_temperature: new_radiant_temperature,
                         clo_ensemble_name:
                           cloTable[parseInt(params[i].clo_value)].ensemble_name,
                       });
                     }
                     let bodyb = bodybuilderObj;
                     let clothing = cloTable;
-                    const resultsToPass = await axios
+                    const metrics = await axios
                       .post("/api/process", {
                         // Chaining of data is intentional
-                        phases: phasesToPass,
+                        phases,
                         bodyb,
                         clothing,
-                        raw: true,
+                        raw: false,
                       })
                       .then((res) => {
-                        return res.data;
+                        if ("success" in res.data) {
+                          loadingModal.onClose();
+                          alert("An error has occurred. Please try again.");
+                          return;
+                        }
+                        let tempArr = [];
+                        for (let j = 0; j < res.data.length; j++) {
+                          tempArr.push({
+                            ...res.data[j][numtoGraph],
+                            index: j,
+                          });
+                        }
+                        setData(tempArr);
+                        setFullData(res.data);
+                        setCache(params.slice());
+                        setGraph(decideGraph(tempArr, numtoGraph));
+
+                        let totalDuration = 0;
+                        for (let i = 0; i < params.length; i++) {
+                          totalDuration += params[i].exposure_duration;
+                        }
+                        setSliderMaxVal(totalDuration);
+                        setSliderVal([1, totalDuration]);
+
+                        let colorsArr = [];
+                        let mins = [],
+                          maxes = [];
+                        for (let i = 0; i <= 17; i++) {
+                          mins.push(
+                            findMin(res.data, places[i], currentChoiceToGraph)
+                          );
+                          maxes.push(
+                            findMax(res.data, places[i], currentChoiceToGraph)
+                          );
+                        }
+                        for (let time = 0; time < res.data.length; time++) {
+                          let bodyPartsArr = [];
+                          for (let i = 0; i <= 17; i++) {
+                            bodyPartsArr.push(
+                              determineColor(
+                                res.data[time][places[i]],
+                                currentChoiceToGraph,
+                                mins[i],
+                                maxes[i]
+                              )
+                            );
+                          }
+                          colorsArr.push(bodyPartsArr);
+                        }
+                        setBodyColors(colorsArr);
+                        setCurrentColorArray(Array(18).fill("white"));
+                        let data = [];
+                        data.push(csvHeaderLine);
+                        for (let time = 0; time < res.data.length; time++) {
+                          let tempRow = [time];
+                          tempRow.push(
+                            ...convertResultToArrayForCSV(res.data[time][0])
+                          );
+                          for (let i = 0; i < signals.length; i++) {
+                            for (let j = 1; j < res.data[time].length; j++) {
+                              tempRow.push(
+                                res.data[time][j][signals[i].slice(0, -1)]
+                              );
+                            }
+                          }
+                          data.push(tempRow);
+                        }
+                        setCSVData(data);
+                        setComfortView(false);
+                        loadingModal.onClose();
                       });
-                    const obj = {
-                      name: "CBE Interface Test",
-                      description: "Prototype testing requests",
-                      reference_time: new Date(),
-                      output_freq: 60,
-                      options: {
-                        csvOutput: false,
-                        sensation_adaptation: false,
-                        sensation_coredTdt: false,
-                        ignore_segments: false,
-                        ignore_physiology: false,
-                        neutralSimulationOutput: false,
-                      },
-                      phases: phases,
-                      clothing: cloTable,
-                      results: resultsToPass,
-                    };
-                    try {
-                      const fh = await getSaveFilePicker();
-                      const writeable = await fh.createWritable();
-                      await writeable.write(
-                        new Blob([JSON.stringify(obj, undefined, 2)], {
-                          type: "application/json",
-                        })
-                      );
-                      await writeable.close();
-                    } catch (e) {
-                      alert(e);
-                    }
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  textColor="gray.600"
-                  bgColor="white"
-                  borderWidth={2}
-                  onClick={advancedModal.onOpen}
-                >
-                  Advanced
-                </Button>
-                <Tooltip label="Switch to narrow view" placement="right">
-                  <IconButton
-                    icon={<ViewIcon />}
-                    onClick={() => setComfortView(false)}
-                  />
-                </Tooltip>
-              </HStack>
-            </VStack>
-          </>
-        )}
-        {!comfortView ? (
-          <HStack align="center" justifyContent="center">
-            <Button
-              backgroundColor={"#3ebced"}
-              textColor={"white"}
-              colorScheme="blue"
-              alignSelf="center"
-              onClick={async () => {
-                loadingModal.onOpen();
-                try {
+                  } catch (err) {
+                    loadingModal.onClose();
+                    alert("An error has occurred. Please try again.");
+                    console.log(err);
+                  }
+                }}
+              >
+                Simulate
+              </Button>
+              <Button
+                textColor="gray.600"
+                backgroundColor="white"
+                borderWidth={2}
+                alignSelf="center"
+                onClick={() => {
+                  uploadModal.onOpen();
+                }}
+              >
+                Open
+              </Button>
+              <Button
+                textColor="gray.600"
+                backgroundColor="white"
+                borderWidth={2}
+                alignSelf="center"
+                onClick={async () => {
                   let phases = [];
+                  let currTimer = 0;
                   for (let i = 0; i < params.length; i++) {
-                    let new_air_speed = params[i].air_speed.map(Number);
-                    let new_air_temperature =
-                      params[i].air_temperature.map(Number);
-                    let new_radiant_temperature =
-                      params[i].radiant_temperature.map(Number);
-
-                    params[i].personal_comfort_system.forEach((elemIndex) => {
-                      for (let j = 0; j < 16; j++) {
-                        new_air_speed[j] += pcsParams[elemIndex]["v"][j];
-                        new_air_temperature[j] += pcsParams[elemIndex]["ta"][j];
-                        new_radiant_temperature[j] +=
-                          pcsParams[elemIndex]["mrt"][j];
-                      }
+                    let temp_condition_name = params[i].condition_name;
+                    let temp_duration = params[i].exposure_duration;
+                    let temp_met_activity_name = "Custom-defined Met Activity";
+                    let temp_met_activity_value = parseFloat(
+                      params[i].met_value
+                    );
+                    let temp_relative_humidity = params[
+                      i
+                    ].relative_humidity.map(function (x) {
+                      return parseFloat(x) / 100;
                     });
-
+                    let temp_air_speed = params[i].air_speed.map(Number);
+                    let temp_air_temperature =
+                      params[i].air_temperature.map(Number);
+                    let temp_radiant_temperature =
+                      params[i].radiant_temperature.map(Number);
+                    let temp_clo_ensemble_name =
+                      cloTable[parseInt(params[i].clo_value)].ensemble_name;
                     phases.push({
+                      condition_name: temp_condition_name,
+                      start_time: currTimer,
+                      time_units: "minutes",
+                      ramp: params[i].ramp,
+                      end_time: currTimer + temp_duration,
+                      met_activity_name: temp_met_activity_name,
+                      met: temp_met_activity_value,
+                      default_data: {
+                        rh:
+                          temp_relative_humidity.reduce((a, b) => a + b) /
+                          (temp_relative_humidity.length * 100),
+                        v:
+                          temp_air_speed.reduce((a, b) => a + b) /
+                          temp_air_speed.length,
+                        solar: 0,
+                        ta:
+                          temp_air_temperature.reduce((a, b) => a + b) /
+                          temp_air_temperature.length,
+                        mrt:
+                          temp_radiant_temperature.reduce((a, b) => a + b) /
+                          temp_radiant_temperature.length,
+                      },
+                      clo_ensemble_name: temp_clo_ensemble_name,
+                      segment_data: {
+                        Head: {
+                          mrt: temp_radiant_temperature[0],
+                          rh: temp_relative_humidity[0],
+                          solar: 0,
+                          ta: temp_air_temperature[0],
+                          v: temp_air_speed[0],
+                        },
+                        Chest: {
+                          mrt: temp_radiant_temperature[1],
+                          rh: temp_relative_humidity[1],
+                          solar: 0,
+                          ta: temp_air_temperature[1],
+                          v: temp_air_speed[1],
+                        },
+                        Back: {
+                          mrt: temp_radiant_temperature[2],
+                          rh: temp_relative_humidity[2],
+                          solar: 0,
+                          ta: temp_air_temperature[2],
+                          v: temp_air_speed[2],
+                        },
+                        Pelvis: {
+                          mrt: temp_radiant_temperature[3],
+                          rh: temp_relative_humidity[3],
+                          solar: 0,
+                          ta: temp_air_temperature[3],
+                          v: temp_air_speed[3],
+                        },
+                        "Left Upper Arm": {
+                          mrt: temp_radiant_temperature[4],
+                          rh: temp_relative_humidity[4],
+                          solar: 0,
+                          ta: temp_air_temperature[4],
+                          v: temp_air_speed[4],
+                        },
+                        "Right Upper Arm": {
+                          mrt: temp_radiant_temperature[5],
+                          rh: temp_relative_humidity[5],
+                          solar: 0,
+                          ta: temp_air_temperature[5],
+                          v: temp_air_speed[5],
+                        },
+                        "Left Lower Arm": {
+                          mrt: temp_radiant_temperature[6],
+                          rh: temp_relative_humidity[6],
+                          solar: 0,
+                          ta: temp_air_temperature[6],
+                          v: temp_air_speed[6],
+                        },
+                        "Right Lower Arm": {
+                          mrt: temp_radiant_temperature[7],
+                          rh: temp_relative_humidity[7],
+                          solar: 0,
+                          ta: temp_air_temperature[7],
+                          v: temp_air_speed[7],
+                        },
+                        "Left Hand": {
+                          mrt: temp_radiant_temperature[8],
+                          rh: temp_relative_humidity[8],
+                          solar: 0,
+                          ta: temp_air_temperature[8],
+                          v: temp_air_speed[8],
+                        },
+                        "Right Hand": {
+                          mrt: temp_radiant_temperature[9],
+                          rh: temp_relative_humidity[9],
+                          solar: 0,
+                          ta: temp_air_temperature[9],
+                          v: temp_air_speed[9],
+                        },
+                        "Left Thigh": {
+                          mrt: temp_radiant_temperature[10],
+                          rh: temp_relative_humidity[10],
+                          solar: 0,
+                          ta: temp_air_temperature[10],
+                          v: temp_air_speed[10],
+                        },
+                        "Right Thigh": {
+                          mrt: temp_radiant_temperature[11],
+                          rh: temp_relative_humidity[11],
+                          solar: 0,
+                          ta: temp_air_temperature[11],
+                          v: temp_air_speed[11],
+                        },
+                        "Left Lower Leg": {
+                          mrt: temp_radiant_temperature[12],
+                          rh: temp_relative_humidity[12],
+                          solar: 0,
+                          ta: temp_air_temperature[12],
+                          v: temp_air_speed[12],
+                        },
+                        "Right Lower Leg": {
+                          mrt: temp_radiant_temperature[13],
+                          rh: temp_relative_humidity[13],
+                          solar: 0,
+                          ta: temp_air_temperature[13],
+                          v: temp_air_speed[13],
+                        },
+                        "Left Foot": {
+                          mrt: temp_radiant_temperature[14],
+                          rh: temp_relative_humidity[14],
+                          solar: 0,
+                          ta: temp_air_temperature[14],
+                          v: temp_air_speed[14],
+                        },
+                        "Right Foot": {
+                          mrt: temp_radiant_temperature[15],
+                          rh: temp_relative_humidity[15],
+                          solar: 0,
+                          ta: temp_air_temperature[15],
+                          v: temp_air_speed[15],
+                        },
+                      },
+                    });
+                    currTimer += temp_duration;
+                  }
+                  let phasesToPass = [];
+                  for (let i = 0; i < params.length; i++) {
+                    phasesToPass.push({
                       exposure_duration: params[i].exposure_duration,
                       met_activity_name: "Custom-defined Met Activity",
                       ramp: params[i].ramp,
@@ -1520,366 +1918,157 @@ export default function WithSubnavigation() {
                           return parseFloat(x) / 100;
                         }
                       ),
-                      air_speed: new_air_speed,
-                      air_temperature: new_air_temperature,
-                      radiant_temperature: new_radiant_temperature,
+                      air_speed: params[i].air_speed.map(Number),
+                      air_temperature: params[i].air_temperature.map(Number),
+                      radiant_temperature:
+                        params[i].radiant_temperature.map(Number),
                       clo_ensemble_name:
                         cloTable[parseInt(params[i].clo_value)].ensemble_name,
                     });
                   }
                   let bodyb = bodybuilderObj;
                   let clothing = cloTable;
-                  const metrics = await axios
+                  const resultsToPass = await axios
                     .post("/api/process", {
                       // Chaining of data is intentional
-                      phases,
+                      phases: phasesToPass,
                       bodyb,
                       clothing,
-                      raw: false,
+                      raw: true,
                     })
                     .then((res) => {
-                      if ("success" in res.data) {
-                        loadingModal.onClose();
-                        alert("An error has occurred. Please try again.");
-                        return;
-                      }
-                      let tempArr = [];
-                      for (let j = 0; j < res.data.length; j++) {
-                        tempArr.push({
-                          ...res.data[j][numtoGraph],
-                          index: j,
-                        });
-                      }
-                      setData(tempArr);
-                      setFullData(res.data);
-                      setCache(params.slice());
-                      setGraph(decideGraph(tempArr, numtoGraph));
-
-                      let totalDuration = 0;
-                      for (let i = 0; i < params.length; i++) {
-                        totalDuration += params[i].exposure_duration;
-                      }
-                      setSliderMaxVal(totalDuration);
-                      setSliderVal([1, totalDuration]);
-
-                      let colorsArr = [];
-                      let mins = [],
-                        maxes = [];
-                      for (let i = 0; i <= 17; i++) {
-                        mins.push(
-                          findMin(res.data, places[i], currentChoiceToGraph)
-                        );
-                        maxes.push(
-                          findMax(res.data, places[i], currentChoiceToGraph)
-                        );
-                      }
-                      for (let time = 0; time < res.data.length; time++) {
-                        let bodyPartsArr = [];
-                        for (let i = 0; i <= 17; i++) {
-                          bodyPartsArr.push(
-                            determineColor(
-                              res.data[time][places[i]],
-                              currentChoiceToGraph,
-                              mins[i],
-                              maxes[i]
-                            )
-                          );
-                        }
-                        colorsArr.push(bodyPartsArr);
-                      }
-                      setBodyColors(colorsArr);
-                      setCurrentColorArray(Array(18).fill("white"));
-                      let data = [];
-                      data.push(csvHeaderLine);
-                      for (let time = 0; time < res.data.length; time++) {
-                        let tempRow = [time];
-                        tempRow.push(
-                          ...convertResultToArrayForCSV(res.data[time][0])
-                        );
-                        for (let i = 0; i < signals.length; i++) {
-                          for (let j = 1; j < res.data[time].length; j++) {
-                            tempRow.push(
-                              res.data[time][j][signals[i].slice(0, -1)]
-                            );
-                          }
-                        }
-                        data.push(tempRow);
-                      }
-                      setCSVData(data);
-                      setComfortView(false);
-                      loadingModal.onClose();
+                      return res.data;
                     });
-                } catch (err) {
-                  loadingModal.onClose();
-                  alert("An error has occurred. Please try again.");
-                  console.log(err);
-                }
-              }}
-            >
-              Run
-            </Button>
-            <Button
-              backgroundColor={"#3ebced"}
-              textColor={"white"}
-              colorScheme="blue"
-              alignSelf="center"
-              onClick={() => {
-                uploadModal.onOpen();
-              }}
-            >
-              Open
-            </Button>
-            <Button
-              backgroundColor={"#3ebced"}
-              textColor={"white"}
-              colorScheme="blue"
-              alignSelf="center"
-              onClick={async () => {
-                let phases = [];
-                let currTimer = 0;
-                for (let i = 0; i < params.length; i++) {
-                  let temp_condition_name = params[i].condition_name;
-                  let temp_duration = params[i].exposure_duration;
-                  let temp_met_activity_name = "Custom-defined Met Activity";
-                  let temp_met_activity_value = parseFloat(params[i].met_value);
-                  let temp_relative_humidity = params[i].relative_humidity.map(
-                    function (x) {
-                      return parseFloat(x) / 100;
-                    }
-                  );
-                  let temp_air_speed = params[i].air_speed.map(Number);
-                  let temp_air_temperature =
-                    params[i].air_temperature.map(Number);
-                  let temp_radiant_temperature =
-                    params[i].radiant_temperature.map(Number);
-                  let temp_clo_ensemble_name =
-                    cloTable[parseInt(params[i].clo_value)].ensemble_name;
-                  phases.push({
-                    condition_name: temp_condition_name,
-                    start_time: currTimer,
-                    time_units: "minutes",
-                    ramp: params[i].ramp,
-                    end_time: currTimer + temp_duration,
-                    met_activity_name: temp_met_activity_name,
-                    met: temp_met_activity_value,
-                    default_data: {
-                      rh:
-                        temp_relative_humidity.reduce((a, b) => a + b) /
-                        (temp_relative_humidity.length * 100),
-                      v:
-                        temp_air_speed.reduce((a, b) => a + b) /
-                        temp_air_speed.length,
-                      solar: 0,
-                      ta:
-                        temp_air_temperature.reduce((a, b) => a + b) /
-                        temp_air_temperature.length,
-                      mrt:
-                        temp_radiant_temperature.reduce((a, b) => a + b) /
-                        temp_radiant_temperature.length,
+                  const obj = {
+                    name: "CBE Interface Test",
+                    description: "Prototype testing requests",
+                    reference_time: new Date(),
+                    output_freq: 60,
+                    options: {
+                      csvOutput: false,
+                      sensation_adaptation: false,
+                      sensation_coredTdt: false,
+                      ignore_segments: false,
+                      ignore_physiology: false,
+                      neutralSimulationOutput: false,
                     },
-                    clo_ensemble_name: temp_clo_ensemble_name,
-                    segment_data: {
-                      Head: {
-                        mrt: temp_radiant_temperature[0],
-                        rh: temp_relative_humidity[0],
-                        solar: 0,
-                        ta: temp_air_temperature[0],
-                        v: temp_air_speed[0],
-                      },
-                      Chest: {
-                        mrt: temp_radiant_temperature[1],
-                        rh: temp_relative_humidity[1],
-                        solar: 0,
-                        ta: temp_air_temperature[1],
-                        v: temp_air_speed[1],
-                      },
-                      Back: {
-                        mrt: temp_radiant_temperature[2],
-                        rh: temp_relative_humidity[2],
-                        solar: 0,
-                        ta: temp_air_temperature[2],
-                        v: temp_air_speed[2],
-                      },
-                      Pelvis: {
-                        mrt: temp_radiant_temperature[3],
-                        rh: temp_relative_humidity[3],
-                        solar: 0,
-                        ta: temp_air_temperature[3],
-                        v: temp_air_speed[3],
-                      },
-                      "Left Upper Arm": {
-                        mrt: temp_radiant_temperature[4],
-                        rh: temp_relative_humidity[4],
-                        solar: 0,
-                        ta: temp_air_temperature[4],
-                        v: temp_air_speed[4],
-                      },
-                      "Right Upper Arm": {
-                        mrt: temp_radiant_temperature[5],
-                        rh: temp_relative_humidity[5],
-                        solar: 0,
-                        ta: temp_air_temperature[5],
-                        v: temp_air_speed[5],
-                      },
-                      "Left Lower Arm": {
-                        mrt: temp_radiant_temperature[6],
-                        rh: temp_relative_humidity[6],
-                        solar: 0,
-                        ta: temp_air_temperature[6],
-                        v: temp_air_speed[6],
-                      },
-                      "Right Lower Arm": {
-                        mrt: temp_radiant_temperature[7],
-                        rh: temp_relative_humidity[7],
-                        solar: 0,
-                        ta: temp_air_temperature[7],
-                        v: temp_air_speed[7],
-                      },
-                      "Left Hand": {
-                        mrt: temp_radiant_temperature[8],
-                        rh: temp_relative_humidity[8],
-                        solar: 0,
-                        ta: temp_air_temperature[8],
-                        v: temp_air_speed[8],
-                      },
-                      "Right Hand": {
-                        mrt: temp_radiant_temperature[9],
-                        rh: temp_relative_humidity[9],
-                        solar: 0,
-                        ta: temp_air_temperature[9],
-                        v: temp_air_speed[9],
-                      },
-                      "Left Thigh": {
-                        mrt: temp_radiant_temperature[10],
-                        rh: temp_relative_humidity[10],
-                        solar: 0,
-                        ta: temp_air_temperature[10],
-                        v: temp_air_speed[10],
-                      },
-                      "Right Thigh": {
-                        mrt: temp_radiant_temperature[11],
-                        rh: temp_relative_humidity[11],
-                        solar: 0,
-                        ta: temp_air_temperature[11],
-                        v: temp_air_speed[11],
-                      },
-                      "Left Lower Leg": {
-                        mrt: temp_radiant_temperature[12],
-                        rh: temp_relative_humidity[12],
-                        solar: 0,
-                        ta: temp_air_temperature[12],
-                        v: temp_air_speed[12],
-                      },
-                      "Right Lower Leg": {
-                        mrt: temp_radiant_temperature[13],
-                        rh: temp_relative_humidity[13],
-                        solar: 0,
-                        ta: temp_air_temperature[13],
-                        v: temp_air_speed[13],
-                      },
-                      "Left Foot": {
-                        mrt: temp_radiant_temperature[14],
-                        rh: temp_relative_humidity[14],
-                        solar: 0,
-                        ta: temp_air_temperature[14],
-                        v: temp_air_speed[14],
-                      },
-                      "Right Foot": {
-                        mrt: temp_radiant_temperature[15],
-                        rh: temp_relative_humidity[15],
-                        solar: 0,
-                        ta: temp_air_temperature[15],
-                        v: temp_air_speed[15],
-                      },
-                    },
-                  });
-                  currTimer += temp_duration;
-                }
-                let phasesToPass = [];
-                for (let i = 0; i < params.length; i++) {
-                  phasesToPass.push({
-                    exposure_duration: params[i].exposure_duration,
-                    met_activity_name: "Custom-defined Met Activity",
-                    ramp: params[i].ramp,
-                    met_activity_value: parseFloat(params[i].met_value),
-                    relative_humidity: params[i].relative_humidity.map(
-                      function (x) {
-                        return parseFloat(x) / 100;
-                      }
-                    ),
-                    air_speed: params[i].air_speed.map(Number),
-                    air_temperature: params[i].air_temperature.map(Number),
-                    radiant_temperature:
-                      params[i].radiant_temperature.map(Number),
-                    clo_ensemble_name:
-                      cloTable[parseInt(params[i].clo_value)].ensemble_name,
-                  });
-                }
-                let bodyb = bodybuilderObj;
-                let clothing = cloTable;
-                const resultsToPass = await axios
-                  .post("/api/process", {
-                    // Chaining of data is intentional
-                    phases: phasesToPass,
-                    bodyb,
-                    clothing,
-                    raw: true,
-                  })
-                  .then((res) => {
-                    return res.data;
-                  });
-                const obj = {
-                  name: "CBE Interface Test",
-                  description: "Prototype testing requests",
-                  reference_time: new Date(),
-                  output_freq: 60,
-                  options: {
-                    csvOutput: false,
-                    sensation_adaptation: false,
-                    sensation_coredTdt: false,
-                    ignore_segments: false,
-                    ignore_physiology: false,
-                    neutralSimulationOutput: false,
-                  },
-                  phases: phases,
-                  clothing: cloTable,
-                  results: resultsToPass,
-                };
-                try {
-                  const fh = await getSaveFilePicker();
-                  const writeable = await fh.createWritable();
-                  await writeable.write(
-                    new Blob([JSON.stringify(obj, undefined, 2)], {
-                      type: "application/json",
-                    })
-                  );
-                  await writeable.close();
-                } catch (e) {
-                  alert(e);
-                }
-              }}
+                    phases: phases,
+                    clothing: cloTable,
+                    results: resultsToPass,
+                  };
+                  try {
+                    const fh = await getSaveFilePicker();
+                    const writeable = await fh.createWritable();
+                    await writeable.write(
+                      new Blob([JSON.stringify(obj, undefined, 2)], {
+                        type: "application/json",
+                      })
+                    );
+                    await writeable.close();
+                  } catch (e) {
+                    alert(e);
+                  }
+                }}
+              >
+                Save
+              </Button>
+              <Button
+                textColor="gray.600"
+                bgColor="white"
+                borderWidth={2}
+                onClick={advancedModal.onOpen}
+              >
+                Advanced
+              </Button>
+              <Tooltip label="Switch to wide view" placement="right">
+                <IconButton
+                  icon={<ViewIcon />}
+                  onClick={() => setComfortView(true)}
+                />
+              </Tooltip>
+            </HStack>
+          ) : (
+            <></>
+          )}
+        </Fade>
+      </Flex>
+      <footer>
+        <Box as="footer" bg="#0b2772" color="white" py={1} px={5} mt="auto">
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            justify={{ base: "center", md: "space-between" }}
+            align="center"
+            width="100%"
+          >
+            <Box
+              flex={{ base: "1 0 auto", md: "none" }}
+              textAlign={{ base: "center", md: "left" }}
             >
-              Save
-            </Button>
-            <Button
-              textColor="gray.600"
-              bgColor="white"
-              borderWidth={2}
-              onClick={advancedModal.onOpen}
-            >
-              Advanced
-            </Button>
-            <Tooltip label="Switch to wide view" placement="right">
-              <IconButton
-                icon={<ViewIcon />}
-                onClick={() => setComfortView(true)}
+              <Image
+                src="/img/ucb-logo-2024.png"
+                alt="UC Berkeley Logo"
+                width={150}
+                height={50}
               />
-            </Tooltip>
-          </HStack>
-        ) : (
-          <></>
-        )}
-      </Fade>
+            </Box>
+
+            <Box
+              flex={{ base: "1 0 auto", md: "none" }}
+              textAlign="center"
+              my={{ base: 2, md: 0 }}
+            >
+              <Text>
+                Copyright © {new Date().getFullYear()} The Center for the Built
+                Environment and UC Regents. All rights reserved.
+              </Text>
+            </Box>
+
+            <Box
+              flex={{ base: "1 0 auto", md: "none" }}
+              textAlign={{ base: "center", md: "right" }}
+            >
+              <HStack spacing={5}>
+                <a
+                  href="https://github.com/CenterForTheBuiltEnvironment/ABCWeb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Image
+                    src="/img/github-white-transparent.png"
+                    alt="GitHub"
+                    width={30}
+                    height={30}
+                  />
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/cbe-uc-berkeley/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Image
+                    src="/img/linkedin-white.png"
+                    alt="LinkedIn"
+                    width={30}
+                    height={30}
+                  />
+                </a>
+                <a
+                  href="https://www.youtube.com/@BerkeleyCBE"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Image
+                    src="/img/youtube-white-trans-cropped.png"
+                    alt="YouTube"
+                    width={30}
+                    height={30}
+                  />
+                </a>
+              </HStack>
+            </Box>
+          </Flex>
+        </Box>
+      </footer>
     </Box>
   );
 }
