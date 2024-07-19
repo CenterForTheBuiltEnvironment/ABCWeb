@@ -16,7 +16,7 @@ export default function MetSelector({
   useEffect(() => {}, [params, metIndex]);
   return (
     <>
-      <Text fontWeight="black">Metabolic rate</Text>
+      <Text fontWeight="bold">Metabolic rate</Text>
       <Creatable
         instanceId="zjhddjh1oi2euiAUSD901280198"
         styles={{

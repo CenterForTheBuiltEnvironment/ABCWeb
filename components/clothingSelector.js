@@ -9,7 +9,7 @@ export default function ClothingSelector({
 }) {
   return (
     <>
-      <Text fontWeight="black">Clothing level</Text>
+      <Text fontWeight="bold">Clothing level</Text>
       <Select
         backgroundColor="white"
         w={isHome ? "250px" : "200px"}

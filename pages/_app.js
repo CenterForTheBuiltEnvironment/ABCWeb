@@ -11,13 +11,22 @@ const colors = {
   brand: {
     100: "#97DFFC",
   },
+  berkeleyBlue: {
+    100: "#0c2772",
+  },
+  berkeleyGold: {
+    100: "#fdb516",
+  },
+  cbe: {
+    100: "#3fbbec",
+  },
 };
 
 export const newTheme = extendTheme({
   colors,
   fonts: {
-    heading: `'IBM Plex Sans', sans-serif`,
-    body: `'IBM Plex Sans', sans-serif`,
+    heading: `'Arial', sans-serif`,
+    body: `'Arial', sans-serif`,
   },
   components: {
     Checkbox: {
