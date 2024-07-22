@@ -45,7 +45,7 @@ export const environmentMinimax = (value, data, label) => {
   return curr;
 };
 
-const colorHelper = (value, mn, mx) => {
+const colorHelper = (value, mn, mx, opacity) => {
   const fraction = (value - mn) / (mx - mn),
     midpoint = 0.5,
     fq = 0.25,
@@ -66,28 +66,31 @@ const colorHelper = (value, mn, mx) => {
 
   // output final values
   return (
-    "rgb(" +
+    "rgba(" +
     Math.round(red) +
     "," +
     Math.round(green) +
     "," +
     Math.round(blue) +
+    ", " +
+    toString(opacity) +
     ")"
   );
 };
-export const colorComfort = (comfort) => {
-  if (comfort < -1) return "black";
-  else if (comfort >= -1 && comfort <= 1) return "gray";
-  else return "white";
+export const colorComfort = (comfort, isComparison) => {
+  if (comfort < -1) return "rgba(0, 0, 0, " + (isComparison ? "0.3)" : "1)");
+  else if (comfort >= -1 && comfort <= 1)
+    return "rgba(128, 128, 128, " + (isComparison ? "0.3)" : "1)");
+  else return "rgba(255, 255, 255, " + (isComparison ? "0.3)" : "1)");
 };
-export const colorSensation = (sensation) => {
-  return colorHelper(sensation, -4, 4);
+export const colorSensation = (sensation, isComparison) => {
+  return colorHelper(sensation, -4, 4, isComparison ? 0.3 : 1);
 };
-export const colorTskin = (tskin, min, max) => {
-  return colorHelper(tskin, min, max);
+export const colorTskin = (tskin, min, max, isComparison) => {
+  return colorHelper(tskin, min, max, isComparison ? 0.3 : 1);
 };
-export const colorTcore = (tcore, min, max) => {
-  return colorHelper(tcore, min, max);
+export const colorTcore = (tcore, min, max, isComparison) => {
+  return colorHelper(tcore, min, max, isComparison ? 0.3 : 1);
 };
 export const colorHflux = (elem) => {
   switch (elem) {

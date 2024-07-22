@@ -61,7 +61,7 @@ export function comfBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e) => {
+      data: data.data[0].map((e) => {
         return e.index + 1;
       }),
     },
@@ -87,7 +87,7 @@ export function comfBuilder(data) {
       {
         name: data.legends[0],
         type: "line",
-        data: data.data.map(function (item) {
+        data: data.data[0].map(function (item) {
           return {
             value: item.comfort,
             itemStyle: {
@@ -100,6 +100,23 @@ export function comfBuilder(data) {
       },
     ],
   };
+
+  if (data.data.length > 1) {
+    options.series.push({
+      name: data.legends[1],
+      type: "line",
+      data: data.data[1].map(function (item) {
+        return {
+          value: item.comfort,
+          itemStyle: {
+            normal: {
+              color: colorComfort(item.comfort, true),
+            },
+          },
+        };
+      }),
+    });
+  }
 
   return options;
 }
@@ -146,7 +163,7 @@ export function sensBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e) => {
+      data: data.data[0].map((e) => {
         return e.index + 1;
       }),
     },
@@ -172,12 +189,12 @@ export function sensBuilder(data) {
       {
         name: data.legends[0],
         type: "line",
-        data: data.data.map(function (item) {
+        data: data.data[0].map(function (item) {
           return {
             value: item.sensation,
             itemStyle: {
               normal: {
-                color: colorSensation(item.sensation),
+                color: colorSensation(item.sensation, false),
               },
             },
           };
@@ -185,6 +202,23 @@ export function sensBuilder(data) {
       },
     ],
   };
+
+  if (data.data.length > 1) {
+    options.series.push({
+      name: data.legends[1],
+      type: "line",
+      data: data.data[1].map(function (item) {
+        return {
+          value: item.sensation,
+          itemStyle: {
+            normal: {
+              color: colorSensation(item.sensation, true),
+            },
+          },
+        };
+      }),
+    });
+  }
 
   return options;
 }
@@ -232,7 +266,7 @@ export function tskinBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e) => {
+      data: data.data[0].map((e) => {
         return e.index + 1;
       }),
     },
@@ -241,8 +275,8 @@ export function tskinBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: parseInt(Math.floor(miniMax(0, data.data, "tskin"))),
-      max: parseInt(Math.ceil(miniMax(1, data.data, "tskin"))),
+      min: parseInt(Math.floor(miniMax(0, data.data[0], "tskin"))),
+      max: parseInt(Math.ceil(miniMax(1, data.data[0], "tskin"))),
     },
     dataZoom: [
       {
@@ -253,15 +287,15 @@ export function tskinBuilder(data) {
       {
         name: data.legends[0],
         type: "line",
-        data: data.data.map(function (item) {
+        data: data.data[0].map(function (item) {
           return {
             value: item.tskin,
             itemStyle: {
               normal: {
                 color: colorTskin(
                   item.tskin,
-                  parseInt(Math.floor(miniMax(0, data.data, "tskin"))),
-                  parseInt(Math.ceil(miniMax(1, data.data, "tskin")))
+                  parseInt(Math.floor(miniMax(0, data.data[0], "tskin"))),
+                  parseInt(Math.ceil(miniMax(1, data.data[0], "tskin")))
                 ),
               },
             },
@@ -270,6 +304,27 @@ export function tskinBuilder(data) {
       },
     ],
   };
+
+  if (data.data.length > 1) {
+    options.series.push({
+      name: data.legends[1],
+      type: "line",
+      data: data.data[1].map(function (item) {
+        return {
+          value: item.tskin,
+          itemStyle: {
+            normal: {
+              color: colorTskin(
+                item.tskin,
+                parseInt(Math.floor(miniMax(0, data.data[1], "tskin"))),
+                parseInt(Math.ceil(miniMax(1, data.data[1], "tskin")))
+              ),
+            },
+          },
+        };
+      }),
+    });
+  }
 
   return options;
 }
@@ -317,7 +372,7 @@ export function tcoreBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e) => {
+      data: data.data[0].map((e) => {
         return e.index + 1;
       }),
     },
@@ -326,8 +381,8 @@ export function tcoreBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: miniMax(0, data.data, "tcore").toFixed(5),
-      max: miniMax(1, data.data, "tcore").toFixed(5),
+      min: miniMax(0, data.data[0], "tcore").toFixed(5),
+      max: miniMax(1, data.data[0], "tcore").toFixed(5),
     },
     dataZoom: [
       {
@@ -338,15 +393,15 @@ export function tcoreBuilder(data) {
       {
         name: data.legends[0],
         type: "line",
-        data: data.data.map(function (item) {
+        data: data.data[0].map(function (item) {
           return {
             value: item.tcore,
             itemStyle: {
               normal: {
                 color: colorTcore(
                   item.tcore,
-                  miniMax(0, data.data, "tcore").toFixed(5),
-                  miniMax(1, data.data, "tcore").toFixed(5)
+                  miniMax(0, data.data[0], "tcore").toFixed(5),
+                  miniMax(1, data.data[0], "tcore").toFixed(5)
                 ),
               },
             },
@@ -355,6 +410,27 @@ export function tcoreBuilder(data) {
       },
     ],
   };
+
+  if (data.data.length > 1) {
+    options.series.push({
+      name: data.legends[1],
+      type: "line",
+      data: data.data[1].map(function (item) {
+        return {
+          value: item.tcore,
+          itemStyle: {
+            normal: {
+              color: colorTcore(
+                item.tcore,
+                miniMax(0, data.data[1], "tcore").toFixed(5),
+                miniMax(1, data.data[1], "tcore").toFixed(5)
+              ),
+            },
+          },
+        };
+      }),
+    });
+  }
 
   return options;
 }

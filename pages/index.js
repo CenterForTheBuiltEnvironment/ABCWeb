@@ -131,38 +131,77 @@ export default function WithSubnavigation() {
   const [sliderVal, setSliderVal] = useState([0, 0]);
   const [comfortView, setComfortView] = useState(true);
 
+  const [isComparing, setComparing] = useState(false);
+  const [comparedResults, setComparedResults] = useState();
+  // tells the upload modal whether the user is currently trying to upload for comparison or not
+  const [isInComparingUploadModal, setInComparingUploadModal] = useState(false);
+  const [fullDataCompare, setFullDataCompare] = useState([]);
+  const [graphDataCompare, setDataCompare] = useState([]);
+
   const [cloTable, setCloTable] = useState(clo_correspondence);
 
-  const decideGraph = (tempArr, value, choice = "") => {
+  const decideGraph = (tempArr, compareArr, value, choice = "") => {
     let graphedChoice = choice;
     if (graphedChoice == "") graphedChoice = currentChoiceToGraph;
     if (graphedChoice == "sensation") {
-      return sensBuilder({
-        data: tempArr,
-        legends: ["Sensation"],
-      });
+      if (compareArr.length == 0) {
+        return sensBuilder({
+          data: [tempArr],
+          legends: ["Sensation"],
+        });
+      } else {
+        return sensBuilder({
+          data: [tempArr, compareArr],
+          legends: ["Sensation", "Compared sensation"],
+        });
+      }
     } else if (graphedChoice == "comfort") {
-      return comfBuilder({
-        data: tempArr,
-        legends: ["Comfort"],
-      });
+      if (compareArr.length == 0) {
+        return comfBuilder({
+          data: [tempArr],
+          legends: ["Comfort"],
+        });
+      } else {
+        return comfBuilder({
+          data: [tempArr, compareArr],
+          legends: ["Comfort", "Compared comfort"],
+        });
+      }
     } else if (graphedChoice == "tskin") {
-      return tskinBuilder({
-        data: tempArr,
-        legends: ["Skin Temperature"],
-      });
+      if (compareArr.length == 0) {
+        return tskinBuilder({
+          data: [tempArr],
+          legends: ["Skin Temperature"],
+        });
+      } else {
+        return tskinBuilder({
+          data: [tempArr, compareArr],
+          legends: ["Skin Temperature", "Compared skin temp"],
+        });
+      }
     } else if (graphedChoice == "tcore") {
-      let tcoreArr = [...tempArr];
+      let tcoreArr = [...tempArr],
+        tcoreArrCompared = [...compareArr];
       if (value == 0) {
         // overall
         for (let i = 0; i < tcoreArr.length; i++) {
           tcoreArr[i]["tcore"] = tcoreArr[i].tblood;
         }
+        for (let i = 0; i < tcoreArrCompared.length; i++) {
+          tcoreArrCompared[i]["tcore"] = tcoreArr[i].tblood;
+        }
       }
-      return tcoreBuilder({
-        data: tempArr,
-        legends: ["Core Temperature"],
-      });
+      if (compareArr.length == 0) {
+        return tcoreBuilder({
+          data: [tcoreArr],
+          legends: ["Core Temperature"],
+        });
+      } else {
+        return tcoreBuilder({
+          data: [tcoreArr, tcoreArrCompared],
+          legends: ["Core Temperature", "Compared core temp"],
+        });
+      }
     } else if (graphedChoice == "hflux") {
       if (value == 0) {
         // overall
@@ -245,6 +284,8 @@ export default function WithSubnavigation() {
     ind,
     numtoGraph,
     currentColorArray,
+    isInComparingUploadModal,
+    isComparing,
   ]);
 
   const onEvents = useMemo(
@@ -270,6 +311,254 @@ export default function WithSubnavigation() {
     [cache, bodyColors]
   );
 
+  const runSimulationManager = async (comparing = isComparing) => {
+    console.log(isComparing);
+    console.log(comparing);
+    if (comparing) {
+      // check if each condition's duration is the same
+      if (params.length != comparedResults.length) {
+        toast.closeAll();
+        toast({
+          title:
+            "The # of conditions in your current configuration and compared configuration don't match.",
+          status: "warning",
+          duration: 2000,
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      } else {
+        // check if each condition's duration is the same
+        for (let i = 0; i < params.length; i++) {
+          if (
+            params[i].exposure_duration != comparedResults[i].exposure_duration
+          ) {
+            toast.closeAll();
+            toast({
+              title:
+                "The exposure duration of a condition in your current configuration and compared configuration don't match.",
+              status: "warning",
+              duration: 2000,
+              isClosable: true,
+              position: "top",
+            });
+            return;
+          }
+        }
+        // run data processing for each configuration
+        const tempArrMain = await runSimulationMain();
+        const tempArrCompare = await runSimulationCompare();
+
+        // console.log("TAKING COMPARE PATH");
+        // console.log(tempArrMain);
+        // console.log(tempArrCompare);
+
+        // do graph logic here
+        setGraph(decideGraph(tempArrMain, tempArrCompare, numtoGraph));
+      }
+    } else {
+      const tempArrMain = await runSimulationMain();
+
+      // console.log("TAKING MAIN PATH");
+      // console.log(tempArrMain);
+
+      // do graph logic here
+      setGraph(decideGraph(tempArrMain, [], numtoGraph));
+    }
+  };
+
+  const runSimulationCompare = async () => {
+    loadingModal.onOpen();
+    try {
+      let phases = [];
+      for (let i = 0; i < comparedResults.length; i++) {
+        let new_air_speed = comparedResults[i].air_speed.map(Number);
+        let new_air_temperature =
+          comparedResults[i].air_temperature.map(Number);
+        let new_radiant_temperature =
+          comparedResults[i].radiant_temperature.map(Number);
+
+        comparedResults[i].personal_comfort_system.forEach((elemIndex) => {
+          for (let j = 0; j < 16; j++) {
+            new_air_speed[j] += pcsParams[elemIndex]["v"][j];
+            new_air_temperature[j] += pcsParams[elemIndex]["ta"][j];
+            new_radiant_temperature[j] += pcsParams[elemIndex]["mrt"][j];
+          }
+        });
+
+        phases.push({
+          exposure_duration: comparedResults[i].exposure_duration,
+          met_activity_name: "Custom-defined Met Activity",
+          ramp: comparedResults[i].ramp,
+          met_activity_value: parseFloat(comparedResults[i].met_value),
+          relative_humidity: comparedResults[i].relative_humidity.map(function (
+            x
+          ) {
+            return parseFloat(x) / 100;
+          }),
+          air_speed: new_air_speed,
+          air_temperature: new_air_temperature,
+          radiant_temperature: new_radiant_temperature,
+          clo_ensemble_name:
+            cloTable[parseInt(comparedResults[i].clo_value)].ensemble_name,
+        });
+      }
+      let bodyb = bodybuilderObj;
+      let clothing = cloTable;
+      const metrics = await axios
+        .post("/api/process", {
+          // Chaining of data is intentional
+          phases,
+          bodyb,
+          clothing,
+          raw: false,
+        })
+        .then((res) => {
+          // Failure case: res.data.success = false
+          // Success case: res.data does not have a "success" property
+          if ("success" in res.data) {
+            loadingModal.onClose();
+            alert("An error has occurred. Please try again.");
+            return;
+          }
+
+          let tempArr = [];
+          for (let j = 0; j < res.data.length; j++) {
+            tempArr.push({
+              ...res.data[j][numtoGraph],
+              index: j,
+            });
+          }
+          setDataCompare(tempArr);
+          setFullDataCompare(res.data);
+
+          setComfortView(false);
+          loadingModal.onClose();
+          return tempArr;
+        });
+      return metrics;
+    } catch (err) {
+      loadingModal.onClose();
+      alert("An error has occurred. Please try again.");
+      console.log(err);
+    }
+  };
+
+  const runSimulationMain = async () => {
+    loadingModal.onOpen();
+    try {
+      let phases = [];
+      for (let i = 0; i < params.length; i++) {
+        let new_air_speed = params[i].air_speed.map(Number);
+        let new_air_temperature = params[i].air_temperature.map(Number);
+        let new_radiant_temperature = params[i].radiant_temperature.map(Number);
+
+        params[i].personal_comfort_system.forEach((elemIndex) => {
+          for (let j = 0; j < 16; j++) {
+            new_air_speed[j] += pcsParams[elemIndex]["v"][j];
+            new_air_temperature[j] += pcsParams[elemIndex]["ta"][j];
+            new_radiant_temperature[j] += pcsParams[elemIndex]["mrt"][j];
+          }
+        });
+
+        phases.push({
+          exposure_duration: params[i].exposure_duration,
+          met_activity_name: "Custom-defined Met Activity",
+          ramp: params[i].ramp,
+          met_activity_value: parseFloat(params[i].met_value),
+          relative_humidity: params[i].relative_humidity.map(function (x) {
+            return parseFloat(x) / 100;
+          }),
+          air_speed: new_air_speed,
+          air_temperature: new_air_temperature,
+          radiant_temperature: new_radiant_temperature,
+          clo_ensemble_name:
+            cloTable[parseInt(params[i].clo_value)].ensemble_name,
+        });
+      }
+      let bodyb = bodybuilderObj;
+      let clothing = cloTable;
+      const metrics = await axios
+        .post("/api/process", {
+          // Chaining of data is intentional
+          phases,
+          bodyb,
+          clothing,
+          raw: false,
+        })
+        .then((res) => {
+          if ("success" in res.data) {
+            loadingModal.onClose();
+            alert("An error has occurred. Please try again.");
+            return;
+          }
+
+          let tempArr = [];
+          for (let j = 0; j < res.data.length; j++) {
+            tempArr.push({
+              ...res.data[j][numtoGraph],
+              index: j,
+            });
+          }
+          setData(tempArr);
+          setFullData(res.data);
+          setCache(params.slice());
+
+          let totalDuration = 0;
+          for (let i = 0; i < params.length; i++) {
+            totalDuration += params[i].exposure_duration;
+          }
+          setSliderMaxVal(totalDuration);
+          setSliderVal([1, totalDuration]);
+
+          let colorsArr = [];
+          let mins = [],
+            maxes = [];
+          for (let i = 0; i <= 17; i++) {
+            mins.push(findMin(res.data, places[i], currentChoiceToGraph));
+            maxes.push(findMax(res.data, places[i], currentChoiceToGraph));
+          }
+          for (let time = 0; time < res.data.length; time++) {
+            let bodyPartsArr = [];
+            for (let i = 0; i <= 17; i++) {
+              bodyPartsArr.push(
+                determineColor(
+                  res.data[time][places[i]],
+                  currentChoiceToGraph,
+                  mins[i],
+                  maxes[i]
+                )
+              );
+            }
+            colorsArr.push(bodyPartsArr);
+          }
+          setBodyColors(colorsArr);
+          setCurrentColorArray(Array(18).fill("white"));
+          let data = [];
+          data.push(csvHeaderLine);
+          for (let time = 0; time < res.data.length; time++) {
+            let tempRow = [time];
+            tempRow.push(...convertResultToArrayForCSV(res.data[time][0]));
+            for (let i = 0; i < signals.length; i++) {
+              for (let j = 1; j < res.data[time].length; j++) {
+                tempRow.push(res.data[time][j][signals[i].slice(0, -1)]);
+              }
+            }
+            data.push(tempRow);
+          }
+          setCSVData(data);
+          setComfortView(false);
+          loadingModal.onClose();
+          return tempArr;
+        });
+      return metrics;
+    } catch (err) {
+      loadingModal.onClose();
+      alert("An error has occurred. Please try again.");
+      console.log(err);
+    }
+  };
+
   return (
     <Box minH="100vh" display="flex" flexDirection="column">
       <Head>
@@ -293,6 +582,11 @@ export default function WithSubnavigation() {
           setCloTable={setCloTable}
           conditionParams={conditionParams}
           toast={toast}
+          isUploadingForComparison={isInComparingUploadModal}
+          setIsUploadingForComparison={setInComparingUploadModal}
+          comparedResults={comparedResults}
+          setComparedResults={setComparedResults}
+          setComparing={setComparing}
           rKey={setRefreshKey}
         />
         <AdvancedSettingsModal
@@ -677,6 +971,26 @@ export default function WithSubnavigation() {
                       borderRadius="10px"
                     >
                       <HStack>
+                        <Button
+                          colorScheme="blue"
+                          onClick={() => {
+                            if (isComparing) {
+                              // turn off comparison
+                              setComparing(false);
+                              setComparedResults();
+                              setFullDataCompare([]);
+                              setDataCompare([]);
+                              // rerender graph
+                              runSimulationManager(false);
+                            } else {
+                              // allow user to upload with special option
+                              setInComparingUploadModal(true);
+                              uploadModal.onOpen();
+                            }
+                          }}
+                        >
+                          {isComparing ? "Remove comparison" : "Compare"}
+                        </Button>
                         {/* Body segment selection*/}
                         <RSelect
                           className="basic-single"
@@ -696,19 +1010,30 @@ export default function WithSubnavigation() {
                           onChange={(val) => {
                             loadingModal.onOpen();
                             setNumToGraph(val.value);
-                            let changedArr = [];
+                            let changedArr = [],
+                              changedArrCompare = [];
                             for (let j = 0; j < fullData.length; j++) {
                               changedArr.push({
                                 ...fullData[j][val.value],
                                 index: j,
                               });
+                              changedArrCompare.push({
+                                ...fullDataCompare[j][val.value],
+                                index: j,
+                              });
                             }
                             setData(changedArr);
-                            setGraph(decideGraph(changedArr, val.value));
+                            setGraph(
+                              decideGraph(
+                                changedArr,
+                                changedArrCompare,
+                                val.value
+                              )
+                            );
                             loadingModal.onClose();
                           }}
                         />
-                        {/* Result veriable to display*/}
+                        {/* Result variable to display*/}
                         <RSelect
                           className="basic-single"
                           classNamePrefix="select"
@@ -729,6 +1054,10 @@ export default function WithSubnavigation() {
                             setGraph(
                               decideGraph(
                                 graphData.slice(sliderVal[0], sliderVal[1]),
+                                graphDataCompare.slice(
+                                  sliderVal[0],
+                                  sliderVal[1]
+                                ),
                                 numtoGraph,
                                 val.value
                               )
@@ -808,14 +1137,25 @@ export default function WithSubnavigation() {
                                   step={1}
                                   onChange={(e) => {
                                     setSliderVal([e[0], e[1]]);
-                                    let tempArr = [];
+                                    let tempArr = [],
+                                      tempArrCompare = [];
                                     for (let j = e[0]; j < e[1]; j++) {
                                       tempArr.push({
                                         ...fullData[j][numtoGraph],
                                         index: j,
                                       });
+                                      tempArrCompare.push({
+                                        ...fullDataCompare[j][numtoGraph],
+                                        index: j,
+                                      });
                                     }
-                                    setGraph(decideGraph(tempArr, numtoGraph));
+                                    setGraph(
+                                      decideGraph(
+                                        tempArr,
+                                        tempArrCompare,
+                                        numtoGraph
+                                      )
+                                    );
                                   }}
                                 >
                                   <RangeSliderTrack height="10px" bg="#3ebced">
@@ -875,7 +1215,15 @@ export default function WithSubnavigation() {
                             </span>
                           </Text>
                           <Text textAlign="center" w="100%">
-                            Click a data point to visualize on manikin.
+                            Click a point to visualize on manikin.{" "}
+                            {isComparing ? (
+                              <Text fontWeight="bold">
+                                Only results from your current input will be
+                                displayed, not comparison ones."
+                              </Text>
+                            ) : (
+                              ""
+                            )}
                           </Text>
                           {/* There is no color shema for heat flux and envirnmental variables */}
                           <Canvass currentColorArray={currentColorArray} />
@@ -1175,149 +1523,7 @@ export default function WithSubnavigation() {
                     backgroundColor={"#3ebced"}
                     textColor={"white"}
                     colorScheme="blue"
-                    onClick={async () => {
-                      loadingModal.onOpen();
-                      try {
-                        let phases = [];
-                        for (let i = 0; i < params.length; i++) {
-                          let new_air_speed = params[i].air_speed.map(Number);
-                          let new_air_temperature =
-                            params[i].air_temperature.map(Number);
-                          let new_radiant_temperature =
-                            params[i].radiant_temperature.map(Number);
-
-                          params[i].personal_comfort_system.forEach(
-                            (elemIndex) => {
-                              for (let j = 0; j < 16; j++) {
-                                new_air_speed[j] +=
-                                  pcsParams[elemIndex]["v"][j];
-                                new_air_temperature[j] +=
-                                  pcsParams[elemIndex]["ta"][j];
-                                new_radiant_temperature[j] +=
-                                  pcsParams[elemIndex]["mrt"][j];
-                              }
-                            }
-                          );
-
-                          phases.push({
-                            exposure_duration: params[i].exposure_duration,
-                            met_activity_name: "Custom-defined Met Activity",
-                            ramp: params[i].ramp,
-                            met_activity_value: parseFloat(params[i].met_value),
-                            relative_humidity: params[i].relative_humidity.map(
-                              function (x) {
-                                return parseFloat(x) / 100;
-                              }
-                            ),
-                            air_speed: new_air_speed,
-                            air_temperature: new_air_temperature,
-                            radiant_temperature: new_radiant_temperature,
-                            clo_ensemble_name:
-                              cloTable[parseInt(params[i].clo_value)]
-                                .ensemble_name,
-                          });
-                        }
-                        let bodyb = bodybuilderObj;
-                        let clothing = cloTable;
-                        const metrics = await axios
-                          .post("/api/process", {
-                            // Chaining of data is intentional
-                            phases,
-                            bodyb,
-                            clothing,
-                            raw: false,
-                          })
-                          .then((res) => {
-                            if ("success" in res.data) {
-                              loadingModal.onClose();
-                              alert("An error has occurred. Please try again.");
-                              return;
-                            }
-
-                            let tempArr = [];
-                            for (let j = 0; j < res.data.length; j++) {
-                              tempArr.push({
-                                ...res.data[j][numtoGraph],
-                                index: j,
-                              });
-                            }
-                            setData(tempArr);
-                            setFullData(res.data);
-                            setCache(params.slice());
-                            setGraph(decideGraph(tempArr, numtoGraph));
-
-                            let totalDuration = 0;
-                            for (let i = 0; i < params.length; i++) {
-                              totalDuration += params[i].exposure_duration;
-                            }
-                            setSliderMaxVal(totalDuration);
-                            setSliderVal([1, totalDuration]);
-
-                            let colorsArr = [];
-                            let mins = [],
-                              maxes = [];
-                            for (let i = 0; i <= 17; i++) {
-                              mins.push(
-                                findMin(
-                                  res.data,
-                                  places[i],
-                                  currentChoiceToGraph
-                                )
-                              );
-                              maxes.push(
-                                findMax(
-                                  res.data,
-                                  places[i],
-                                  currentChoiceToGraph
-                                )
-                              );
-                            }
-                            for (let time = 0; time < res.data.length; time++) {
-                              let bodyPartsArr = [];
-                              for (let i = 0; i <= 17; i++) {
-                                bodyPartsArr.push(
-                                  determineColor(
-                                    res.data[time][places[i]],
-                                    currentChoiceToGraph,
-                                    mins[i],
-                                    maxes[i]
-                                  )
-                                );
-                              }
-                              colorsArr.push(bodyPartsArr);
-                            }
-                            setBodyColors(colorsArr);
-                            setCurrentColorArray(Array(18).fill("white"));
-                            let data = [];
-                            data.push(csvHeaderLine);
-                            for (let time = 0; time < res.data.length; time++) {
-                              let tempRow = [time];
-                              tempRow.push(
-                                ...convertResultToArrayForCSV(res.data[time][0])
-                              );
-                              for (let i = 0; i < signals.length; i++) {
-                                for (
-                                  let j = 1;
-                                  j < res.data[time].length;
-                                  j++
-                                ) {
-                                  tempRow.push(
-                                    res.data[time][j][signals[i].slice(0, -1)]
-                                  );
-                                }
-                              }
-                              data.push(tempRow);
-                            }
-                            setCSVData(data);
-                            setComfortView(false);
-                            loadingModal.onClose();
-                          });
-                      } catch (err) {
-                        loadingModal.onClose();
-                        alert("An error has occurred. Please try again.");
-                        console.log(err);
-                      }
-                    }}
+                    onClick={() => runSimulationManager()}
                   >
                     Simulate
                   </Button>
@@ -1362,6 +1568,12 @@ export default function WithSubnavigation() {
                           params[i].radiant_temperature.map(Number);
                         let temp_clo_ensemble_name =
                           cloTable[parseInt(params[i].clo_value)].ensemble_name;
+                        let pcs = [];
+                        for (let j = 0; j < personalComfortSystem.length; j++) {
+                          if (params[i].personal_comfort_system.has(j)) {
+                            pcs.push(personalComfortSystem[j].name);
+                          }
+                        }
                         phases.push({
                           condition_name: temp_condition_name,
                           start_time: currTimer,
@@ -1370,6 +1582,7 @@ export default function WithSubnavigation() {
                           end_time: currTimer + temp_duration,
                           met_activity_name: temp_met_activity_name,
                           met: temp_met_activity_value,
+                          personal_comfort_system: pcs,
                           default_data: {
                             rh:
                               temp_relative_humidity.reduce((a, b) => a + b) /
@@ -1598,132 +1811,7 @@ export default function WithSubnavigation() {
                 textColor={"white"}
                 colorScheme="blue"
                 alignSelf="center"
-                onClick={async () => {
-                  loadingModal.onOpen();
-                  try {
-                    let phases = [];
-                    for (let i = 0; i < params.length; i++) {
-                      let new_air_speed = params[i].air_speed.map(Number);
-                      let new_air_temperature =
-                        params[i].air_temperature.map(Number);
-                      let new_radiant_temperature =
-                        params[i].radiant_temperature.map(Number);
-
-                      params[i].personal_comfort_system.forEach((elemIndex) => {
-                        for (let j = 0; j < 16; j++) {
-                          new_air_speed[j] += pcsParams[elemIndex]["v"][j];
-                          new_air_temperature[j] +=
-                            pcsParams[elemIndex]["ta"][j];
-                          new_radiant_temperature[j] +=
-                            pcsParams[elemIndex]["mrt"][j];
-                        }
-                      });
-
-                      phases.push({
-                        exposure_duration: params[i].exposure_duration,
-                        met_activity_name: "Custom-defined Met Activity",
-                        ramp: params[i].ramp,
-                        met_activity_value: parseFloat(params[i].met_value),
-                        relative_humidity: params[i].relative_humidity.map(
-                          function (x) {
-                            return parseFloat(x) / 100;
-                          }
-                        ),
-                        air_speed: new_air_speed,
-                        air_temperature: new_air_temperature,
-                        radiant_temperature: new_radiant_temperature,
-                        clo_ensemble_name:
-                          cloTable[parseInt(params[i].clo_value)].ensemble_name,
-                      });
-                    }
-                    let bodyb = bodybuilderObj;
-                    let clothing = cloTable;
-                    const metrics = await axios
-                      .post("/api/process", {
-                        // Chaining of data is intentional
-                        phases,
-                        bodyb,
-                        clothing,
-                        raw: false,
-                      })
-                      .then((res) => {
-                        if ("success" in res.data) {
-                          loadingModal.onClose();
-                          alert("An error has occurred. Please try again.");
-                          return;
-                        }
-                        let tempArr = [];
-                        for (let j = 0; j < res.data.length; j++) {
-                          tempArr.push({
-                            ...res.data[j][numtoGraph],
-                            index: j,
-                          });
-                        }
-                        setData(tempArr);
-                        setFullData(res.data);
-                        setCache(params.slice());
-                        setGraph(decideGraph(tempArr, numtoGraph));
-
-                        let totalDuration = 0;
-                        for (let i = 0; i < params.length; i++) {
-                          totalDuration += params[i].exposure_duration;
-                        }
-                        setSliderMaxVal(totalDuration);
-                        setSliderVal([1, totalDuration]);
-
-                        let colorsArr = [];
-                        let mins = [],
-                          maxes = [];
-                        for (let i = 0; i <= 17; i++) {
-                          mins.push(
-                            findMin(res.data, places[i], currentChoiceToGraph)
-                          );
-                          maxes.push(
-                            findMax(res.data, places[i], currentChoiceToGraph)
-                          );
-                        }
-                        for (let time = 0; time < res.data.length; time++) {
-                          let bodyPartsArr = [];
-                          for (let i = 0; i <= 17; i++) {
-                            bodyPartsArr.push(
-                              determineColor(
-                                res.data[time][places[i]],
-                                currentChoiceToGraph,
-                                mins[i],
-                                maxes[i]
-                              )
-                            );
-                          }
-                          colorsArr.push(bodyPartsArr);
-                        }
-                        setBodyColors(colorsArr);
-                        setCurrentColorArray(Array(18).fill("white"));
-                        let data = [];
-                        data.push(csvHeaderLine);
-                        for (let time = 0; time < res.data.length; time++) {
-                          let tempRow = [time];
-                          tempRow.push(
-                            ...convertResultToArrayForCSV(res.data[time][0])
-                          );
-                          for (let i = 0; i < signals.length; i++) {
-                            for (let j = 1; j < res.data[time].length; j++) {
-                              tempRow.push(
-                                res.data[time][j][signals[i].slice(0, -1)]
-                              );
-                            }
-                          }
-                          data.push(tempRow);
-                        }
-                        setCSVData(data);
-                        setComfortView(false);
-                        loadingModal.onClose();
-                      });
-                  } catch (err) {
-                    loadingModal.onClose();
-                    alert("An error has occurred. Please try again.");
-                    console.log(err);
-                  }
-                }}
+                onClick={() => runSimulationManager()}
               >
                 Simulate
               </Button>
@@ -1765,6 +1853,12 @@ export default function WithSubnavigation() {
                       params[i].radiant_temperature.map(Number);
                     let temp_clo_ensemble_name =
                       cloTable[parseInt(params[i].clo_value)].ensemble_name;
+                    let pcs = [];
+                    for (let j = 0; j < personalComfortSystem.length; j++) {
+                      if (params[i].personal_comfort_system.has(j)) {
+                        pcs.push(personalComfortSystem[j].name);
+                      }
+                    }
                     phases.push({
                       condition_name: temp_condition_name,
                       start_time: currTimer,
@@ -1773,6 +1867,7 @@ export default function WithSubnavigation() {
                       end_time: currTimer + temp_duration,
                       met_activity_name: temp_met_activity_name,
                       met: temp_met_activity_value,
+                      personal_comfort_system: pcs,
                       default_data: {
                         rh:
                           temp_relative_humidity.reduce((a, b) => a + b) /

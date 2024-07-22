@@ -1,7 +1,6 @@
-import { graphsVals, listOfParameters } from "@/constants/constants";
+import { personalComfortSystem } from "@/constants/constants";
 import {
   Button,
-  HStack,
   Modal,
   ModalBody,
   ModalContent,
@@ -10,8 +9,11 @@ import {
   ModalOverlay,
   ModalCloseButton,
   Text,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
-import styles from "../styles/Home.module.css";
 
 export default function UploadModal({
   disclosure,
@@ -20,6 +22,11 @@ export default function UploadModal({
   setCloTable,
   setMetIndex,
   toast,
+  isUploadingForComparison,
+  setIsUploadingForComparison,
+  comparedResults,
+  setComparedResults,
+  setComparing,
   rKey,
 }) {
   const handleFileChangeAndUpload = async (event) => {
@@ -121,7 +128,19 @@ export default function UploadModal({
         String(phase[j].segment_data[e].mrt)
       );
 
-      console.log(newCloObj);
+      const newPcs = new Set();
+      for (let k = 0; k < personalComfortSystem.length; k++) {
+        if (
+          phase[j].personal_comfort_system.includes(
+            personalComfortSystem[k].name
+          )
+        ) {
+          newPcs.add(k);
+        }
+      }
+
+      newObj.personal_comfort_system = newPcs;
+
       let temp_ensemble = newCloObj.findIndex((ensemble) => {
         return ensemble.ensemble_name === phase[j].clo_ensemble_name;
       });
@@ -144,17 +163,42 @@ export default function UploadModal({
       newObj.ramp = phase[j].ramp;
       updatedParams.push(newObj);
     }
-    setParams(updatedParams);
+
+    setComparing(true);
+    if (isUploadingForComparison) {
+      setComparedResults(updatedParams);
+      toast.closeAll();
+      toast({
+        title:
+          "Your file for comparison was successfully uploaded! Try simulating again.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+        position: "top",
+      });
+    } else {
+      setParams(updatedParams);
+    }
+    setIsUploadingForComparison(false);
     rKey(Math.random());
   };
 
   return (
-    <Modal isOpen={disclosure.isOpen} onClose={disclosure.onClose}>
+    <Modal
+      isCentered
+      isOpen={disclosure.isOpen}
+      onClose={() => {
+        setIsUploadingForComparison(false);
+        disclosure.onClose();
+      }}
+    >
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Upload Parameter</ModalHeader>
+      <ModalContent maxW="70vw">
+        <ModalHeader>
+          Upload Parameter {isUploadingForComparison ? "(comparison)" : ""}
+        </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
+        <ModalBody w="100%">
           <input
             type="file"
             id="paramupload"
@@ -165,6 +209,26 @@ export default function UploadModal({
             (Running into an error? Check that your clothing ensemble name is
             correct and that other fields are nonempty.)
           </Text>
+          {isUploadingForComparison ? (
+            <Alert status="info" mt="10px">
+              To simulate later on, you will need to match the same number of
+              Conditions as your uploaded comparison file.
+            </Alert>
+          ) : (
+            <></>
+          )}
+          {isUploadingForComparison && comparedResults ? (
+            <Alert status="warning" mt="10px">
+              <AlertIcon />
+              <AlertTitle>You already have an active comparison!</AlertTitle>
+              <AlertDescription>
+                Uploading a new file for comparison will overwrite your current
+                comparison file.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <></>
+          )}
         </ModalBody>
         <ModalFooter>
           <Button
@@ -180,6 +244,14 @@ export default function UploadModal({
                 disclosure.onClose();
               } else {
                 console.warn("Please select a file");
+                toast.closeAll();
+                toast({
+                  title: "Please select a file.",
+                  status: "warning",
+                  duration: 2000,
+                  isClosable: true,
+                  position: "top",
+                });
               }
             }}
           >
