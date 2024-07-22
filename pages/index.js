@@ -1219,7 +1219,7 @@ export default function WithSubnavigation() {
                             {isComparing ? (
                               <Text fontWeight="bold">
                                 Only results from your current input will be
-                                displayed, not comparison ones."
+                                displayed, not comparison ones.
                               </Text>
                             ) : (
                               ""
