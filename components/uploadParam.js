@@ -28,6 +28,7 @@ export default function UploadModal({
   setComparedResults,
   setComparing,
   rKey,
+  runSimulation,
 }) {
   const handleFileChangeAndUpload = async (event) => {
     const file = event.target.files[0];
@@ -164,13 +165,12 @@ export default function UploadModal({
       updatedParams.push(newObj);
     }
 
-    setComparing(true);
     if (isUploadingForComparison) {
+      setComparing(true);
       setComparedResults(updatedParams);
       toast.closeAll();
       toast({
-        title:
-          "Your file for comparison was successfully uploaded! Try simulating again.",
+        title: "Your file for comparison was successfully uploaded!",
         status: "success",
         duration: 2000,
         isClosable: true,
@@ -211,8 +211,8 @@ export default function UploadModal({
           </Text>
           {isUploadingForComparison ? (
             <Alert status="info" mt="10px">
-              To simulate later on, you will need to match the same number of
-              Conditions as your uploaded comparison file.
+              To simulate later on, you will need to match the total exposure
+              time as your uploaded comparison file.
             </Alert>
           ) : (
             <></>

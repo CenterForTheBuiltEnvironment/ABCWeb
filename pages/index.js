@@ -288,6 +288,12 @@ export default function WithSubnavigation() {
     isComparing,
   ]);
 
+  useEffect(() => {
+    if (comparedResults) {
+      runSimulationManager();
+    }
+  }, [comparedResults]);
+
   const onEvents = useMemo(
     () => ({
       click: (params) => {
@@ -311,51 +317,43 @@ export default function WithSubnavigation() {
     [cache, bodyColors]
   );
 
-  const runSimulationManager = async (comparing = isComparing) => {
-    console.log(isComparing);
-    console.log(comparing);
+  const runSimulationManager = async (
+    comparing = isComparing,
+    compResults = comparedResults
+  ) => {
     if (comparing) {
+      let totDurationMain = 0,
+        totDurationComparing = 0;
       // check if each condition's duration is the same
-      if (params.length != comparedResults.length) {
+      for (let i = 0; i < params.length; i++) {
+        totDurationMain += params[i].exposure_duration;
+      }
+      for (let i = 0; i < compResults.length; i++) {
+        totDurationComparing += compResults[i].exposure_duration;
+      }
+      if (totDurationMain != totDurationComparing) {
         toast.closeAll();
         toast({
           title:
-            "The # of conditions in your current configuration and compared configuration don't match.",
+            "The total exposure duration of your current config and your comparison file don't match.",
           status: "warning",
           duration: 2000,
           isClosable: true,
           position: "top",
         });
         return;
-      } else {
-        // check if each condition's duration is the same
-        for (let i = 0; i < params.length; i++) {
-          if (
-            params[i].exposure_duration != comparedResults[i].exposure_duration
-          ) {
-            toast.closeAll();
-            toast({
-              title:
-                "The exposure duration of a condition in your current configuration and compared configuration don't match.",
-              status: "warning",
-              duration: 2000,
-              isClosable: true,
-              position: "top",
-            });
-            return;
-          }
-        }
-        // run data processing for each configuration
-        const tempArrMain = await runSimulationMain();
-        const tempArrCompare = await runSimulationCompare();
-
-        // console.log("TAKING COMPARE PATH");
-        // console.log(tempArrMain);
-        // console.log(tempArrCompare);
-
-        // do graph logic here
-        setGraph(decideGraph(tempArrMain, tempArrCompare, numtoGraph));
       }
+
+      // run data processing for each configuration
+      const tempArrMain = await runSimulationMain();
+      const tempArrCompare = await runSimulationCompare();
+
+      // console.log("TAKING COMPARE PATH");
+      // console.log(tempArrMain);
+      // console.log(tempArrCompare);
+
+      // do graph logic here
+      setGraph(decideGraph(tempArrMain, tempArrCompare, numtoGraph));
     } else {
       const tempArrMain = await runSimulationMain();
 
@@ -587,6 +585,7 @@ export default function WithSubnavigation() {
           comparedResults={comparedResults}
           setComparedResults={setComparedResults}
           setComparing={setComparing}
+          runSimulation={(input) => runSimulationManager(input)}
           rKey={setRefreshKey}
         />
         <AdvancedSettingsModal
@@ -1203,7 +1202,7 @@ export default function WithSubnavigation() {
                             </HStack>
                           </Box>
                         </VStack>
-                        {/* Manikn visualization */}
+                        {/* Manikin visualization */}
                         <VStack w="25%">
                           <Text fontWeight="bold">
                             {params[currIndex[0]].condition_name}{" "}
