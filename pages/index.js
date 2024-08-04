@@ -1016,12 +1016,19 @@ export default function WithSubnavigation() {
                                 ...fullData[j][val.value],
                                 index: j,
                               });
-                              changedArrCompare.push({
-                                ...fullDataCompare[j][val.value],
-                                index: j,
-                              });
                             }
                             setData(changedArr);
+
+                            if (isComparing) {
+                              for (let j = 0; j < fullDataCompare.length; j++) {
+                                changedArrCompare.push({
+                                  ...fullDataCompare[j][val.value],
+                                  index: j,
+                                });
+                              }
+                              setDataCompare(changedArrCompare);
+                            }
+
                             setGraph(
                               decideGraph(
                                 changedArr,
