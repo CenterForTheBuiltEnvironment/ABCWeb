@@ -250,7 +250,7 @@ export default function AdvancedSettingsModal({
         <HStack spacing={2} w="100%">
           {[
             "Air speed offset",
-            "Ambient temp offset",
+            "Air temp offset",
             "Mean radiant temp offset",
           ].map((elemType, elemTypeInd) => {
             let objProp;

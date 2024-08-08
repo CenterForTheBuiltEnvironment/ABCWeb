@@ -233,8 +233,8 @@ export const listOfParameters = [
     pcsKey: "",
   },
   {
-    title: "Ambient temp",
-    fullTitle: "Ambient temperature",
+    title: "Air temp",
+    fullTitle: "Air temperature",
     icon: <SunIcon color="gray.400" />,
     unit: " °C",
     fullUnit: " ° Celsius",
