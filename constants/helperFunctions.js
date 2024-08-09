@@ -86,11 +86,11 @@ export const colorComfort = (comfort, isComparison = false) => {
 export const colorSensation = (sensation, isComparison = false) => {
   return colorHelper(sensation, -4, 4, isComparison ? 0.3 : 1);
 };
-export const colorTskin = (tskin, min, max, isComparison = false) => {
-  return colorHelper(tskin, min, max, isComparison ? 0.3 : 1);
+export const colorTskin = (tskin, isComparison = false) => {
+  return colorHelper(tskin, 20, 38, isComparison ? 0.3 : 1);
 };
-export const colorTcore = (tcore, min, max, isComparison = false) => {
-  return colorHelper(tcore, min, max, isComparison ? 0.3 : 1);
+export const colorTcore = (tcore, isComparison = false) => {
+  return colorHelper(tcore, 25, 40, isComparison ? 0.3 : 1);
 };
 export const colorHflux = (elem) => {
   switch (elem) {

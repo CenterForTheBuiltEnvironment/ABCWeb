@@ -21,7 +21,7 @@ export function comfBuilder(data) {
   // }
   const options = {
     textStyle: {
-      fontFamily: "IBM Plex Sans",
+      fontFamily: "Arial",
     },
     title: {
       text: "Comfort vs. Time",
@@ -123,7 +123,7 @@ export function comfBuilder(data) {
 export function sensBuilder(data) {
   const options = {
     textStyle: {
-      fontFamily: "IBM Plex Sans",
+      fontFamily: "Arial",
     },
     title: {
       text: "Sensation vs. Time",
@@ -226,7 +226,7 @@ export function sensBuilder(data) {
 export function tskinBuilder(data) {
   const options = {
     textStyle: {
-      fontFamily: "IBM Plex Sans",
+      fontFamily: "Arial",
     },
     title: {
       text: "Skin Temperature vs. Time",
@@ -275,8 +275,8 @@ export function tskinBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: parseInt(Math.floor(miniMax(0, data.data[0], "tskin"))),
-      max: parseInt(Math.ceil(miniMax(1, data.data[0], "tskin"))),
+      min: 20,
+      max: 38,
     },
     dataZoom: [
       {
@@ -332,7 +332,7 @@ export function tskinBuilder(data) {
 export function tcoreBuilder(data) {
   const options = {
     textStyle: {
-      fontFamily: "IBM Plex Sans",
+      fontFamily: "Arial",
     },
     title: {
       text: "Core Temperature vs. Time",
@@ -381,8 +381,8 @@ export function tcoreBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: miniMax(0, data.data[0], "tcore").toFixed(5),
-      max: miniMax(1, data.data[0], "tcore").toFixed(5),
+      min: 25,
+      max: 40,
     },
     dataZoom: [
       {
@@ -438,7 +438,7 @@ export function tcoreBuilder(data) {
 export function hfluxBuilder(data) {
   const options = {
     textStyle: {
-      fontFamily: "IBM Plex Sans",
+      fontFamily: "Arial",
     },
     title: {
       text: "Heat Flux Variables vs. Time",
@@ -512,7 +512,7 @@ export function hfluxBuilder(data) {
 export function environmentBuilder(data) {
   const options = {
     textStyle: {
-      fontFamily: "IBM Plex Sans",
+      fontFamily: "Arial",
     },
     title: {
       text: "Environment Variables vs. Time",
