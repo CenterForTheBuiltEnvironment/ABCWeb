@@ -45,13 +45,42 @@ export const environmentMinimax = (value, data, label) => {
   return curr;
 };
 
-const colorHelper = (value, mn, mx, opacity = 1) => {
-  const fraction = (value - mn) / (mx - mn),
-    midpoint = 0.5,
-    fq = 0.25,
-    tq = 0.75;
+const clamp = (value, min, max) => {
+  return Math.max(min, Math.min(value, max));
+};
 
-  // blue -> green -> red
+const colorHelper = (value, mn, mx, opacity = 1, isComfort = false) => {
+  const fraction = (value - mn) / (mx - mn);
+
+  if (isComfort) {
+    // Black -> Gray -> Green gradient processing for comfort
+    const midpoint = 0.5;
+
+    let blackToGray =
+        fraction <= midpoint
+          ? (fraction / midpoint) * 128 // 0 to 128 (Black to Gray)
+          : (1 - (fraction - midpoint) / midpoint) * 128, // 128 to 0 (Gray to Green)
+      grayToGreen =
+        fraction <= midpoint
+          ? (fraction / midpoint) * 128 // 0 to 128 (Black to Gray)
+          : 128 + ((fraction - midpoint) / midpoint) * 127; // 128 to 255 (Gray to Green)
+
+    const blue = blackToGray;
+    const red = blackToGray;
+    const green = grayToGreen;
+
+    // Clamp values between 0 and their respective maximums
+    const clampedRed = clamp(red, 0, 128);
+    const clampedGreen = clamp(green, 0, 255);
+    const clampedBlue = clamp(blue, 0, 128);
+
+    return `rgba(${Math.round(clampedRed)},${Math.round(
+      clampedGreen
+    )},${Math.round(clampedBlue)},${opacity})`;
+  }
+
+  // Blue -> Green -> Red gradient processing for the other parameters
+  const midpoint = 0.5;
   let blue = ((midpoint - fraction) * 255) / midpoint,
     green =
       fraction <= midpoint
@@ -59,36 +88,29 @@ const colorHelper = (value, mn, mx, opacity = 1) => {
         : 2 * (1 - fraction) * 255,
     red = ((fraction - midpoint) * 255) / midpoint;
 
-  // clamp values
-  blue = Math.max(0, Math.min(blue, 255));
-  green = Math.max(0, Math.min(green, 255));
-  red = Math.max(0, Math.min(red, 255));
+  // Clamp values between 0 and 255
+  blue = clamp(blue, 0, 255);
+  green = clamp(green, 0, 255);
+  red = clamp(red, 0, 255);
 
-  // output final values
-  return (
-    "rgba(" +
-    Math.round(red) +
-    "," +
-    Math.round(green) +
-    "," +
-    Math.round(blue) +
-    ", " +
-    opacity.toString() +
-    ")"
-  );
+  // Return the final rgba value
+  return `rgba(${Math.round(red)},${Math.round(green)},${Math.round(
+    blue
+  )}, ${opacity})`;
 };
+
 export const colorComfort = (comfort, isComparison = false) => {
-  if (comfort < -1) return "rgba(0, 0, 0, " + (isComparison ? "0.3)" : "1)");
-  else if (comfort >= -1 && comfort <= 1)
-    return "rgba(128, 128, 128, " + (isComparison ? "0.3)" : "1)");
-  else return "rgba(255, 255, 255, " + (isComparison ? "0.3)" : "1)");
+  return colorHelper(comfort, -4, 4, isComparison ? 0.3 : 1, true);
 };
+
 export const colorSensation = (sensation, isComparison = false) => {
   return colorHelper(sensation, -4, 4, isComparison ? 0.3 : 1);
 };
+
 export const colorTskin = (tskin, isComparison = false) => {
   return colorHelper(tskin, 20, 38, isComparison ? 0.3 : 1);
 };
+
 export const colorTcore = (tcore, isComparison = false) => {
   return colorHelper(tcore, 25, 40, isComparison ? 0.3 : 1);
 };
@@ -176,22 +198,15 @@ export const determineColorFunction = (key) => {
           <div
             style={{
               width: "100%",
-              height: "33%",
-              backgroundColor: "white",
+              height: "50%",
+              backgroundImage: "linear-gradient(green, white)",
             }}
           />
           <div
             style={{
               width: "100%",
-              height: "33%",
-              backgroundColor: "gray",
-            }}
-          />
-          <div
-            style={{
-              width: "100%",
-              height: "33%",
-              backgroundColor: "black",
+              height: "50%",
+              backgroundImage: "linear-gradient(white, black)",
             }}
           />
         </VStack>
