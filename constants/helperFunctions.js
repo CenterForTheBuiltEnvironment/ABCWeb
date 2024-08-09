@@ -154,16 +154,16 @@ export const findMax = (data, ind, key) => {
   }
   return res;
 };
-export const determineColor = (value, key, mn, mx) => {
+export const determineColor = (value, key) => {
   switch (key) {
     case "comfort":
       return colorComfort(value[key]);
     case "sensation":
       return colorSensation(value[key]);
     case "tskin":
-      return colorTskin(value[key], mn, mx);
+      return colorTskin(value[key]);
     case "tcore":
-      return colorTcore(value[key], mn, mx);
+      return colorTcore(value[key]);
     default:
       return "white";
   }

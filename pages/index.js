@@ -970,26 +970,6 @@ export default function WithSubnavigation() {
                       borderRadius="10px"
                     >
                       <HStack>
-                        <Button
-                          colorScheme="blue"
-                          onClick={() => {
-                            if (isComparing) {
-                              // turn off comparison
-                              setComparing(false);
-                              setComparedResults();
-                              setFullDataCompare([]);
-                              setDataCompare([]);
-                              // rerender graph
-                              runSimulationManager(false);
-                            } else {
-                              // allow user to upload with special option
-                              setInComparingUploadModal(true);
-                              uploadModal.onOpen();
-                            }
-                          }}
-                        >
-                          {isComparing ? "Remove comparison" : "Compare"}
-                        </Button>
                         {/* Body segment selection*/}
                         <RSelect
                           className="basic-single"
@@ -2072,6 +2052,29 @@ export default function WithSubnavigation() {
                 }}
               >
                 Save
+              </Button>
+              <Button
+                textColor="gray.600"
+                bgColor="white"
+                borderWidth={2}
+                colorScheme="gray"
+                onClick={() => {
+                  if (isComparing) {
+                    // turn off comparison
+                    setComparing(false);
+                    setComparedResults();
+                    setFullDataCompare([]);
+                    setDataCompare([]);
+                    // rerender graph
+                    runSimulationManager(false);
+                  } else {
+                    // allow user to upload with special option
+                    setInComparingUploadModal(true);
+                    uploadModal.onOpen();
+                  }
+                }}
+              >
+                {isComparing ? "Remove comparison" : "Compare"}
               </Button>
               <Button
                 textColor="gray.600"

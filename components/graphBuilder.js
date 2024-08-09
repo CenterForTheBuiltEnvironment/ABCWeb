@@ -293,9 +293,9 @@ export function tskinBuilder(data) {
             itemStyle: {
               normal: {
                 color: colorTskin(
-                  item.tskin,
-                  parseInt(Math.floor(miniMax(0, data.data[0], "tskin"))),
-                  parseInt(Math.ceil(miniMax(1, data.data[0], "tskin")))
+                  item.tskin
+                  // parseInt(Math.floor(miniMax(0, data.data[0], "tskin"))),
+                  // parseInt(Math.ceil(miniMax(1, data.data[0], "tskin")))
                 ),
               },
             },
@@ -315,9 +315,9 @@ export function tskinBuilder(data) {
           itemStyle: {
             normal: {
               color: colorTskin(
-                item.tskin,
-                parseInt(Math.floor(miniMax(0, data.data[1], "tskin"))),
-                parseInt(Math.ceil(miniMax(1, data.data[1], "tskin")))
+                item.tskin
+                // parseInt(Math.floor(miniMax(0, data.data[1], "tskin"))),
+                // parseInt(Math.ceil(miniMax(1, data.data[1], "tskin")))
               ),
             },
           },
@@ -399,9 +399,9 @@ export function tcoreBuilder(data) {
             itemStyle: {
               normal: {
                 color: colorTcore(
-                  item.tcore,
-                  miniMax(0, data.data[0], "tcore").toFixed(5),
-                  miniMax(1, data.data[0], "tcore").toFixed(5)
+                  item.tcore
+                  // miniMax(0, data.data[0], "tcore").toFixed(5),
+                  // miniMax(1, data.data[0], "tcore").toFixed(5)
                 ),
               },
             },
@@ -421,9 +421,9 @@ export function tcoreBuilder(data) {
           itemStyle: {
             normal: {
               color: colorTcore(
-                item.tcore,
-                miniMax(0, data.data[1], "tcore").toFixed(5),
-                miniMax(1, data.data[1], "tcore").toFixed(5)
+                item.tcore
+                // miniMax(0, data.data[1], "tcore").toFixed(5),
+                // miniMax(1, data.data[1], "tcore").toFixed(5)
               ),
             },
           },
