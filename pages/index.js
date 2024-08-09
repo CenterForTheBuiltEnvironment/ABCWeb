@@ -561,6 +561,7 @@ export default function WithSubnavigation() {
     <Box minH="100vh" display="flex" flexDirection="column">
       <Head>
         <title>Advanced Berkeley Comfort (ABC) model</title>
+        <link rel="icon" href="/img/ABC-logo.png" type="image/png" />
       </Head>
       <Flex flex="1" flexDirection="column">
         <EditModal
