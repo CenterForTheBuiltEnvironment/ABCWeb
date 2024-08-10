@@ -72,7 +72,7 @@ import {
   getSaveFilePicker,
   determineColorFunction,
 } from "@/constants/helperFunctions";
-
+import AboutModal from "@/components/aboutModal";
 import OptionRenderer from "@/components/optionRenderer";
 import Canvass from "@/components/model";
 import EditModal from "@/components/editModal";
@@ -602,14 +602,13 @@ export default function WithSubnavigation() {
         />
         <Spinner loadingModal={loadingModal} />
         <Flex
-          bg={useColorModeValue("white", "gray.800")}
-          color={useColorModeValue("gray.600", "white")}
+          bg={useColorModeValue("cbe.grey", "gray.800")}
           minH={"60px"}
           py={{ base: 2 }}
           px={{ base: 4 }}
           borderBottom={1}
           borderStyle={"solid"}
-          borderColor={useColorModeValue("gray.200", "gray.900")}
+          borderColor={useColorModeValue("gray.300", "gray.900")}
           align={"center"}
         >
           <Flex
@@ -630,17 +629,33 @@ export default function WithSubnavigation() {
               aria-label={"Toggle Navigation"}
             />
           </Flex>
+          {/* Header */}
           <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-            <Text
-              textAlign={useBreakpointValue({ base: "center", md: "left" })}
-              fontFamily={"heading"}
-              style={{ fontWeight: "bold", fontSize: 35 }}
+            <a
+              href="https://example.com"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <span style={{ color: "#1b76bc" }}>
-                Advanced Berkeley Comfort Tool
-              </span>{" "}
-            </Text>
-
+              <Image
+                src="/img/ABC-logo.png"
+                width={50}
+                height={50}
+                alt="ABC Logo"
+              />
+            </a>
+            <Box ml={5}>
+              <Text
+                textAlign={useBreakpointValue({ base: "center", md: "left" })}
+                fontFamily="Arial"
+                fontWeight="bold"
+                fontSize={35}
+                textColor="cbe.blue"
+              >
+                <span style={{ color: "cbe.blue" }}>
+                  Advanced Berkeley Comfort Tool
+                </span>
+              </Text>
+            </Box>
             <Flex display={{ base: "none", md: "flex" }} ml={10}></Flex>
           </Flex>
           <Stack
@@ -649,9 +664,9 @@ export default function WithSubnavigation() {
             direction={"row"}
             spacing={2}
             alignItems={"center"}
-            style={{ fontWeight: "bold", color: "#1b76bc" }}
+            textColor="cbe.lightBlue"
           >
-            <Text mr={5}>About</Text>
+            <AboutModal />
             <a
               href="https://cbe-berkeley.gitbook.io/advanced-berkeley-comfort-abc-model"
               target="_blank"
@@ -688,12 +703,6 @@ export default function WithSubnavigation() {
             <Text mr={5} style={{ color: "gray" }}>
               IP
             </Text>
-            {/* <Image
-    src="/img/CBE-logo-2018-blue.webp"
-    width={300}
-    height={0}
-    alt="CBE Logo"
-  /> */}
           </Stack>
         </Flex>
         <Collapse in={isOpen} animateOpacity></Collapse>
@@ -2105,7 +2114,7 @@ export default function WithSubnavigation() {
             align="center"
             width="100%"
           >
-            <HStack>
+            <HStack spacing={10}>
               <a
                 href="https://cbe.berkeley.edu/"
                 target="_blank"
@@ -2114,7 +2123,7 @@ export default function WithSubnavigation() {
                 <Image
                   src="/img/CBE-logo-2019-white.png"
                   alt="CBE Logo"
-                  width={150}
+                  width={120}
                   height={50}
                 />
               </a>
@@ -2132,7 +2141,7 @@ export default function WithSubnavigation() {
               </a>
             </HStack>
 
-            {/* <Box
+            <Box
               flex={{ base: "1 0 auto", md: "none" }}
               textAlign="center"
               my={{ base: 2, md: 0 }}
@@ -2142,12 +2151,12 @@ export default function WithSubnavigation() {
                 Environment and UC Regents. All rights reserved.
               </Text>
             </Box>
-             */}
+
             <Box
               flex={{ base: "1 0 auto", md: "none" }}
               textAlign={{ base: "center", md: "right" }}
             >
-              <HStack spacing={8}>
+              <HStack spacing={7}>
                 <a
                   href="https://cbe.berkeley.edu/about-us/contact/"
                   target="_blank"
@@ -2156,7 +2165,7 @@ export default function WithSubnavigation() {
                   <Text>Contact Us</Text>
                 </a>
                 <a
-                  href="https://github.com/CenterForTheBuiltEnvironment/cbe-tool-template/issues/new?labels=bug&template=issue--bug-report.md"
+                  href="https://github.com/CenterForTheBuiltEnvironment/ABCWeb/issues/new?labels=bug&template=issue-bug-report.md"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
