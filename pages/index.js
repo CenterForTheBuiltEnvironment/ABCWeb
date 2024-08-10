@@ -2098,26 +2098,41 @@ export default function WithSubnavigation() {
         </Fade>
       </Flex>
       <footer>
-        <Box as="footer" bg="#0b2772" color="white" py={1} px={5} mt="auto">
+        <Box as="footer" bg="cbe.blue" color="white" py={1} px={5} mt="auto">
           <Flex
             direction={{ base: "column", md: "row" }}
             justify={{ base: "center", md: "space-between" }}
             align="center"
             width="100%"
           >
-            <Box
-              flex={{ base: "1 0 auto", md: "none" }}
-              textAlign={{ base: "center", md: "left" }}
-            >
-              <Image
-                src="/img/ucb-logo-2024.png"
-                alt="UC Berkeley Logo"
-                width={150}
-                height={50}
-              />
-            </Box>
+            <HStack>
+              <a
+                href="https://cbe.berkeley.edu/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/img/CBE-logo-2019-white.png"
+                  alt="CBE Logo"
+                  width={150}
+                  height={50}
+                />
+              </a>
+              <a
+                href="https://www.berkeley.edu/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/img/ucb-logo-2024-white.png"
+                  alt="UC Berkeley Logo"
+                  width={120}
+                  height={50}
+                />
+              </a>
+            </HStack>
 
-            <Box
+            {/* <Box
               flex={{ base: "1 0 auto", md: "none" }}
               textAlign="center"
               my={{ base: 2, md: 0 }}
@@ -2127,12 +2142,26 @@ export default function WithSubnavigation() {
                 Environment and UC Regents. All rights reserved.
               </Text>
             </Box>
-
+             */}
             <Box
               flex={{ base: "1 0 auto", md: "none" }}
               textAlign={{ base: "center", md: "right" }}
             >
-              <HStack spacing={5}>
+              <HStack spacing={8}>
+                <a
+                  href="https://cbe.berkeley.edu/about-us/contact/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Text>Contact Us</Text>
+                </a>
+                <a
+                  href="https://github.com/CenterForTheBuiltEnvironment/cbe-tool-template/issues/new?labels=bug&template=issue--bug-report.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Text>Report Issues</Text>
+                </a>
                 <a
                   href="https://github.com/CenterForTheBuiltEnvironment/ABCWeb"
                   target="_blank"

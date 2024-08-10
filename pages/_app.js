@@ -18,7 +18,9 @@ const colors = {
     100: "#fdb516",
   },
   cbe: {
-    100: "#3fbbec",
+    grey: "#fafafa",
+    lightBlue: "#3fbbec",
+    blue: "#0077c2",
   },
 };
 
