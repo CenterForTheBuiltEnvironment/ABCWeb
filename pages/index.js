@@ -561,7 +561,11 @@ export default function WithSubnavigation() {
     <Box minH="100vh" display="flex" flexDirection="column">
       <Head>
         <title>Advanced Berkeley Comfort (ABC) model</title>
-        <link rel="icon" href="/img/ABC-logo.png" type="image/png" />
+        <link
+          rel="icon"
+          href="/img/ABC model logo/svg/ABC logo_square_blue.svg"
+          type="image/svg+xml"
+        />
       </Head>
       <Flex flex="1" flexDirection="column">
         <EditModal
@@ -637,7 +641,7 @@ export default function WithSubnavigation() {
               rel="noopener noreferrer"
             >
               <Image
-                src="/img/ABC-logo.png"
+                src="/img/ABC model logo/svg/ABC logo_square_blue.svg"
                 width={50}
                 height={50}
                 alt="ABC Logo"
