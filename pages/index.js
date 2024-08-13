@@ -94,6 +94,8 @@ import CloseButton from "@/components/closeButton";
 import AdvancedSettingsModal from "@/components/advancedSettingsModal";
 
 export default function WithSubnavigation() {
+  const [isMetric, setMetric] = useState(true);
+
   const { isOpen, onToggle } = useDisclosure();
   const [params, setParams] = useState([conditionParams(1)]);
 
@@ -140,7 +142,13 @@ export default function WithSubnavigation() {
 
   const [cloTable, setCloTable] = useState(clo_correspondence);
 
-  const decideGraph = (tempArr, compareArr, value, choice = "") => {
+  const decideGraph = (
+    tempArr,
+    compareArr,
+    value,
+    frontOffset = 0,
+    choice = ""
+  ) => {
     let graphedChoice = choice;
     if (graphedChoice == "") graphedChoice = currentChoiceToGraph;
     if (graphedChoice == "sensation") {
@@ -148,11 +156,13 @@ export default function WithSubnavigation() {
         return sensBuilder({
           data: [tempArr],
           legends: ["Sensation"],
+          offset: frontOffset,
         });
       } else {
         return sensBuilder({
           data: [tempArr, compareArr],
           legends: ["Sensation", "Compared sensation"],
+          offset: frontOffset,
         });
       }
     } else if (graphedChoice == "comfort") {
@@ -160,11 +170,13 @@ export default function WithSubnavigation() {
         return comfBuilder({
           data: [tempArr],
           legends: ["Comfort"],
+          offset: frontOffset,
         });
       } else {
         return comfBuilder({
           data: [tempArr, compareArr],
           legends: ["Comfort", "Compared comfort"],
+          offest: frontOffset,
         });
       }
     } else if (graphedChoice == "tskin") {
@@ -172,11 +184,13 @@ export default function WithSubnavigation() {
         return tskinBuilder({
           data: [tempArr],
           legends: ["Skin Temperature"],
+          offset: frontOffset,
         });
       } else {
         return tskinBuilder({
           data: [tempArr, compareArr],
           legends: ["Skin Temperature", "Compared skin temp"],
+          offset: frontOffset,
         });
       }
     } else if (graphedChoice == "tcore") {
@@ -195,11 +209,13 @@ export default function WithSubnavigation() {
         return tcoreBuilder({
           data: [tcoreArr],
           legends: ["Core Temperature"],
+          offset: frontOffset,
         });
       } else {
         return tcoreBuilder({
           data: [tcoreArr, tcoreArrCompared],
           legends: ["Core Temperature", "Compared core temp"],
+          offset: frontOffset,
         });
       }
     } else if (graphedChoice == "hflux") {
@@ -208,6 +224,7 @@ export default function WithSubnavigation() {
         return hfluxBuilder({
           data: tempArr,
           legends: ["q_met", "q_conv", "q_rad", "q_solar", "q_resp", "q_sweat"],
+          offset: frontOffset,
         });
       } else {
         return hfluxBuilder({
@@ -222,12 +239,14 @@ export default function WithSubnavigation() {
             "q_blood",
             "q_blood_skin",
           ],
+          offset: frontOffset,
         });
       }
     } else if (graphedChoice == "environment") {
       return environmentBuilder({
         data: tempArr,
         legends: ["ta", "mrt", "solar", "eht", "rh", "v"],
+        offset: frontOffset,
       });
     }
   };
@@ -348,17 +367,10 @@ export default function WithSubnavigation() {
       const tempArrMain = await runSimulationMain();
       const tempArrCompare = await runSimulationCompare();
 
-      // console.log("TAKING COMPARE PATH");
-      // console.log(tempArrMain);
-      // console.log(tempArrCompare);
-
       // do graph logic here
       setGraph(decideGraph(tempArrMain, tempArrCompare, numtoGraph));
     } else {
       const tempArrMain = await runSimulationMain();
-
-      // console.log("TAKING MAIN PATH");
-      // console.log(tempArrMain);
 
       // do graph logic here
       setGraph(decideGraph(tempArrMain, [], numtoGraph));
@@ -574,6 +586,7 @@ export default function WithSubnavigation() {
           params={params}
           ind={ind}
           setParams={setParams}
+          isMetric={isMetric}
         />
         <UploadModal
           disclosure={uploadModal}
@@ -692,16 +705,8 @@ export default function WithSubnavigation() {
             <Text style={{ color: "gray" }}>SI</Text>
             <Switch
               size="lg"
-              isChecked={false}
-              onMouseEnter={() => {
-                toast.closeAll();
-                toast({
-                  title: "To be implemented soon!",
-                  status: "warning",
-                  duration: 2000,
-                  isClosable: true,
-                  position: "top",
-                });
+              onChange={(e) => {
+                setMetric(!e.target.checked);
               }}
             />
             <Text mr={5} style={{ color: "gray" }}>
@@ -812,7 +817,7 @@ export default function WithSubnavigation() {
                     <HStack w="100%" alignItems="flex-start">
                       {/* Left side */}
                       <VStack w="45%" alignItems="flex-start">
-                        {listOfParameters.map((option) => {
+                        {listOfParameters(isMetric).map((option) => {
                           return (
                             <div key={option.title}>
                               <OptionRenderer
@@ -828,6 +833,8 @@ export default function WithSubnavigation() {
                                   comp: option.comp,
                                   step: option.step,
                                   deltaKey: option.deltaKey,
+                                  isMetric: isMetric,
+                                  conversionFunction: option.conversionFunction,
                                 }}
                               />
                             </div>
@@ -937,7 +944,7 @@ export default function WithSubnavigation() {
                             Edit data
                           </MenuButton>
                           <MenuList>
-                            {listOfParameters.map((e, ind) => {
+                            {listOfParameters(isMetric).map((e, ind) => {
                               if (ind >= 1)
                                 return (
                                   <MenuItem
@@ -1059,6 +1066,7 @@ export default function WithSubnavigation() {
                                   sliderVal[1]
                                 ),
                                 numtoGraph,
+                                sliderVal[0],
                                 val.value
                               )
                             );
@@ -1139,21 +1147,24 @@ export default function WithSubnavigation() {
                                     setSliderVal([e[0], e[1]]);
                                     let tempArr = [],
                                       tempArrCompare = [];
-                                    for (let j = e[0]; j < e[1]; j++) {
+                                    for (let j = e[0]; j <= e[1]; j++) {
                                       tempArr.push({
-                                        ...fullData[j][numtoGraph],
-                                        index: j,
+                                        ...fullData[j - 1][numtoGraph],
+                                        index: j - 1,
                                       });
-                                      tempArrCompare.push({
-                                        ...fullDataCompare[j][numtoGraph],
-                                        index: j,
-                                      });
+                                      if (isComparing) {
+                                        tempArrCompare.push({
+                                          ...fullDataCompare[j - 1][numtoGraph],
+                                          index: j - 1,
+                                        });
+                                      }
                                     }
                                     setGraph(
                                       decideGraph(
                                         tempArr,
                                         tempArrCompare,
-                                        numtoGraph
+                                        numtoGraph,
+                                        e[0] - 1
                                       )
                                     );
                                   }}
@@ -1181,20 +1192,18 @@ export default function WithSubnavigation() {
                                       index={1}
                                     />
                                   </Tooltip>
-                                  <div style={{ marginTop: "10px" }}>
-                                    {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                                      <RangeSliderMark
-                                        key={i}
-                                        value={(sliderMaxVal / 6) * i}
-                                        mt="1"
-                                        ml="-2.5"
-                                        fontSize="sm"
-                                      >
-                                        {Math.round((sliderMaxVal / 6) * i)}
-                                      </RangeSliderMark>
-                                    ))}
-                                  </div>
                                 </RangeSlider>
+                                <div
+                                  style={{
+                                    marginTop: "10px",
+                                  }}
+                                >
+                                  <Text>
+                                    Drag ends of slider to adjust. Min is{" "}
+                                    <b>{sliderVal[0]}</b> min from start, and
+                                    max is <b>{sliderVal[1]}</b> min from start.
+                                  </Text>
+                                </div>
                               </VStack>
                               {/* Color bar */}
                               <Box w="1.5%" h="32vh" style={{ opacity: 0.8 }}>
@@ -1339,7 +1348,7 @@ export default function WithSubnavigation() {
                     <HStack w="100%" alignItems="flex-start" spacing={5}>
                       {/* Left side input items */}
                       <VStack pl={200} w="50%" alignItems="flex-start">
-                        {listOfParameters.map((option) => {
+                        {listOfParameters(isMetric).map((option) => {
                           return (
                             <div key={option.title}>
                               <OptionRenderer
@@ -1355,6 +1364,8 @@ export default function WithSubnavigation() {
                                   comp: option.comp,
                                   step: option.step,
                                   deltaKey: option.deltaKey,
+                                  isMetric: isMetric,
+                                  conversionFunction: option.conversionFunction,
                                   isHome: true,
                                 }}
                               />
@@ -1488,7 +1499,7 @@ export default function WithSubnavigation() {
                             Edit variable data
                           </MenuButton>
                           <MenuList>
-                            {listOfParameters.map((e, ind) => {
+                            {listOfParameters(isMetric).map((e, ind) => {
                               if (ind >= 1)
                                 return (
                                   <MenuItem

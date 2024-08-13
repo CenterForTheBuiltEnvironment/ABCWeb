@@ -1,6 +1,14 @@
 import { SpinnerIcon, StarIcon, SunIcon, TimeIcon } from "@chakra-ui/icons";
 import { HStack } from "@chakra-ui/react";
 import { ImDroplet } from "react-icons/im";
+import {
+  cToF,
+  cToFDiff,
+  defaultConversionFunc,
+  fToC,
+  mphToMs,
+  msToMph,
+} from "./helperFunctions";
 
 export const met_auto = [
   {
@@ -219,7 +227,7 @@ export const bodyBuildParams = () => {
 
 export const advancedSettingsArr = ["Body Builder", "Personal Comfort System"];
 
-export const listOfParameters = [
+export const listOfParameters = (metric = true) => [
   {
     title: "Exposure time",
     fullTitle: "Exposure Time",
@@ -231,13 +239,16 @@ export const listOfParameters = [
     step: 1,
     precision: 0,
     pcsKey: "",
+    conversionFunction: defaultConversionFunc,
+    reverseConversionFunction: defaultConversionFunc,
+    conversionFunctionIncr: defaultConversionFunc,
   },
   {
     title: "Air temp",
     fullTitle: "Air temperature",
     icon: <SunIcon color="gray.400" />,
-    unit: " °C",
-    fullUnit: " ° Celsius",
+    unit: metric ? " °C" : " °F",
+    fullUnit: metric ? " ° Celsius" : " ° Fahrenheit",
     val: "air_temperature",
     key: "air temp",
     step: 0.1,
@@ -245,13 +256,16 @@ export const listOfParameters = [
     deltaKey: "at_delta",
     tempKey: "at_d",
     pcsKey: "ta",
+    conversionFunction: cToF,
+    reverseConversionFunction: fToC,
+    conversionFunctionIncr: cToFDiff,
   },
   {
     title: "Mean rad temp",
     fullTitle: "Mean radiant temperature",
     icon: <StarIcon color="gray.400" />,
-    unit: " °C",
-    fullUnit: " ° Celsius",
+    unit: metric ? " °C" : " °F",
+    fullUnit: metric ? " ° Celsius" : " ° Fahrenheit",
     val: "radiant_temperature",
     key: "MRT",
     step: 0.1,
@@ -259,13 +273,16 @@ export const listOfParameters = [
     deltaKey: "mr_delta",
     tempKey: "rt_d",
     pcsKey: "mrt",
+    conversionFunction: cToF,
+    reverseConversionFunction: fToC,
+    conversionFunctionIncr: cToFDiff,
   },
   {
     title: "Air speed",
     fullTitle: "Speed of surrounding air",
     icon: <SpinnerIcon color="gray.400" />,
-    unit: " m/s",
-    fullUnit: " meters/second",
+    unit: metric ? " m/s" : " mph",
+    fullUnit: metric ? " meters/second" : " miles/hour",
     val: "air_speed",
     key: "speed",
     step: 0.1,
@@ -273,6 +290,9 @@ export const listOfParameters = [
     deltaKey: "as_delta",
     tempKey: "ai_d",
     pcsKey: "v",
+    conversionFunction: msToMph,
+    reverseConversionFunction: mphToMs,
+    conversionFunctionIncr: msToMph,
   },
   {
     title: "Rel humidity",
@@ -287,5 +307,8 @@ export const listOfParameters = [
     deltaKey: "rh_delta",
     tempKey: "rh_d",
     pcsKey: "",
+    conversionFunction: defaultConversionFunc,
+    reverseConversionFunction: defaultConversionFunc,
+    conversionFunctionIncr: defaultConversionFunc,
   },
 ];

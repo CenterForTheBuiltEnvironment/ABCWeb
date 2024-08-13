@@ -1,4 +1,42 @@
-import { HStack, Text, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
+
+export const defaultConversionFunc = (value) => value;
+
+export const cToF = (value) => {
+  return value * 1.8 + 32;
+};
+
+export const cToFDiff = (value) => {
+  return value * 1.8;
+};
+
+export const fToC = (value) => {
+  return (value - 32) / 1.8;
+};
+
+export const msToMph = (value) => {
+  return value * 2.236936;
+};
+
+export const mphToMs = (value) => {
+  return value / 2.236936;
+};
+
+export const mToInches = (value) => {
+  return value * 39.3701;
+};
+
+export const inchesToM = (value) => {
+  return value / 39.3701;
+};
+
+export const kgToLbs = (value) => {
+  return value * 2.2046226218;
+};
+
+export const lbsToKg = (value) => {
+  return value / 2.2046226218;
+};
 
 export const miniMax = (value, data, label) => {
   // 0 for finding min, 1 for finding max

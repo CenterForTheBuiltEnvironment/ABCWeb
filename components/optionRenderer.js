@@ -17,6 +17,8 @@ export default function OptionRenderer({
   params,
   setParams,
   ind,
+  isMetric,
+  conversionFunction,
   isHome = false,
 }) {
   return (
@@ -30,11 +32,17 @@ export default function OptionRenderer({
           <HStack width="100%" justifyContent="flex-start">
             {icon}
             <Text>
-              {(
-                params[ind][val].reduce(
-                  (a, b) => parseFloat(a) + parseFloat(b)
-                ) / params[ind][val].length
-              ).toFixed(1)}
+              {isMetric
+                ? (
+                    params[ind][val].reduce(
+                      (a, b) => parseFloat(a) + parseFloat(b)
+                    ) / params[ind][val].length
+                  ).toFixed(1)
+                : conversionFunction(
+                    params[ind][val].reduce(
+                      (a, b) => parseFloat(a) + parseFloat(b)
+                    ) / params[ind][val].length
+                  ).toFixed(1)}
 
               {unit}
             </Text>

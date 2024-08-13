@@ -26,6 +26,7 @@ export default function EditModal({
   params,
   ind,
   setParams,
+  isMetric,
 }) {
   const uploadMRTJson = (uploadedFile) => {
     const fileReader = new FileReader();
@@ -35,8 +36,7 @@ export default function EditModal({
 
         let newState = [...params];
         for (let i = 0; i < data.segment_data.length; i++) {
-          newState[ind][listOfParameters[currentlyEditing].val][i] =
-            data.segment_data[i].mrt;
+          newState[ind][optionRendererObj.val][i] = data.segment_data[i].mrt;
         }
         setParams(newState);
       } catch (e) {
@@ -45,6 +45,8 @@ export default function EditModal({
     };
     if (uploadedFile !== undefined) fileReader.readAsText(uploadedFile);
   };
+
+  const optionRendererObj = listOfParameters(isMetric)[currentlyEditing];
   return (
     <Modal
       isCentered
@@ -55,9 +57,7 @@ export default function EditModal({
     >
       <ModalOverlay />
       <ModalContent maxW="90%" maxH="90%" overflowY="scroll">
-        <ModalHeader>
-          Edit {listOfParameters[currentlyEditing].title.toLowerCase()}
-        </ModalHeader>
+        <ModalHeader>Edit {optionRendererObj.title.toLowerCase()}</ModalHeader>
         <ModalBody>
           <HStack justifyContent="center" spacing={8}>
             <HStack>
@@ -67,17 +67,24 @@ export default function EditModal({
                 backgroundColor="white"
                 type="number"
                 textAlign="right"
-                value={params[ind][listOfParameters[currentlyEditing].tempKey]}
+                value={
+                  isMetric
+                    ? params[ind][optionRendererObj.tempKey]
+                    : optionRendererObj.conversionFunction(
+                        params[ind][optionRendererObj.tempKey]
+                      )
+                }
                 onChange={(e) => {
                   let newState = [...params];
-                  newState[ind][listOfParameters[currentlyEditing].tempKey] =
-                    e.toString();
+                  newState[ind][optionRendererObj.tempKey] = isMetric
+                    ? e.toString()
+                    : optionRendererObj.reverseConversionFunction(e).toString();
                   setParams(newState);
                 }}
                 min={0}
-                max={100}
-                precision={listOfParameters[currentlyEditing].precision}
-                step={listOfParameters[currentlyEditing].step}
+                max={isMetric ? 100 : optionRendererObj.conversionFunction(100)}
+                precision={optionRendererObj.precision}
+                step={optionRendererObj.step}
               >
                 <NumberInputField />
                 <NumberInputStepper>
@@ -85,17 +92,13 @@ export default function EditModal({
                   <NumberDecrementStepper />
                 </NumberInputStepper>
               </NumberInput>
-              <Text>{listOfParameters[currentlyEditing].unit}</Text>
+              <Text>{optionRendererObj.unit}</Text>
               <Button
                 colorScheme="blue"
                 onClick={() => {
                   let newState = [...params];
-                  newState[ind][listOfParameters[currentlyEditing].val] = Array(
-                    16
-                  ).fill(
-                    params[ind][
-                      listOfParameters[currentlyEditing].tempKey
-                    ].toString()
+                  newState[ind][optionRendererObj.val] = Array(16).fill(
+                    params[ind][optionRendererObj.tempKey].toString()
                   );
                   setParams(newState);
                 }}
@@ -110,13 +113,10 @@ export default function EditModal({
                 allowMouseWheel
                 backgroundColor="white"
                 textAlign="right"
-                defaultValue={
-                  params[ind][listOfParameters[currentlyEditing].deltaKey]
-                }
+                defaultValue={params[ind][optionRendererObj.deltaKey]}
                 onChange={(e) => {
                   let newState = [...params];
-                  newState[ind][listOfParameters[currentlyEditing].deltaKey] =
-                    e.toString();
+                  newState[ind][optionRendererObj.deltaKey] = e.toString();
                   setParams(newState);
                 }}
                 // min={-100}
@@ -137,22 +137,13 @@ export default function EditModal({
                   for (let i = 0; i < 16; i++) {
                     newArray.push(
                       (
-                        parseFloat(
-                          params[ind][
-                            listOfParameters[currentlyEditing].tempKey
-                          ]
-                        ) +
-                        parseFloat(
-                          params[ind][
-                            listOfParameters[currentlyEditing].deltaKey
-                          ]
-                        ) *
+                        parseFloat(params[ind][optionRendererObj.tempKey]) +
+                        parseFloat(params[ind][optionRendererObj.deltaKey]) *
                           (1 - graphsVals[i + 1].stand)
                       ).toString()
                     );
                   }
-                  newState[ind][listOfParameters[currentlyEditing].val] =
-                    newArray;
+                  newState[ind][optionRendererObj.val] = newArray;
                   setParams(newState);
                 }}
               >
@@ -165,22 +156,13 @@ export default function EditModal({
                   for (let i = 0; i < 16; i++) {
                     newArray.push(
                       (
-                        parseFloat(
-                          params[ind][
-                            listOfParameters[currentlyEditing].tempKey
-                          ]
-                        ) +
-                        parseFloat(
-                          params[ind][
-                            listOfParameters[currentlyEditing].deltaKey
-                          ]
-                        ) *
+                        parseFloat(params[ind][optionRendererObj.tempKey]) +
+                        parseFloat(params[ind][optionRendererObj.deltaKey]) *
                           (1 - graphsVals[i + 1].sit)
                       ).toString()
                     );
                   }
-                  newState[ind][listOfParameters[currentlyEditing].val] =
-                    newArray;
+                  newState[ind][optionRendererObj.val] = newArray;
                   setParams(newState);
                 }}
               >
@@ -188,7 +170,7 @@ export default function EditModal({
               </Button>
             </HStack>
             <HStack justifyContent="center">
-              {listOfParameters[currentlyEditing].key == "MRT" ? (
+              {optionRendererObj.key == "MRT" ? (
                 <label
                   htmlFor="mrtJSON"
                   style={{ width: "fit-content", cursor: "pointer" }}
@@ -211,119 +193,159 @@ export default function EditModal({
             </HStack>
           </HStack>
           <HStack w="100%" justifyContent="center" spacing={8} margin={2}>
-            {params[ind][listOfParameters[currentlyEditing].val].map(
-              (value, indx) => {
-                if (indx < 8)
-                  return (
-                    <VStack key={indx}>
-                      <Text>{graphsVals[indx + 1].label}</Text>
-                      <NumberInput
-                        w="7vw"
-                        allowMouseWheel
-                        backgroundColor="white"
-                        type="number"
-                        textAlign="right"
-                        value={value}
-                        onChange={(e) => {
-                          let newState = [...params];
-                          newState[ind][listOfParameters[currentlyEditing].val][
-                            indx
-                          ] = e.toString();
-                          setParams(newState);
-                        }}
-                        min={0}
-                        max={100}
-                        precision={listOfParameters[currentlyEditing].precision}
-                        step={listOfParameters[currentlyEditing].step}
-                      >
-                        <NumberInputField />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                      {["v", "ta", "mrt"].includes(
-                        listOfParameters[currentlyEditing].pcsKey
-                      ) ? (
-                        <Text color="red">
-                          +
-                          {[...params[ind].personal_comfort_system].reduce(
-                            (partialSum, increase) =>
-                              partialSum +
-                              personalComfortSystem[increase][
-                                listOfParameters[currentlyEditing].pcsKey
-                              ][indx],
-                            0
-                          )}
-                        </Text>
-                      ) : (
-                        <></>
-                      )}
-                    </VStack>
-                  );
-              }
-            )}
+            {params[ind][optionRendererObj.val].map((value, indx) => {
+              if (indx < 8)
+                return (
+                  <VStack key={indx}>
+                    <Text>{graphsVals[indx + 1].label}</Text>
+                    <NumberInput
+                      w="7vw"
+                      allowMouseWheel
+                      backgroundColor="white"
+                      type="number"
+                      textAlign="right"
+                      value={
+                        isMetric
+                          ? value
+                          : optionRendererObj.conversionFunction(value)
+                      }
+                      onChange={(e) => {
+                        let newState = [...params];
+                        newState[ind][optionRendererObj.val][indx] = isMetric
+                          ? e.toString()
+                          : optionRendererObj
+                              .reverseConversionFunction(e)
+                              .toString();
+                        setParams(newState);
+                      }}
+                      min={0}
+                      max={
+                        isMetric
+                          ? 100
+                          : optionRendererObj.conversionFunction(100)
+                      }
+                      precision={optionRendererObj.precision}
+                      step={optionRendererObj.step}
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                    {["v", "ta", "mrt"].includes(optionRendererObj.pcsKey) ? (
+                      <Text color="red">
+                        +
+                        {isMetric
+                          ? [...params[ind].personal_comfort_system]
+                              .reduce(
+                                (partialSum, increase) =>
+                                  partialSum +
+                                  personalComfortSystem[increase][
+                                    optionRendererObj.pcsKey
+                                  ][indx],
+                                0
+                              )
+                              .toFixed(2)
+                          : [...params[ind].personal_comfort_system]
+                              .reduce(
+                                (partialSum, increase) =>
+                                  partialSum +
+                                  optionRendererObj.conversionFunctionIncr(
+                                    personalComfortSystem[increase][
+                                      optionRendererObj.pcsKey
+                                    ][indx]
+                                  ),
+                                0
+                              )
+                              .toFixed(2)}
+                      </Text>
+                    ) : (
+                      <></>
+                    )}
+                  </VStack>
+                );
+            })}
           </HStack>
           <HStack w="100%" justifyContent="center" spacing={8} margin={2}>
-            {params[ind][listOfParameters[currentlyEditing].val].map(
-              (value, indx) => {
-                if (indx >= 8)
-                  return (
-                    <VStack key={indx}>
-                      <Text>{graphsVals[indx + 1].label}</Text>
-                      <NumberInput
-                        w="7vw"
-                        allowMouseWheel
-                        backgroundColor="white"
-                        type="number"
-                        textAlign="right"
-                        value={value}
-                        onChange={(e) => {
-                          let newState = [...params];
-                          newState[ind][listOfParameters[currentlyEditing].val][
-                            indx
-                          ] = e.toString();
-                          setParams(newState);
-                        }}
-                        min={0}
-                        max={100}
-                        precision={listOfParameters[currentlyEditing].precision}
-                        step={listOfParameters[currentlyEditing].step}
-                      >
-                        <NumberInputField />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper />
-                          <NumberDecrementStepper />
-                        </NumberInputStepper>
-                      </NumberInput>
-                      {["v", "ta", "mrt"].includes(
-                        listOfParameters[currentlyEditing].pcsKey
-                      ) ? (
-                        <Text color="red">
-                          +
-                          {[...params[ind].personal_comfort_system].reduce(
-                            (partialSum, increase) =>
-                              partialSum +
-                              personalComfortSystem[increase][
-                                listOfParameters[currentlyEditing].pcsKey
-                              ][indx],
-                            0
-                          )}
-                        </Text>
-                      ) : (
-                        <></>
-                      )}
-                    </VStack>
-                  );
-              }
-            )}
+            {params[ind][optionRendererObj.val].map((value, indx) => {
+              if (indx >= 8)
+                return (
+                  <VStack key={indx}>
+                    <Text>{graphsVals[indx + 1].label}</Text>
+                    <NumberInput
+                      w="7vw"
+                      allowMouseWheel
+                      backgroundColor="white"
+                      type="number"
+                      textAlign="right"
+                      value={
+                        isMetric
+                          ? value
+                          : optionRendererObj.conversionFunction(value)
+                      }
+                      onChange={(e) => {
+                        let newState = [...params];
+                        newState[ind][optionRendererObj.val][indx] = isMetric
+                          ? e.toString()
+                          : optionRendererObj
+                              .reverseConversionFunction(e)
+                              .toString();
+                        setParams(newState);
+                      }}
+                      min={0}
+                      max={
+                        isMetric
+                          ? 100
+                          : optionRendererObj.conversionFunction(100)
+                      }
+                      precision={optionRendererObj.precision}
+                      step={optionRendererObj.step}
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                    {["v", "ta", "mrt"].includes(optionRendererObj.pcsKey) ? (
+                      <Text color="red">
+                        +
+                        {isMetric
+                          ? [...params[ind].personal_comfort_system]
+                              .reduce(
+                                (partialSum, increase) =>
+                                  partialSum +
+                                  personalComfortSystem[increase][
+                                    optionRendererObj.pcsKey
+                                  ][indx],
+                                0
+                              )
+                              .toFixed(2)
+                          : [...params[ind].personal_comfort_system]
+                              .reduce(
+                                (partialSum, increase) =>
+                                  partialSum +
+                                  optionRendererObj.conversionFunctionIncr(
+                                    personalComfortSystem[increase][
+                                      optionRendererObj.pcsKey
+                                    ][indx]
+                                  ),
+                                0
+                              )
+                              .toFixed(2)}
+                      </Text>
+                    ) : (
+                      <></>
+                    )}
+                  </VStack>
+                );
+            })}
           </HStack>
         </ModalBody>
         <ModalFooter>
           <HStack w="100%" justifyContent="end">
-            {["v", "ta", "mrt"].includes(
-              listOfParameters[currentlyEditing].pcsKey
-            ) ? (
+            {["v", "ta", "mrt"].includes(optionRendererObj.pcsKey) ? (
               <Text color="red">
                 Contributions in red are from the personal comfort system.
               </Text>

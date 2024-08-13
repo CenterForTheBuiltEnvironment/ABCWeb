@@ -32,7 +32,7 @@ export function comfBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex + 1
+          params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)}</span>`;
@@ -134,7 +134,7 @@ export function sensBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex + 1
+          params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)}</span>`;
@@ -237,7 +237,7 @@ export function tskinBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex + 1
+          params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)} C</span>`;
@@ -343,7 +343,7 @@ export function tcoreBuilder(data) {
       trigger: "axis",
       formatter: function (params) {
         return `<span id="inlineColor">${
-          params[0].dataIndex + 1
+          params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
         }: <span id="inlineColor">${params[0].data.value.toFixed(3)} C</span>`;
