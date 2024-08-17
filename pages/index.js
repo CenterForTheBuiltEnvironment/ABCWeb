@@ -257,7 +257,7 @@ export default function WithSubnavigation() {
 
     return isEditing ? (
       <IconButton
-        backgroundColor={"#3ebced"}
+        backgroundColor={"cbe.lightBlue"}
         textColor={"white"}
         colorScheme="blue"
         icon={<CheckIcon />}
@@ -268,7 +268,7 @@ export default function WithSubnavigation() {
         {isHome ? (
           <HStack justifyContent={"center"} spacing={2}>
             <IconButton
-              backgroundColor={"#3ebced"}
+              backgroundColor={"cbe.lightBlue"}
               textColor={"white"}
               colorScheme="blue"
               icon={<EditIcon />}
@@ -284,7 +284,7 @@ export default function WithSubnavigation() {
           </HStack>
         ) : (
           <IconButton
-            backgroundColor={"#3ebced"}
+            backgroundColor={"cbe.lightBlue"}
             textColor={"white"}
             colorScheme="blue"
             icon={<EditIcon />}
@@ -730,7 +730,9 @@ export default function WithSubnavigation() {
                         <Button
                           key={indx}
                           minW="110px"
-                          backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
+                          backgroundColor={
+                            ind == indx ? "#1b75bc" : "cbe.lightBlue"
+                          }
                           textColor="white"
                           colorScheme="blue"
                           onClick={() => {
@@ -765,8 +767,8 @@ export default function WithSubnavigation() {
                 <VStack
                   w="100%"
                   // borderColor="#1b75bc"
-                  // borderWidth="1px"
-                  background={"gray.100"}
+                  borderWidth="1px"
+                  background={"cbe.grey"}
                   borderRadius="10px"
                   padding={5}
                   spacing={1}
@@ -797,21 +799,21 @@ export default function WithSubnavigation() {
                           mr="10px"
                         />
                         <EditableControls />
+                        <IconButton
+                          w="5%"
+                          colorScheme="red"
+                          backgroundColor={"red.300"}
+                          icon={<CloseIcon />}
+                          isDisabled={params.length == 1}
+                          onClick={() => {
+                            let tempParams = [...params];
+                            tempParams.splice(ind, 1);
+                            setParams(tempParams);
+                            setIndex(Math.max(0, ind - 1));
+                          }}
+                          ml="10px"
+                        ></IconButton>
                       </Editable>
-                      <Spacer />
-                      <IconButton
-                        w="5%"
-                        colorScheme="red"
-                        backgroundColor={"red.300"}
-                        icon={<CloseIcon />}
-                        isDisabled={params.length == 1}
-                        onClick={() => {
-                          let tempParams = [...params];
-                          tempParams.splice(ind, 1);
-                          setParams(tempParams);
-                          setIndex(Math.max(0, ind - 1));
-                        }}
-                      ></IconButton>
                     </Flex>
                     {/* Input parameters */}
                     <HStack w="100%" alignItems="flex-start">
@@ -937,7 +939,7 @@ export default function WithSubnavigation() {
                             as={Button}
                             rightIcon={<ChevronDownIcon />}
                             w="200px"
-                            backgroundColor={"cbe.100"}
+                            backgroundColor={"cbe.lightBlue"}
                             textColor={"white"}
                             colorScheme="blue"
                           >
@@ -968,7 +970,7 @@ export default function WithSubnavigation() {
                         </Menu>
                       </VStack>
                     </HStack>
-                    <Text>
+                    <Text style={{ marginTop: "10px" }}>
                       These values are averages. Click &quot;Edit data&quot; to
                       see your input data more accurately.
                     </Text>
@@ -980,11 +982,21 @@ export default function WithSubnavigation() {
               <VStack w="70%">
                 {graphOptions ? (
                   <>
-                    <VStack
+                    {/* <VStack
                       alignSelf="center"
                       // borderColor="#1b75bc"
                       bgColor="gray.200"
                       // borderWidth="1px"
+                      padding={5}
+                      spacing={8}
+                      w="100%"
+                      borderRadius="10px"
+                    > */}
+                    <VStack
+                      alignSelf="center"
+                      // borderColor="#1b75bc"
+                      bgColor="cbe.grey"
+                      borderWidth="1px"
                       padding={5}
                       spacing={8}
                       w="100%"
@@ -1103,7 +1115,7 @@ export default function WithSubnavigation() {
                           }}
                         />
                         {/* CSV output */}
-                        <Button colorScheme="green" background={"green.500"}>
+                        <Button colorScheme="green" background={"green.400"}>
                           <CSVLink
                             data={csvData}
                             filename={`ABCWEB_${new Date().toDateString({
@@ -1115,7 +1127,7 @@ export default function WithSubnavigation() {
                               .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
                             target="_blank"
                           >
-                            Export to CSV file
+                            Export to CSV
                           </CSVLink>
                         </Button>
                       </HStack>
@@ -1137,8 +1149,8 @@ export default function WithSubnavigation() {
                                 <RangeSlider
                                   left="5%"
                                   right="5%"
-                                  top="10px"
-                                  w="95%"
+                                  top="5%"
+                                  w="85%"
                                   value={sliderVal}
                                   min={1}
                                   max={sliderMaxVal}
@@ -1169,8 +1181,8 @@ export default function WithSubnavigation() {
                                     );
                                   }}
                                 >
-                                  <RangeSliderTrack height="10px" bg="#3ebced">
-                                    <RangeSliderFilledTrack bg="#1b75bc" />
+                                  <RangeSliderTrack height="10px" bg="gray.300">
+                                    <RangeSliderFilledTrack bg="cbe.blue" />
                                   </RangeSliderTrack>
                                   <Tooltip
                                     label={`${sliderVal[0]} mins`}
@@ -1195,7 +1207,7 @@ export default function WithSubnavigation() {
                                 </RangeSlider>
                                 <div
                                   style={{
-                                    marginTop: "10px",
+                                    marginTop: "15px",
                                   }}
                                 >
                                   <Text>
@@ -1206,7 +1218,11 @@ export default function WithSubnavigation() {
                                 </div>
                               </VStack>
                               {/* Color bar */}
-                              <Box w="1.5%" h="32vh" style={{ opacity: 0.8 }}>
+                              <Box
+                                w="1.5%"
+                                h="28vh"
+                                style={{ opacity: 0.8, marginTop: "-4%" }}
+                              >
                                 {determineColorFunction(currentChoiceToGraph)}
                               </Box>
                             </HStack>
@@ -1217,7 +1233,10 @@ export default function WithSubnavigation() {
                           <Text fontWeight="bold">
                             {params[currIndex[0]].condition_name}{" "}
                             <span
-                              style={{ color: "#3ebced", marginLeft: "5px" }}
+                              style={{
+                                color: "cbe.lightBlue",
+                                marginLeft: "5px",
+                              }}
                             >
                               {" "}
                               {currIndex[1]} mins{" "}
@@ -1260,7 +1279,7 @@ export default function WithSubnavigation() {
               {/* Wide view mode */}
               <VStack
                 w="100%"
-                minH="70vh"
+                minH="60vh"
                 margin="50px"
                 alignItems="center"
                 justifyContent="center"
@@ -1274,7 +1293,9 @@ export default function WithSubnavigation() {
                         <Button
                           key={indx}
                           minW="110px"
-                          backgroundColor={ind == indx ? "#1b75bc" : "#3ebced"}
+                          backgroundColor={
+                            ind == indx ? "cbe.lue" : "cbe.lightBlue"
+                          }
                           textColor="white"
                           colorScheme="blue"
                           onClick={() => {
@@ -1309,9 +1330,9 @@ export default function WithSubnavigation() {
                 {/* Main condition section*/}
                 <VStack
                   minW="60%"
-                  background={"gray.100"}
-                  // borderColor="gray"
-                  // borderWidth="3px"
+                  background={"cbe.grey"}
+                  borderColor="gray.300"
+                  borderWidth="1px"
                   borderRadius="10px"
                   padding={5}
                   spacing={1}
@@ -1492,7 +1513,7 @@ export default function WithSubnavigation() {
                             as={Button}
                             rightIcon={<ChevronDownIcon />}
                             w="60%"
-                            backgroundColor={"cbe.100"}
+                            backgroundColor={"cbe.lightBlue"}
                             textColor={"white"}
                             colorScheme="blue"
                           >
@@ -1523,7 +1544,11 @@ export default function WithSubnavigation() {
                         </Menu>
                       </VStack>
                     </HStack>
-                    <Text textAlign="center" w="100%">
+                    <Text
+                      textAlign="center"
+                      w="100%"
+                      style={{ marginTop: "10px" }}
+                    >
                       These values are averages. Click &quot;Edit variable
                       data&quot; to see your input data more accurately.
                     </Text>
@@ -1531,7 +1556,7 @@ export default function WithSubnavigation() {
                 </VStack>
                 <HStack align="center" justifyContent="center">
                   <Button
-                    backgroundColor={"#3ebced"}
+                    backgroundColor={"cbe.Blue"}
                     textColor={"white"}
                     colorScheme="blue"
                     onClick={() => runSimulationManager()}
@@ -1818,7 +1843,7 @@ export default function WithSubnavigation() {
           {!comfortView ? (
             <HStack align="center" justifyContent="center">
               <Button
-                backgroundColor={"#3ebced"}
+                backgroundColor={"cbe.Blue"}
                 textColor={"white"}
                 colorScheme="blue"
                 alignSelf="center"
