@@ -71,6 +71,8 @@ import {
   findMax,
   getSaveFilePicker,
   determineColorFunction,
+  cToF,
+  msToMph,
 } from "@/constants/helperFunctions";
 import AboutModal from "@/components/aboutModal";
 import OptionRenderer from "@/components/optionRenderer";
@@ -143,6 +145,7 @@ export default function WithSubnavigation() {
   const [cloTable, setCloTable] = useState(clo_correspondence);
 
   const decideGraph = (
+    metric,
     tempArr,
     compareArr,
     value,
@@ -176,21 +179,33 @@ export default function WithSubnavigation() {
         return comfBuilder({
           data: [tempArr, compareArr],
           legends: ["Comfort", "Compared comfort"],
-          offest: frontOffset,
+          offset: frontOffset,
         });
       }
     } else if (graphedChoice == "tskin") {
+      if (!isMetric) {
+        tempArr = tempArr.map((obj) => {
+          obj.tskin = cToF(obj.tskin);
+          return obj;
+        });
+        compareArr = compareArr.map((obj) => {
+          obj.tskin = cToF(obj.tskin);
+          return obj;
+        });
+      }
       if (compareArr.length == 0) {
         return tskinBuilder({
           data: [tempArr],
           legends: ["Skin Temperature"],
           offset: frontOffset,
+          metric: metric,
         });
       } else {
         return tskinBuilder({
           data: [tempArr, compareArr],
           legends: ["Skin Temperature", "Compared skin temp"],
           offset: frontOffset,
+          metric: metric,
         });
       }
     } else if (graphedChoice == "tcore") {
@@ -199,23 +214,35 @@ export default function WithSubnavigation() {
       if (value == 0) {
         // overall
         for (let i = 0; i < tcoreArr.length; i++) {
-          tcoreArr[i]["tcore"] = tcoreArr[i].tblood;
+          tcoreArr[i].tcore = tcoreArr[i].tblood;
         }
         for (let i = 0; i < tcoreArrCompared.length; i++) {
-          tcoreArrCompared[i]["tcore"] = tcoreArr[i].tblood;
+          tcoreArrCompared[i].tcore = tcoreArr[i].tblood;
         }
+      }
+      if (!isMetric) {
+        tcoreArr = tcoreArr.map((obj) => {
+          obj.tcore = cToF(obj.tcore);
+          return obj;
+        });
+        tcoreArrCompared = tcoreArrCompared.map((obj) => {
+          obj.tcore = cToF(obj.tcore);
+          return obj;
+        });
       }
       if (compareArr.length == 0) {
         return tcoreBuilder({
           data: [tcoreArr],
           legends: ["Core Temperature"],
           offset: frontOffset,
+          metric: metric,
         });
       } else {
         return tcoreBuilder({
           data: [tcoreArr, tcoreArrCompared],
           legends: ["Core Temperature", "Compared core temp"],
           offset: frontOffset,
+          metric: metric,
         });
       }
     } else if (graphedChoice == "hflux") {
@@ -243,10 +270,20 @@ export default function WithSubnavigation() {
         });
       }
     } else if (graphedChoice == "environment") {
+      if (!isMetric) {
+        tempArr = tempArr.map((obj) => {
+          obj.ta = cToF(obj.ta);
+          obj.mrt = cToF(obj.mrt);
+          obj.eht = cToF(obj.eht);
+          obj.v = msToMph(obj.v);
+          return obj;
+        });
+      }
       return environmentBuilder({
         data: tempArr,
         legends: ["ta", "mrt", "solar", "eht", "rh", "v"],
         offset: frontOffset,
+        metric: metric,
       });
     }
   };
@@ -368,12 +405,12 @@ export default function WithSubnavigation() {
       const tempArrCompare = await runSimulationCompare();
 
       // do graph logic here
-      setGraph(decideGraph(tempArrMain, tempArrCompare, numtoGraph));
+      setGraph(decideGraph(isMetric, tempArrMain, tempArrCompare, numtoGraph));
     } else {
       const tempArrMain = await runSimulationMain();
 
       // do graph logic here
-      setGraph(decideGraph(tempArrMain, [], numtoGraph));
+      setGraph(decideGraph(isMetric, tempArrMain, [], numtoGraph));
     }
   };
 
@@ -616,6 +653,7 @@ export default function WithSubnavigation() {
           params={params}
           setParams={setParams}
           setPcsParams={setPcsParams}
+          isMetric={isMetric}
         />
         <Spinner loadingModal={loadingModal} />
         <Flex
@@ -1044,6 +1082,7 @@ export default function WithSubnavigation() {
 
                             setGraph(
                               decideGraph(
+                                isMetric,
                                 changedArr,
                                 changedArrCompare,
                                 val.value
@@ -1072,6 +1111,7 @@ export default function WithSubnavigation() {
                             setCurrentChoiceToGraph(val.value);
                             setGraph(
                               decideGraph(
+                                isMetric,
                                 graphData.slice(sliderVal[0], sliderVal[1]),
                                 graphDataCompare.slice(
                                   sliderVal[0],
@@ -1173,6 +1213,7 @@ export default function WithSubnavigation() {
                                     }
                                     setGraph(
                                       decideGraph(
+                                        isMetric,
                                         tempArr,
                                         tempArrCompare,
                                         numtoGraph,

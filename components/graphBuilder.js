@@ -35,7 +35,17 @@ export function comfBuilder(data) {
           params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
-        }: <span id="inlineColor">${params[0].data.value.toFixed(3)}</span>`;
+        }: <span id="inlineColor">${params[0].data.value.toFixed(
+          3
+        )}</span><br />${
+          data.data.length > 1 && params.length > 1
+            ? `${
+                params[0].seriesName
+              }-compared: <span id="inlineColor">${params[1].data.value.toFixed(
+                3
+              )}</span>`
+            : ""
+        }`;
       },
     },
     legend: {
@@ -137,7 +147,17 @@ export function sensBuilder(data) {
           params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
-        }: <span id="inlineColor">${params[0].data.value.toFixed(3)}</span>`;
+        }: <span id="inlineColor">${params[0].data.value.toFixed(
+          3
+        )}</span><br />${
+          data.data.length > 1 && params.length > 1
+            ? `${
+                params[0].seriesName
+              }-compared: <span id="inlineColor">${params[1].data.value.toFixed(
+                3
+              )}</span>`
+            : ""
+        }`;
       },
     },
     legend: {
@@ -236,11 +256,22 @@ export function tskinBuilder(data) {
     tooltip: {
       trigger: "axis",
       formatter: function (params) {
+        console.log(params);
         return `<span id="inlineColor">${
           params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
-        }: <span id="inlineColor">${params[0].data.value.toFixed(3)} C</span>`;
+        }: <span id="inlineColor">${params[0].data.value.toFixed(3)} ${
+          data.metric ? "C" : "F"
+        }</span><br />${
+          data.data.length > 1 && params.length > 1
+            ? `${
+                params[0].seriesName
+              }-compared: <span id="inlineColor">${params[1].data.value.toFixed(
+                3
+              )} ${data.metric ? "C" : "F"}</span>`
+            : ""
+        }`;
       },
     },
     legend: {
@@ -275,8 +306,8 @@ export function tskinBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: 20,
-      max: 38,
+      min: data.metric ? 20 : 68,
+      max: data.metric ? 38 : 101,
     },
     dataZoom: [
       {
@@ -346,7 +377,17 @@ export function tcoreBuilder(data) {
           params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
           params[0].seriesName
-        }: <span id="inlineColor">${params[0].data.value.toFixed(3)} C</span>`;
+        }: <span id="inlineColor">${params[0].data.value.toFixed(3)} ${
+          data.metric ? "C" : "F"
+        }</span><br />${
+          data.data.length > 1 && params.length > 1
+            ? `${
+                params[0].seriesName
+              }-compared: <span id="inlineColor">${params[1].data.value.toFixed(
+                3
+              )} ${data.metric ? "C" : "F"}</span>`
+            : ""
+        }`;
       },
     },
     legend: {
@@ -381,8 +422,8 @@ export function tcoreBuilder(data) {
       name: "Value",
       nameLocation: "center",
       nameTextStyle: { padding: 10 },
-      min: 25,
-      max: 40,
+      min: data.metric ? 25 : 77,
+      max: data.metric ? 40 : 104,
     },
     dataZoom: [
       {
@@ -574,7 +615,7 @@ export function environmentBuilder(data) {
           },
         },
         min: 0,
-        max: 2,
+        max: data.metric ? 2 : 5,
       },
     ],
     dataZoom: [

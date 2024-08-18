@@ -211,8 +211,8 @@ export default function UploadModal({
           </Text>
           {isUploadingForComparison ? (
             <Alert status="info" mt="10px">
-              To simulate later on, you will need to match the total exposure
-              time as your uploaded comparison file.
+              To simulate with a comparison, you will need to match the total
+              exposure time as your uploaded comparison file.
             </Alert>
           ) : (
             <></>

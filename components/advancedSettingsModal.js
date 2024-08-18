@@ -27,13 +27,25 @@ export default function AdvancedSettingsModal({
   setAdvIndex,
   setbbParams,
   setPcsParams,
+  isMetric,
 }) {
+  const components = (metric) => {
+    return [
+      <BodyBuilderChanger key={"bodybuilder"} metric={metric} />,
+      <PersonalComfortSystemChanger key={"pcs"} />,
+    ];
+  };
+
   const [componentArr, setCompArr] = useState([
-    <BodyBuilderChanger key={"bodybuilder"} />,
+    <BodyBuilderChanger key={"bodybuilder"} metric={isMetric} />,
     <PersonalComfortSystemChanger key={"pcs"} />,
   ]);
 
-  function BodyBuilderChanger() {
+  useEffect(() => {
+    setCompArr(components(isMetric));
+  }, [isMetric]);
+
+  function BodyBuilderChanger({ metric }) {
     const isValidHeight = (height) =>
       !isNaN(height) && height >= 1 && height <= 3;
     const isValidWeight = (weight) =>
@@ -43,6 +55,22 @@ export default function AdvancedSettingsModal({
     const isValidBf = (bf) => !isNaN(bf) && bf >= 0.01 && bf <= 0.7;
     const isValidSkinColor = (sk) =>
       sk == "white" || sk == "brown" || sk == "black";
+
+    const convertHeightToFeet = (heightInM) => {
+      return Math.floor(heightInM * 3.28084);
+    };
+    const convertFeetToHeight = (heightInFeet) => {
+      return heightInFeet * 0.3048;
+    };
+    const convertHeightToModInches = (heightInM) => {
+      return Math.floor(heightInM * 39.3701) % 12;
+    };
+    const convertModInchesToHeight = (heightInModInches) => {
+      return heightInModInches * 0.0254;
+    };
+
+    const [feet, setFeet] = useState(convertHeightToFeet(bbParams.height));
+    const [inch, setInch] = useState(convertHeightToModInches(bbParams.height));
 
     const isValidChangeToParams = (params) => {
       let { height, weight, age, sex, body_fat, skin_color } = params;
@@ -64,28 +92,87 @@ export default function AdvancedSettingsModal({
           <Text fontWeight="bold" w="100px">
             Height:{" "}
           </Text>
-          <NumberInput
-            w="300px"
-            allowMouseWheel
-            backgroundColor="white"
-            type="number"
-            textAlign="right"
-            defaultValue={prospectiveParams.height}
-            onChange={(e) => {
-              prospectiveParams.height = parseFloat(e);
-            }}
-            min={1}
-            max={3}
-            precision={2}
-            step={0.01}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Text> m</Text>
+          {metric ? (
+            <>
+              <NumberInput
+                w="300px"
+                allowMouseWheel
+                backgroundColor="white"
+                type="number"
+                textAlign="right"
+                defaultValue={prospectiveParams.height}
+                onChange={(e) => {
+                  prospectiveParams.height = parseFloat(e);
+                }}
+                min={1}
+                max={3}
+                precision={2}
+                step={0.01}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Text> m</Text>
+            </>
+          ) : (
+            <>
+              <NumberInput
+                w="300px"
+                allowMouseWheel
+                backgroundColor="white"
+                type="number"
+                textAlign="right"
+                defaultValue={convertHeightToFeet(prospectiveParams.height)}
+                onChange={(e) => {
+                  prospectiveParams.height =
+                    convertFeetToHeight(parseFloat(e)) +
+                    convertModInchesToHeight(inch);
+                  setFeet(parseFloat(e));
+                }}
+                min={0}
+                max={10}
+                precision={0}
+                step={1}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Text> ft</Text>
+              <NumberInput
+                w="300px"
+                allowMouseWheel
+                backgroundColor="white"
+                type="number"
+                textAlign="right"
+                defaultValue={convertHeightToModInches(
+                  prospectiveParams.height
+                )}
+                onChange={(e) => {
+                  prospectiveParams.height =
+                    convertFeetToHeight(feet) +
+                    convertModInchesToHeight(parseFloat(e));
+                  setInch(parseFloat(e));
+                }}
+                min={0}
+                max={11}
+                precision={0}
+                step={1}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Text> in</Text>
+            </>
+          )}
         </HStack>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
