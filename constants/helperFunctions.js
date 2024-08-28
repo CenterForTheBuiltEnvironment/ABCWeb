@@ -149,9 +149,18 @@ export const colorTskin = (tskin, isComparison = false) => {
   return colorHelper(tskin, 20, 38, isComparison ? 0.3 : 1);
 };
 
+export const colorTskinNotMetric = (tskin, isComparison = false) => {
+  return colorHelper(tskin, cToF(20), cToF(38), isComparison ? 0.3 : 1);
+};
+
 export const colorTcore = (tcore, isComparison = false) => {
   return colorHelper(tcore, 25, 40, isComparison ? 0.3 : 1);
 };
+
+export const colorTcoreNotMetric = (tcore, isComparison = false) => {
+  return colorHelper(tcore, cToF(25), cToF(40), isComparison ? 0.3 : 1);
+};
+
 export const colorHflux = (elem) => {
   switch (elem) {
     case "q_met":

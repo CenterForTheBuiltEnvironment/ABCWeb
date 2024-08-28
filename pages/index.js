@@ -183,14 +183,16 @@ export default function WithSubnavigation() {
         });
       }
     } else if (graphedChoice == "tskin") {
-      if (!isMetric) {
-        tempArr = tempArr.map((obj) => {
-          obj.tskin = cToF(obj.tskin);
-          return obj;
+      if (!metric) {
+        tempArr = tempArr.slice().map((obj) => {
+          const o = { ...obj };
+          o.tskin = cToF(o.tskin);
+          return o;
         });
-        compareArr = compareArr.map((obj) => {
-          obj.tskin = cToF(obj.tskin);
-          return obj;
+        compareArr = compareArr.slice().map((obj) => {
+          const o = { ...obj };
+          o.tskin = cToF(o.tskin);
+          return o;
         });
       }
       if (compareArr.length == 0) {
@@ -220,14 +222,16 @@ export default function WithSubnavigation() {
           tcoreArrCompared[i].tcore = tcoreArr[i].tblood;
         }
       }
-      if (!isMetric) {
+      if (!metric) {
         tcoreArr = tcoreArr.map((obj) => {
-          obj.tcore = cToF(obj.tcore);
-          return obj;
+          const o = { ...obj };
+          o.tcore = cToF(o.tcore);
+          return o;
         });
         tcoreArrCompared = tcoreArrCompared.map((obj) => {
-          obj.tcore = cToF(obj.tcore);
-          return obj;
+          const o = { ...obj };
+          o.tcore = cToF(o.tcore);
+          return o;
         });
       }
       if (compareArr.length == 0) {
@@ -270,13 +274,14 @@ export default function WithSubnavigation() {
         });
       }
     } else if (graphedChoice == "environment") {
-      if (!isMetric) {
-        tempArr = tempArr.map((obj) => {
-          obj.ta = cToF(obj.ta);
-          obj.mrt = cToF(obj.mrt);
-          obj.eht = cToF(obj.eht);
-          obj.v = msToMph(obj.v);
-          return obj;
+      if (!metric) {
+        tempArr = tempArr.slice().map((obj) => {
+          const o = { ...obj };
+          o.ta = cToF(o.ta);
+          o.mrt = cToF(o.mrt);
+          o.eht = cToF(o.eht);
+          o.v = msToMph(o.v);
+          return o;
         });
       }
       return environmentBuilder({
@@ -374,8 +379,8 @@ export default function WithSubnavigation() {
   );
 
   const runSimulationManager = async (
-    comparing = isComparing,
-    compResults = comparedResults
+    metric = isMetric,
+    comparing = isComparing
   ) => {
     if (comparing) {
       let totDurationMain = 0,
@@ -405,12 +410,12 @@ export default function WithSubnavigation() {
       const tempArrCompare = await runSimulationCompare();
 
       // do graph logic here
-      setGraph(decideGraph(isMetric, tempArrMain, tempArrCompare, numtoGraph));
+      setGraph(decideGraph(metric, tempArrMain, tempArrCompare, numtoGraph));
     } else {
       const tempArrMain = await runSimulationMain();
 
       // do graph logic here
-      setGraph(decideGraph(isMetric, tempArrMain, [], numtoGraph));
+      setGraph(decideGraph(metric, tempArrMain, [], numtoGraph));
     }
   };
 
@@ -640,7 +645,6 @@ export default function WithSubnavigation() {
           comparedResults={comparedResults}
           setComparedResults={setComparedResults}
           setComparing={setComparing}
-          runSimulation={(input) => runSimulationManager(input)}
           rKey={setRefreshKey}
         />
         <AdvancedSettingsModal
@@ -745,6 +749,8 @@ export default function WithSubnavigation() {
               size="lg"
               onChange={(e) => {
                 setMetric(!e.target.checked);
+                if (fullData.length > 0)
+                  runSimulationManager(!e.target.checked, isComparing);
               }}
             />
             <Text mr={5} style={{ color: "gray" }}>
@@ -2157,7 +2163,7 @@ export default function WithSubnavigation() {
                     setFullDataCompare([]);
                     setDataCompare([]);
                     // rerender graph
-                    runSimulationManager(false);
+                    runSimulationManager(isMetric, false);
                   } else {
                     // allow user to upload with special option
                     setInComparingUploadModal(true);

@@ -28,7 +28,6 @@ export default function UploadModal({
   setComparedResults,
   setComparing,
   rKey,
-  runSimulation,
 }) {
   const handleFileChangeAndUpload = async (event) => {
     const file = event.target.files[0];

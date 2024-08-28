@@ -4,7 +4,9 @@ import {
   colorHflux,
   colorSensation,
   colorTcore,
+  colorTcoreNotMetric,
   colorTskin,
+  colorTskinNotMetric,
   environmentMinimax,
   formatComfDescriptor,
   formatSensDescriptor,
@@ -256,7 +258,6 @@ export function tskinBuilder(data) {
     tooltip: {
       trigger: "axis",
       formatter: function (params) {
-        console.log(params);
         return `<span id="inlineColor">${
           params[0].dataIndex + 1 + data.offset
         }</span> min from start<br />${
@@ -323,11 +324,9 @@ export function tskinBuilder(data) {
             value: item.tskin,
             itemStyle: {
               normal: {
-                color: colorTskin(
-                  item.tskin
-                  // parseInt(Math.floor(miniMax(0, data.data[0], "tskin"))),
-                  // parseInt(Math.ceil(miniMax(1, data.data[0], "tskin")))
-                ),
+                color: data.metric
+                  ? colorTskin(item.tskin)
+                  : colorTskinNotMetric(item.tskin),
               },
             },
           };
@@ -345,11 +344,9 @@ export function tskinBuilder(data) {
           value: item.tskin,
           itemStyle: {
             normal: {
-              color: colorTskin(
-                item.tskin
-                // parseInt(Math.floor(miniMax(0, data.data[1], "tskin"))),
-                // parseInt(Math.ceil(miniMax(1, data.data[1], "tskin")))
-              ),
+              color: data.metric
+                ? colorTskin(item.tskin)
+                : colorTskinNotMetric(item.tskin),
             },
           },
         };
@@ -439,11 +436,9 @@ export function tcoreBuilder(data) {
             value: item.tcore,
             itemStyle: {
               normal: {
-                color: colorTcore(
-                  item.tcore
-                  // miniMax(0, data.data[0], "tcore").toFixed(5),
-                  // miniMax(1, data.data[0], "tcore").toFixed(5)
-                ),
+                color: data.metric
+                  ? colorTcore(item.tcore)
+                  : colorTcoreNotMetric(item.tcore),
               },
             },
           };
@@ -461,11 +456,9 @@ export function tcoreBuilder(data) {
           value: item.tcore,
           itemStyle: {
             normal: {
-              color: colorTcore(
-                item.tcore
-                // miniMax(0, data.data[1], "tcore").toFixed(5),
-                // miniMax(1, data.data[1], "tcore").toFixed(5)
-              ),
+              color: data.metric
+                ? colorTcore(item.tcore)
+                : colorTcoreNotMetric(item.tcore),
             },
           },
         };

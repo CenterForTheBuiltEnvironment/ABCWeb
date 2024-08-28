@@ -18,6 +18,14 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import {
+  cToF,
+  fToC,
+  kgToLbs,
+  lbsToKg,
+  mphToMs,
+  msToMph,
+} from "@/constants/helperFunctions";
 
 export default function AdvancedSettingsModal({
   disclosure,
@@ -32,13 +40,13 @@ export default function AdvancedSettingsModal({
   const components = (metric) => {
     return [
       <BodyBuilderChanger key={"bodybuilder"} metric={metric} />,
-      <PersonalComfortSystemChanger key={"pcs"} />,
+      <PersonalComfortSystemChanger key={"pcs"} metric={metric} />,
     ];
   };
 
   const [componentArr, setCompArr] = useState([
     <BodyBuilderChanger key={"bodybuilder"} metric={isMetric} />,
-    <PersonalComfortSystemChanger key={"pcs"} />,
+    <PersonalComfortSystemChanger key={"pcs"} metric={isMetric} />,
   ]);
 
   useEffect(() => {
@@ -178,28 +186,57 @@ export default function AdvancedSettingsModal({
           <Text fontWeight="bold" w="100px">
             Weight:{" "}
           </Text>
-          <NumberInput
-            w="300px"
-            allowMouseWheel
-            backgroundColor="white"
-            type="number"
-            textAlign="right"
-            defaultValue={prospectiveParams.weight}
-            onChange={(e) => {
-              prospectiveParams.weight = parseFloat(e);
-            }}
-            min={25}
-            max={200}
-            precision={1}
-            step={0.1}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-          <Text> kg</Text>
+          {metric ? (
+            <>
+              <NumberInput
+                w="300px"
+                allowMouseWheel
+                backgroundColor="white"
+                type="number"
+                textAlign="right"
+                defaultValue={prospectiveParams.weight}
+                onChange={(e) => {
+                  prospectiveParams.weight = parseFloat(e);
+                }}
+                min={25}
+                max={200}
+                precision={1}
+                step={0.1}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Text> kg</Text>
+            </>
+          ) : (
+            <>
+              <NumberInput
+                w="300px"
+                allowMouseWheel
+                backgroundColor="white"
+                type="number"
+                textAlign="right"
+                defaultValue={kgToLbs(prospectiveParams.weight)}
+                onChange={(e) => {
+                  prospectiveParams.weight = lbsToKg(parseFloat(e));
+                }}
+                min={kgToLbs(25)}
+                max={kgToLbs(200)}
+                precision={1}
+                step={0.1}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              <Text> lb</Text>
+            </>
+          )}
         </HStack>
         <HStack spacing={2}>
           <Text fontWeight="bold" w="100px">
@@ -308,8 +345,8 @@ export default function AdvancedSettingsModal({
     );
   }
 
-  function PersonalComfortSystemChanger() {
-    const [tempPcsParams, setTempPcsParmas] = useState(pcsParams);
+  function PersonalComfortSystemChanger({ metric }) {
+    const [tempPcsParams, setTempPcsParams] = useState(pcsParams);
     const [currPcsInd, setCurrPcsInd] = useState(0);
 
     useEffect(() => {}, [tempPcsParams]);
@@ -336,10 +373,28 @@ export default function AdvancedSettingsModal({
         </HStack>
         <HStack spacing={2} w="100%">
           {[
-            "Air speed offset",
-            "Air temp offset",
-            "Mean radiant temp offset",
-          ].map((elemType, elemTypeInd) => {
+            {
+              name: "Air speed offset",
+              func: msToMph,
+              reverseFunc: mphToMs,
+              mUnit: "m/s",
+              nmUnit: "mph",
+            },
+            {
+              name: "Air temp offset",
+              func: cToF,
+              reverseFunc: fToC,
+              mUnit: "°C",
+              nmUnit: "°F",
+            },
+            {
+              name: "Mean radiant temp offset",
+              func: cToF,
+              reverseFunc: fToC,
+              mUnit: "°C",
+              nmUnit: "°F",
+            },
+          ].map(({ name, func, reverseFunc, mUnit, nmUnit }, elemTypeInd) => {
             let objProp;
             if (elemTypeInd == 0) {
               objProp = "v";
@@ -351,24 +406,35 @@ export default function AdvancedSettingsModal({
             return (
               <VStack w="33%" key={elemTypeInd + "offsetTextMapping"}>
                 <Text fontWeight="bold" w="100%" textAlign="center">
-                  {elemType} ({tempPcsParams[currPcsInd].name})
+                  {name} ({tempPcsParams[currPcsInd].name})
                 </Text>
                 {graphsVals.slice(1).map((bodyPart, bodyPartInd) => {
                   return (
                     <HStack w="100%" key={bodyPartInd + "graphValsMapping"}>
-                      <Text w="70%">{bodyPart.label}</Text>
+                      <Text w="60%" fontWeight="bold">
+                        {bodyPart.label}
+                      </Text>
                       <NumberInput
-                        w="30%"
+                        w="25%"
                         allowMouseWheel
                         backgroundColor="white"
                         type="number"
                         textAlign="right"
-                        value={tempPcsParams[currPcsInd][objProp][bodyPartInd]}
+                        value={
+                          metric
+                            ? tempPcsParams[currPcsInd][objProp][
+                                bodyPartInd
+                              ].toFixed(1)
+                            : func(
+                                tempPcsParams[currPcsInd][objProp][bodyPartInd]
+                              ).toFixed(1)
+                        }
                         onChange={(e) => {
                           let nwState = [...tempPcsParams];
-                          nwState[currPcsInd][objProp][bodyPartInd] =
-                            parseFloat(e);
-                          setTempPcsParmas(nwState);
+                          nwState[currPcsInd][objProp][bodyPartInd] = metric
+                            ? parseFloat(e)
+                            : reverseFunc(parseFloat(e));
+                          setTempPcsParams(nwState);
                         }}
                         min={0}
                         precision={1}
@@ -380,6 +446,7 @@ export default function AdvancedSettingsModal({
                           <NumberDecrementStepper />
                         </NumberInputStepper>
                       </NumberInput>
+                      <Text w="15%">{metric ? mUnit : nmUnit}</Text>
                     </HStack>
                   );
                 })}
