@@ -285,8 +285,8 @@ export const listOfParameters = (metric = true) => [
     fullUnit: metric ? " meters/second" : " feet/minute",
     val: "air_speed",
     key: "speed",
-    step: 0.1,
-    precision: 1,
+    step: metric ? 0.01 : 0.1, // Set step: 0.01 for m/s and 0.1 for fpm
+    precision: metric ? 2 : 1, // Set precision: 2 for m/s and 1 for fpm
     deltaKey: "as_delta",
     tempKey: "ai_d",
     pcsKey: "v",
