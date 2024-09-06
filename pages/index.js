@@ -73,6 +73,7 @@ import {
   determineColorFunction,
   cToF,
   msToMph,
+  msToFpm,
 } from "@/constants/helperFunctions";
 import AboutModal from "@/components/aboutModal";
 import OptionRenderer from "@/components/optionRenderer";
@@ -280,7 +281,7 @@ export default function WithSubnavigation() {
           o.ta = cToF(o.ta);
           o.mrt = cToF(o.mrt);
           o.eht = cToF(o.eht);
-          o.v = msToMph(o.v);
+          o.v = msToFpm(o.v);
           return o;
         });
       }

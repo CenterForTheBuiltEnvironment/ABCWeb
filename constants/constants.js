@@ -6,8 +6,8 @@ import {
   cToFDiff,
   defaultConversionFunc,
   fToC,
-  mphToMs,
-  msToMph,
+  fpmToMs,
+  msToFpm,
 } from "./helperFunctions";
 
 export const met_auto = [
@@ -281,8 +281,8 @@ export const listOfParameters = (metric = true) => [
     title: "Air speed",
     fullTitle: "Speed of surrounding air",
     icon: <SpinnerIcon color="gray.400" />,
-    unit: metric ? " m/s" : " mph",
-    fullUnit: metric ? " meters/second" : " miles/hour",
+    unit: metric ? " m/s" : " fpm",
+    fullUnit: metric ? " meters/second" : " feet/minute",
     val: "air_speed",
     key: "speed",
     step: 0.1,
@@ -290,9 +290,9 @@ export const listOfParameters = (metric = true) => [
     deltaKey: "as_delta",
     tempKey: "ai_d",
     pcsKey: "v",
-    conversionFunction: msToMph,
-    reverseConversionFunction: mphToMs,
-    conversionFunctionIncr: msToMph,
+    conversionFunction: msToFpm,
+    reverseConversionFunction: fpmToMs,
+    conversionFunctionIncr: msToFpm,
   },
   {
     title: "Rel humidity",

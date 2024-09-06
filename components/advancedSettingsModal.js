@@ -20,10 +20,14 @@ import {
 import { useEffect, useState } from "react";
 import {
   cToF,
+  cToFDiff,
+  fpmToMs,
   fToC,
+  fToCDiff,
   kgToLbs,
   lbsToKg,
   mphToMs,
+  msToFpm,
   msToMph,
 } from "@/constants/helperFunctions";
 
@@ -375,22 +379,22 @@ export default function AdvancedSettingsModal({
           {[
             {
               name: "Air speed offset",
-              func: msToMph,
-              reverseFunc: mphToMs,
+              func: msToFpm,
+              reverseFunc: fpmToMs,
               mUnit: "m/s",
-              nmUnit: "mph",
+              nmUnit: "fpm",
             },
             {
               name: "Air temp offset",
-              func: cToF,
-              reverseFunc: fToC,
+              func: cToFDiff,
+              reverseFunc: fToCDiff,
               mUnit: "°C",
               nmUnit: "°F",
             },
             {
               name: "Mean radiant temp offset",
-              func: cToF,
-              reverseFunc: fToC,
+              func: cToFDiff,
+              reverseFunc: fToCDiff,
               mUnit: "°C",
               nmUnit: "°F",
             },

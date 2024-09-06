@@ -14,12 +14,25 @@ export const fToC = (value) => {
   return (value - 32) / 1.8;
 };
 
+export const fToCDiff = (value) => {
+  return value / 1.8;
+};
+
 export const msToMph = (value) => {
   return value * 2.236936;
 };
 
 export const mphToMs = (value) => {
   return value / 2.236936;
+};
+
+// Researchers in comfort studies typically use feet per minute (fpm) in IP unit.
+export const msToFpm = (value) => {
+  return value * 196.850394;
+};
+
+export const fpmToMs = (value) => {
+  return value / 196.850394;
 };
 
 export const mToInches = (value) => {
