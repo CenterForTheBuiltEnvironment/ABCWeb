@@ -206,8 +206,10 @@ export default function EditModal({
                       textAlign="right"
                       value={
                         isMetric
-                          ? value
-                          : optionRendererObj.conversionFunction(value)
+                          ? parseFloat(value)
+                          : optionRendererObj
+                              .conversionFunction(parseFloat(value))
+                              .toFixed(1) // Round to 1 decimal place for fpm
                       }
                       onChange={(e) => {
                         let newState = [...params];
@@ -246,7 +248,7 @@ export default function EditModal({
                                   ][indx],
                                 0
                               )
-                              .toFixed(2)
+                              .toFixed(1)
                           : [...params[ind].personal_comfort_system]
                               .reduce(
                                 (partialSum, increase) =>
@@ -258,7 +260,7 @@ export default function EditModal({
                                   ),
                                 0
                               )
-                              .toFixed(2)}
+                              .toFixed(1)}
                       </Text>
                     ) : (
                       <></>
@@ -281,8 +283,10 @@ export default function EditModal({
                       textAlign="right"
                       value={
                         isMetric
-                          ? value
-                          : optionRendererObj.conversionFunction(value)
+                          ? parseFloat(value)
+                          : optionRendererObj
+                              .conversionFunction(parseFloat(value))
+                              .toFixed(1) // Round to 1 decimal place for fpm
                       }
                       onChange={(e) => {
                         let newState = [...params];
@@ -321,7 +325,7 @@ export default function EditModal({
                                   ][indx],
                                 0
                               )
-                              .toFixed(2)
+                              .toFixed(1)
                           : [...params[ind].personal_comfort_system]
                               .reduce(
                                 (partialSum, increase) =>
@@ -333,7 +337,7 @@ export default function EditModal({
                                   ),
                                 0
                               )
-                              .toFixed(2)}
+                              .toFixed(1)}
                       </Text>
                     ) : (
                       <></>
