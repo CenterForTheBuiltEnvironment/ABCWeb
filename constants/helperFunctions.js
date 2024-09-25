@@ -408,3 +408,7 @@ export const getSaveFilePicker = async () => {
   };
   return await window.showSaveFilePicker(opts);
 };
+
+export function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

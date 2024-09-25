@@ -8,6 +8,7 @@ import {
   fToC,
   fpmToMs,
   msToFpm,
+  capitalize,
 } from "./helperFunctions";
 
 export const met_auto = [
@@ -144,48 +145,48 @@ export const graphsVals = [
   { label: "Right Foot", value: 16, stand: 0.0, sit: 0.0 },
 ];
 export const signals = [
-  "tskin-",
-  "tcore-",
   "sensation-",
   "sensation_weighted-",
   "comfort-",
   "comfort_weighted-",
   "eht-",
+  "tskin-",
+  "tcore-",
   "tskin_set-",
   "tskin_set_reg-",
 ];
 
 export const csvHeaderLine = [
   "elapsed_time",
-  "air",
-  "mrt",
-  "rh",
-  "velocity",
-  "solar",
-  "clo",
-  "met",
-  "overall_comfort",
-  "overall_comfort_weighted",
-  "overall_sensation",
-  "overall_sensation_linear",
-  "overall_sensation_weighted",
-  "meanskintemp",
-  "tblood",
-  "tneutral",
-  "pmv",
-  "ppd",
-  "eht",
-  "qmet",
-  "qconv",
-  "qrad",
-  "qsolar",
-  "qresp",
-  "qsweat",
+  "Ta",
+  "MRT",
+  "RH",
+  "Velocity",
+  "Solar",
+  "Clo",
+  "Met",
+  "Overall_Comfort",
+  "Overall_Comfort_weighted",
+  "Overall_Sensation",
+  "Overall_Sensation_Linear",
+  "Overall_Sensation_Weighted",
+  "MeanSkinTemp",
+  "Tblood",
+  "Tneutral",
+  "PMV",
+  "PPD",
+  "EHT",
+  "Qmet",
+  "Qconv",
+  "Qrad",
+  "Qsolar",
+  "Qresp",
+  "Qsweat",
 ].concat(
   signals
     .map((value) =>
       graphsVals
-        .map((value2, idx) => (idx != 0 ? [`${value}${value2.label}`] : []))
+        .map((value2, idx) => (idx != 0 ? [`${capitalize(value)}${value2.label}`] : []))
         .flat()
     )
     .flat()
