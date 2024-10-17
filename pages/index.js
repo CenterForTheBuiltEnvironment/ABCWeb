@@ -501,11 +501,14 @@ export default function WithSubnavigation() {
     loadingModal.onOpen();
     try {
       let phases = [];
+
+      // Iterate over the params to build the phase data
       for (let i = 0; i < params.length; i++) {
         let new_air_speed = params[i].air_speed.map(Number);
         let new_air_temperature = params[i].air_temperature.map(Number);
         let new_radiant_temperature = params[i].radiant_temperature.map(Number);
 
+        // Adjust air speed, air temperature, and radiant temperature based on PCS
         params[i].personal_comfort_system.forEach((elemIndex) => {
           for (let j = 0; j < 16; j++) {
             new_air_speed[j] += pcsParams[elemIndex]["v"][j];
@@ -514,6 +517,7 @@ export default function WithSubnavigation() {
           }
         });
 
+        // Push each phase data into the phases array with the calculated values
         phases.push({
           exposure_duration: params[i].exposure_duration,
           met_activity_name: "Custom-defined Met Activity",
@@ -529,8 +533,12 @@ export default function WithSubnavigation() {
             cloTable[parseInt(params[i].clo_value)].ensemble_name,
         });
       }
+
+      // Define body and clothing objects
       let bodyb = bodybuilderObj;
       let clothing = cloTable;
+
+      // Make an API request to send the phases, body, and clothing data for simulation
       const metrics = await axios
         .post("/api/process", {
           // Chaining of data is intentional
@@ -545,7 +553,8 @@ export default function WithSubnavigation() {
             alert("An error has occurred. Please try again.");
             return;
           }
-
+          
+          // Prepare an array to store the processed data
           let tempArr = [];
           for (let j = 0; j < res.data.length; j++) {
             tempArr.push({
@@ -553,17 +562,22 @@ export default function WithSubnavigation() {
               index: j,
             });
           }
+          // Update state with the processed data
           setData(tempArr);
           setFullData(res.data);
           setCache(params.slice());
 
+          // Calculate total exposure duration from all phases
           let totalDuration = 0;
           for (let i = 0; i < params.length; i++) {
             totalDuration += params[i].exposure_duration;
           }
+
+          // Set slider values based on total duration
           setSliderMaxVal(totalDuration);
           setSliderVal([1, totalDuration]);
-
+          
+          // Prepare color values for each body part
           let colorsArr = [];
           let mins = [],
             maxes = [];
@@ -585,8 +599,11 @@ export default function WithSubnavigation() {
             }
             colorsArr.push(bodyPartsArr);
           }
+          // Update body colors and current colors in the UI
           setBodyColors(colorsArr);
           setCurrentColorArray(Array(18).fill("white"));
+
+          // Prepare CSV data for export (Aki is here)
           let data = [];
           data.push(csvHeaderLine);
           for (let time = 0; time < res.data.length; time++) {
@@ -1333,7 +1350,7 @@ export default function WithSubnavigation() {
                 justifyContent="center"
               >
                 {/* Adding conditions at the top*/}
-                <HStack padding={2} alignItems="flex-start">
+                <HStack w="30%" overflowX="auto" spacing={3} justifyContent="center">
                   {/* A condition botton */}
                   <HStack w="100%" overflowY={"scroll"} spacing={3}>
                     {params.map((elem, indx) => {
