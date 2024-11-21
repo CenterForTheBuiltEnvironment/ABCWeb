@@ -708,7 +708,7 @@ export default function WithSubnavigation() {
           </Flex>
           {/* Header */}
           <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-            <a
+            {/* <a
               href="https://example.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -719,7 +719,7 @@ export default function WithSubnavigation() {
                 height={50}
                 alt="ABC Logo"
               />
-            </a>
+            </a> */}
             <Box ml={5}>
               <Text
                 textAlign={useBreakpointValue({ base: "center", md: "left" })}
