@@ -14,6 +14,7 @@ import {
   AlertTitle,
   AlertDescription,
 } from "@chakra-ui/react";
+import axios from "axios";
 
 export default function UploadModal({
   disclosure,
@@ -27,15 +28,28 @@ export default function UploadModal({
   comparedResults,
   setComparedResults,
   setComparing,
+  isCSV,
   rKey,
 }) {
   const handleFileChangeAndUpload = async (event) => {
     const file = event.target.files[0];
+    let jsonData;
     if (file) {
       try {
         const fileContent = await readFileContent(file);
-        const jsonData = JSON.parse(fileContent);
-
+        if (isCSV) {
+          const jsonFile = await axios
+            .post("/api/convert", {
+              csv: true,
+              data: fileContent,
+            })
+            .then((res) => {
+              return res.data;
+            });
+          jsonData = jsonFile.obj;
+        } else {
+          jsonData = JSON.parse(fileContent);
+        }
         handleParsedJson(jsonData);
       } catch (error) {
         console.error("Error parsing JSON file", error);
@@ -194,16 +208,26 @@ export default function UploadModal({
       <ModalOverlay />
       <ModalContent maxW="70vw">
         <ModalHeader>
-          Upload Parameter {isUploadingForComparison ? "(comparison)" : ""}
+          Upload Parameter {isCSV ? "(CSV)" : "(JSON)"}{" "}
+          {isUploadingForComparison ? "(comparison)" : ""}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody w="100%">
-          <input
-            type="file"
-            id="paramupload"
-            name="parameterjson"
-            accept=".json"
-          />
+          {isCSV ? (
+            <input
+              type="file"
+              id="paramupload"
+              name="parametercsv"
+              accept=".csv"
+            />
+          ) : (
+            <input
+              type="file"
+              id="paramupload"
+              name="parameterjson"
+              accept=".json"
+            />
+          )}
           <Text marginTop="10px">
             (Running into an error? Check that your clothing ensemble name is
             correct and that other fields are nonempty.)
@@ -237,7 +261,7 @@ export default function UploadModal({
             onClick={async () => {
               const fileInput = document.getElementById("paramupload");
               if (fileInput && fileInput.files && fileInput.files.length > 0) {
-                await handleFileChangeAndUpload({
+                const u = await handleFileChangeAndUpload({
                   target: { files: [fileInput.files[0]] },
                 });
                 disclosure.onClose();

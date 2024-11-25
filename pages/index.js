@@ -122,6 +122,7 @@ export default function WithSubnavigation() {
   const loadingModal = useDisclosure();
   const editModal = useDisclosure();
   const uploadModal = useDisclosure();
+  const uploadCSVModal = useDisclosure();
   const [refreshKey, setRefreshKey] = useState(Math.random());
   const advancedModal = useDisclosure();
 
@@ -553,7 +554,7 @@ export default function WithSubnavigation() {
             alert("An error has occurred. Please try again.");
             return;
           }
-          
+
           // Prepare an array to store the processed data
           let tempArr = [];
           for (let j = 0; j < res.data.length; j++) {
@@ -576,7 +577,7 @@ export default function WithSubnavigation() {
           // Set slider values based on total duration
           setSliderMaxVal(totalDuration);
           setSliderVal([1, totalDuration]);
-          
+
           // Prepare color values for each body part
           let colorsArr = [];
           let mins = [],
@@ -663,6 +664,25 @@ export default function WithSubnavigation() {
           comparedResults={comparedResults}
           setComparedResults={setComparedResults}
           setComparing={setComparing}
+          isCSV={false}
+          rKey={setRefreshKey}
+        />
+        <UploadModal
+          disclosure={uploadCSVModal}
+          params={params}
+          ind={ind}
+          setParams={setParams}
+          setMetIndex={setMetIndex}
+          cloTable={cloTable}
+          setCloTable={setCloTable}
+          conditionParams={conditionParams}
+          toast={toast}
+          isUploadingForComparison={false}
+          setIsUploadingForComparison={() => {}}
+          comparedResults={comparedResults}
+          setComparedResults={setComparedResults}
+          setComparing={setComparing}
+          isCSV={true}
           rKey={setRefreshKey}
         />
         <AdvancedSettingsModal
@@ -1350,7 +1370,12 @@ export default function WithSubnavigation() {
                 justifyContent="center"
               >
                 {/* Adding conditions at the top*/}
-                <HStack w="30%" overflowX="auto" spacing={3} justifyContent="center">
+                <HStack
+                  w="30%"
+                  overflowX="auto"
+                  spacing={3}
+                  justifyContent="center"
+                >
                   {/* A condition botton */}
                   <HStack w="100%" overflowY={"scroll"} spacing={3}>
                     {params.map((elem, indx) => {
@@ -1638,7 +1663,19 @@ export default function WithSubnavigation() {
                       uploadModal.onOpen();
                     }}
                   >
-                    Open
+                    Upload JSON
+                  </Button>
+                  <Button
+                    textColor="gray.600"
+                    bgColor="white"
+                    borderWidth={2}
+                    colorScheme="gray"
+                    alignSelf="center"
+                    onClick={() => {
+                      uploadCSVModal.onOpen();
+                    }}
+                  >
+                    Upload CSV
                   </Button>
                   <Button
                     textColor="gray.600"
@@ -1925,7 +1962,18 @@ export default function WithSubnavigation() {
                   uploadModal.onOpen();
                 }}
               >
-                Open
+                Upload JSON
+              </Button>
+              <Button
+                textColor="gray.600"
+                backgroundColor="white"
+                borderWidth={2}
+                alignSelf="center"
+                onClick={() => {
+                  uploadCSVModal.onOpen();
+                }}
+              >
+                Upload CSV
               </Button>
               <Button
                 textColor="gray.600"
