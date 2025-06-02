@@ -46,7 +46,6 @@ import {
 } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import Head from "next/head";
-import Script from "next/script";
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import dynamic from "next/dynamic";
@@ -641,19 +640,6 @@ export default function WithSubnavigation() {
           type="image/svg+xml"
         />
       </Head>
-      {/* Google Tag Manager */}
-      <Script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-X2YFMWEBG7"
-      />
-      <Script id="google-analytics">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-X2YFMWEBG7');
-        `}
-      </Script>
       <Flex flex="1" flexDirection="column">
         <EditModal
           disclosure={editModal}

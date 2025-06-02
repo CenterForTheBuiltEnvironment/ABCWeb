@@ -72,6 +72,7 @@ export default function App({ Component, pageProps }) {
       <Script
         async
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+        strategy="afterInteractive"
       />
       <Script id="google-analytics">
         {`
