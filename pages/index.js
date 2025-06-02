@@ -639,6 +639,16 @@ export default function WithSubnavigation() {
           href="/img/ABC model logo/svg/ABC logo_square_blue.svg"
           type="image/svg+xml"
         />
+        {/* Google Tag Manager */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-X2YFMWEBG7"></script>
+        <script>
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-X2YFMWEBG7');
+          `}
+        </script>
       </Head>
       <Flex flex="1" flexDirection="column">
         <EditModal
