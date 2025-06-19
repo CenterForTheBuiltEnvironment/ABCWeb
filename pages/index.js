@@ -391,8 +391,8 @@ export default function WithSubnavigation() {
       for (let i = 0; i < params.length; i++) {
         totDurationMain += params[i].exposure_duration;
       }
-      for (let i = 0; i < compResults.length; i++) {
-        totDurationComparing += compResults[i].exposure_duration;
+      for (let i = 0; i < comparedResults.length; i++) {
+        totDurationComparing += comparedResults[i].exposure_duration;
       }
       if (totDurationMain != totDurationComparing) {
         toast.closeAll();
