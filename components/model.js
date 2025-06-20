@@ -39,7 +39,7 @@ function Model({ colors }) {
       })}
     {/* [Aki - Temporal] Append colors[0] (face in segment data) to 
     Basemesh_3,4,5 (face in node) as the number of node's array is weird.
-    
+
     It seems that the number of manikin's segments is 18 not 16 because the Head segment
     subdevides into (1) Face, (2) Back of the head, and (3) Neck.
     This makes the code unreasonable but need more time to fix the issues including the manikin data (humanbody.gltf) and index.js.
@@ -93,11 +93,11 @@ export default function Canvass({ currentColorArray }) {
         }}
         shadows
       >
-        <ambientLight color="white" intensity={1} />
-        <directionalLight color="white" intensity={3} position={[0, 1, 0]} />
-        <directionalLight color="white" intensity={3} position={[0, 0, 1]} />
-        <directionalLight color="white" intensity={3} position={[1, 0, 0]} />
-        <directionalLight color="white" intensity={3} position={[0, 0, -1]} />
+        <ambientLight color="gray" intensity={1} />
+        <directionalLight color="lightGrey" intensity={3} position={[0, 1, 0]} />
+        <directionalLight color="lightGrey" intensity={3} position={[0, 0, 1]} />
+        <directionalLight color="lightGrey" intensity={3} position={[1, 0, 0]} />
+        <directionalLight color="lightGrey" intensity={3} position={[0, 0, -1]} />
         <Suspense fallback={null}>
           <Stage intensity={1} shadows adjustCamera>
             <Model colors={currentColorArray} />
