@@ -296,48 +296,55 @@ export default function WithSubnavigation() {
   };
 
   function EditableControls({ isHome = false }) {
-    const { isEditing, getSubmitButtonProps, getEditButtonProps } =
-      useEditableControls();
+  const { isEditing, getSubmitButtonProps, getEditButtonProps } =
+    useEditableControls();
 
-    return isEditing ? (
+  return isEditing ? (
+    <Tooltip label="Submit changes" fontSize="md">
       <IconButton
-        backgroundColor={"cbe.lightBlue"}
-        textColor={"white"}
-        colorScheme="blue"
+        backgroundColor={"gray.200"}
+        textColor={"gray.600"}
+        colorScheme="gray"
         icon={<CheckIcon />}
         {...getSubmitButtonProps()}
       />
-    ) : (
-      <>
-        {isHome ? (
-          <HStack justifyContent={"center"} spacing={2}>
+    </Tooltip>
+  ) : (
+    <>
+      {isHome ? (
+        <HStack justifyContent={"center"} spacing={2}>
+          <Tooltip label="Edit name" fontSize="md">
             <IconButton
-              backgroundColor={"cbe.lightBlue"}
-              textColor={"white"}
-              colorScheme="blue"
+              backgroundColor={"gray.200"}
+              textColor={"gray.600"}
+              colorScheme="gray"
               icon={<EditIcon />}
               {...getEditButtonProps()}
             />
+          </Tooltip>
+          <Tooltip label="Close" fontSize="md">
             <CloseButton
               params={params}
               ind={ind}
               setParams={setParams}
               setIndex={setIndex}
-              //setRamp={setRamp}
             />
-          </HStack>
-        ) : (
+          </Tooltip>
+        </HStack>
+      ) : (
+        <Tooltip label="Edit name" fontSize="md">
           <IconButton
-            backgroundColor={"cbe.lightBlue"}
-            textColor={"white"}
-            colorScheme="blue"
+            backgroundColor={"gray.200"}
+            textColor={"gray.600"}
+            colorScheme="gray"
             icon={<EditIcon />}
             {...getEditButtonProps()}
           />
-        )}
-      </>
-    );
-  }
+        </Tooltip>
+      )}
+    </>
+  );
+}
 
   const toast = useToast();
 
@@ -633,7 +640,7 @@ export default function WithSubnavigation() {
   return (
     <Box minH="100vh" display="flex" flexDirection="column">
       <Head>
-        <title>Advanced Berkeley Comfort (ABC) model</title>
+        <title>ABC Web</title>
         <link
           rel="icon"
           href="/img/ABC model logo/svg/ABC logo_square_blue.svg"
@@ -701,7 +708,7 @@ export default function WithSubnavigation() {
         <Flex
           bg={useColorModeValue("cbe.grey", "gray.800")}
           minH={"60px"}
-          py={{ base: 2 }}
+          py={{ base: 3 }}
           px={{ base: 4 }}
           borderBottom={1}
           borderStyle={"solid"}
@@ -740,12 +747,12 @@ export default function WithSubnavigation() {
                 alt="ABC Logo"
               />
             </a> */}
-            <Box ml={5}>
+            <Box ml={3}>
               <Text
                 textAlign={useBreakpointValue({ base: "center", md: "left" })}
                 fontFamily="Arial"
                 fontWeight="bold"
-                fontSize={35}
+                fontSize={32}
                 textColor="cbe.blue"
               >
                 <span style={{ color: "cbe.blue" }}>
@@ -813,10 +820,13 @@ export default function WithSubnavigation() {
                           key={indx}
                           minW="110px"
                           backgroundColor={
-                            ind == indx ? "#1b75bc" : "cbe.lightBlue"
+                            ind == indx ? "cbe.blue" : "cbe.grey"
                           }
-                          textColor="white"
-                          colorScheme="blue"
+                          textColor={
+                            ind == indx ? "white" : "gray.600"
+                          }
+                          colorScheme="lightblue"
+                          borderWidth={1}
                           onClick={() => {
                             if (ind == indx) return false;
                             else setIndex(indx);
@@ -830,7 +840,8 @@ export default function WithSubnavigation() {
                       );
                     })}
                   </HStack>
-                  <IconButton
+                  <Tooltip label="Add new phase" fontSize="md">
+                    <IconButton
                     w="5%"
                     colorScheme="red"
                     backgroundColor={"red.300"}
@@ -845,6 +856,7 @@ export default function WithSubnavigation() {
                       setIndex(ind + 1);
                     }}
                   ></IconButton>
+                  </Tooltip>
                 </HStack>
                 <VStack
                   w="100%"
@@ -881,20 +893,22 @@ export default function WithSubnavigation() {
                           mr="10px"
                         />
                         <EditableControls />
-                        <IconButton
-                          w="5%"
-                          colorScheme="red"
-                          backgroundColor={"red.300"}
-                          icon={<CloseIcon />}
-                          isDisabled={params.length == 1}
-                          onClick={() => {
-                            let tempParams = [...params];
-                            tempParams.splice(ind, 1);
-                            setParams(tempParams);
-                            setIndex(Math.max(0, ind - 1));
-                          }}
-                          ml="10px"
-                        ></IconButton>
+                          <Tooltip label="Delete this phase" fontSize="md">
+                            <IconButton
+                              w="5%"
+                              colorScheme="red"
+                              backgroundColor={"red.300"}
+                              icon={<CloseIcon />}
+                              isDisabled={params.length == 1}
+                              onClick={() => {
+                                let tempParams = [...params];
+                                tempParams.splice(ind, 1);
+                                setParams(tempParams);
+                                setIndex(Math.max(0, ind - 1));
+                              }}
+                              ml="10px"
+                            />
+                          </Tooltip>
                       </Editable>
                     </Flex>
                     {/* Input parameters */}
@@ -1193,7 +1207,7 @@ export default function WithSubnavigation() {
                               colorsArr.push(bodyPartsArr);
                             }
                             setBodyColors(colorsArr);
-                            setCurrentColorArray(Array(18).fill("white"));
+                            setCurrentColorArray(Array(18).fill("cbe.gray"));
 
                             loadingModal.onClose();
                           }}
@@ -1384,10 +1398,10 @@ export default function WithSubnavigation() {
                           key={indx}
                           minW="110px"
                           backgroundColor={
-                            ind == indx ? "cbe.lue" : "cbe.lightBlue"
+                            ind == indx ? "cbe.blue" : "cbe.lightBlue"
                           }
                           textColor="white"
-                          colorScheme="blue"
+                          colorScheme="gray"
                           onClick={() => {
                             if (ind == indx) return false;
                             else setIndex(indx);
