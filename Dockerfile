@@ -14,6 +14,8 @@ COPY . .
 
 RUN pip3 install pandas
 
+RUN python3 -V
+
 RUN npm run build
 
 ENV PORT=8080
