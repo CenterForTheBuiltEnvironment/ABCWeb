@@ -2,7 +2,8 @@ FROM node:18-bullseye
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip && \
-    apt-get clean
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    pip3 install --upgrade pip
 
 WORKDIR /app
 
@@ -15,6 +16,7 @@ RUN pip3 install pandas
 
 RUN npm run build
 
-EXPOSE 3000
+ENV PORT=8080
+EXPOSE 8080
 
 CMD ["npm", "start"]
