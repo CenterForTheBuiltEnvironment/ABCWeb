@@ -14,6 +14,11 @@ import {
   miniMax,
 } from "@/constants/helperFunctions";
 
+const globalTextStyle = {
+  fontFamily: "Arial",
+  color: "gray.700",
+};
+
 export function comfBuilder(data) {
   // Schema data:
   // {
@@ -22,9 +27,7 @@ export function comfBuilder(data) {
   //   data: array
   // }
   const options = {
-    textStyle: {
-      fontFamily: "Arial",
-    },
+    textStyle: globalTextStyle,
     title: {
       text: "Comfort vs. Time",
       left: "5%",
@@ -134,9 +137,7 @@ export function comfBuilder(data) {
 }
 export function sensBuilder(data) {
   const options = {
-    textStyle: {
-      fontFamily: "Arial",
-    },
+    textStyle: globalTextStyle,
     title: {
       text: "Sensation vs. Time",
       left: "5%",
@@ -247,9 +248,7 @@ export function sensBuilder(data) {
 
 export function tskinBuilder(data) {
   const options = {
-    textStyle: {
-      fontFamily: "Arial",
-    },
+    textStyle: globalTextStyle,
     title: {
       text: "Skin Temperature vs. Time",
       left: "5%",
@@ -359,9 +358,7 @@ export function tskinBuilder(data) {
 
 export function tcoreBuilder(data) {
   const options = {
-    textStyle: {
-      fontFamily: "Arial",
-    },
+    textStyle: globalTextStyle,
     title: {
       text: "Core Temperature vs. Time",
       left: "5%",
@@ -471,9 +468,7 @@ export function tcoreBuilder(data) {
 
 export function hfluxBuilder(data) {
   const options = {
-    textStyle: {
-      fontFamily: "Arial",
-    },
+    textStyle: globalTextStyle,
     title: {
       text: "Heat Flux Variables vs. Time",
       left: "5%",
@@ -545,9 +540,7 @@ export function hfluxBuilder(data) {
 
 export function environmentBuilder(data) {
   const options = {
-    textStyle: {
-      fontFamily: "Arial",
-    },
+    textStyle: globalTextStyle,
     title: {
       text: "Environment Variables vs. Time",
       left: "5%",
@@ -581,32 +574,19 @@ export function environmentBuilder(data) {
       axisPointer: {
         type: "shadow",
       },
-      data: data.data.map((e) => {
-        return e.index + 1;
-      }),
+      data: data.data.map((e) => e.index + 1),
     },
     yAxis: [
       {
         type: "value",
-        name: "Value",
+        name: "Value - ta, mrt, solar, eht",
         nameLocation: "center",
         nameTextStyle: { padding: 10 },
       },
       {
         type: "value",
         name: "Value - rh and v",
-        nameTextStyle: {
-          padding: 10,
-          color: "red",
-          fontWeight: "600",
-        },
         nameLocation: "center",
-        axisLabel: {
-          textStyle: {
-            color: "red",
-            fontWeight: "600",
-          },
-        },
         min: 0,
         max: data.metric ? 2 : 5,
       },
