@@ -33,6 +33,13 @@ export const newTheme = extendTheme({
     heading: `'Arial', sans-serif`,
     body: `'Arial', sans-serif`,
   },
+  styles: {
+    global: {
+      body: {
+        color: "gray.700",
+      },
+    },
+  },
   components: {
     Checkbox: {
       baseStyle: {
