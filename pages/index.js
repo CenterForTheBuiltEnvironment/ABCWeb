@@ -810,7 +810,7 @@ export default function WithSubnavigation() {
           transition={{ enter: { duration: 0.5 } }}
         >
           {!comfortView ? (
-            <HStack margin="20px" h="100%" alignItems="flex-start" spacing={5}>
+            <HStack margin="20px" h="100%" alignItems="flex-start" spacing={7} padding={1}>
               <VStack w="30%" h="100%">
                 <HStack w="100%" padding={2} alignItems="flex-start">
                   <HStack w="90%" overflowY={"scroll"} spacing={3}>
@@ -825,7 +825,7 @@ export default function WithSubnavigation() {
                           textColor={
                             ind == indx ? "white" : "gray.600"
                           }
-                          colorScheme="lightblue"
+                          colorScheme="gray"
                           borderWidth={1}
                           onClick={() => {
                             if (ind == indx) return false;
@@ -865,7 +865,7 @@ export default function WithSubnavigation() {
                   background={"cbe.grey"}
                   borderRadius="10px"
                   padding={5}
-                  spacing={1}
+                  spacing={3}
                   alignItems="flex-start"
                 >
                   <>
@@ -914,7 +914,7 @@ export default function WithSubnavigation() {
                     {/* Input parameters */}
                     <HStack w="100%" alignItems="flex-start">
                       {/* Left side */}
-                      <VStack w="45%" alignItems="flex-start">
+                      <VStack w="45%" alignItems="flex-start" spacing={2}>
                         {listOfParameters(isMetric).map((option) => {
                           return (
                             <div key={option.title}>
@@ -945,6 +945,7 @@ export default function WithSubnavigation() {
                         w="55%"
                         alignItems="flex-start"
                         justifyContent={"center"}
+                        spacing={2}
                       >
                         <MetSelector
                           params={params}
@@ -981,7 +982,8 @@ export default function WithSubnavigation() {
                             Personal comfort
                           </MenuButton>
                           <MenuList>
-                            {pcsParams.map((e, index) => {
+                            <MenuOptionGroup title="Select all that apply.">
+                              {pcsParams.map((e, index) => {
                               if (params) {
                                 return (
                                   <MenuItem
@@ -1028,6 +1030,7 @@ export default function WithSubnavigation() {
                                 );
                               } else return <></>;
                             })}
+                            </MenuOptionGroup>
                           </MenuList>
                         </Menu>
                         <Menu placement="top">
