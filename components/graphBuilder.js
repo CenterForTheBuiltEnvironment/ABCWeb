@@ -148,10 +148,10 @@ function baseBuilder({
 
   return {
     textStyle: globalTextStyle,
-    title: { text: title, left: "5%", top: "5%" },
+    title: { text: title, left: "5%", top: "2%"},
     tooltip: { trigger: "axis", formatter: tooltipFormatter },
     legend: { data: legends },
-    grid: { left: "20%", right: "10%", bottom: "15%", containLabel: false},
+    grid: { left: "20%", right: "10%", bottom: "15%", top: "20%", containLabel: false},
     toolbox: {
       right: 5,
       feature: { saveAsImage: {}, restore: {} },
@@ -186,9 +186,9 @@ function baseBuilder({
     },
     yAxis: {
       type: "value",
-      name: "Value",
+      name: yAxisCfg.name || "", // y-axis name, if not selected it returns empty
       nameLocation: "center",
-      nameTextStyle: { padding: 15, fontSize: globalTextStyle.fontSize },
+      nameTextStyle: { padding: 20, fontSize: globalTextStyle.fontSize },
       min: yAxisCfg.min,
       max: yAxisCfg.max,
             axisLine: {
@@ -251,11 +251,13 @@ export function sensBuilder(data) {
 export function tskinBuilder(data) {
   const min = data.metric ? 20 : 68;
   const max = data.metric ? 38 : 101;
+  const unit = data.metric ? "°C" : "°F";
   return baseBuilder({
     rawData: data.data,
     legends: data.legends,
     title: "Skin Temperature vs. Time",
     yAxisCfg: {
+      name: `Skin Temperature (${unit})`,
       min: min,
       max: max,
       formatter: (v) => v,
@@ -266,18 +268,20 @@ export function tskinBuilder(data) {
       (v) => (data.metric ? colorTskin(v) : colorTskinNotMetric(v)),
     ],
     offset: data.offset || 0,
-    unit: data.metric ? " °C" : " °F",
+    unit: unit,
   });
 }
 
 export function tcoreBuilder(data) {
   const min = data.metric ? 25 : 77;
   const max = data.metric ? 40 : 104;
+  const unit = data.metric ? "°C" : "°F";
   return baseBuilder({
     rawData: data.data,
     legends: data.legends,
     title: "Core Temperature vs. Time",
     yAxisCfg: {
+      name: `Core Temperature (${unit})`,
       min: min,
       max: max,
       formatter: (v) => v,
@@ -288,7 +292,7 @@ export function tcoreBuilder(data) {
       (v) => (data.metric ? colorTcore(v) : colorTcoreNotMetric(v)),
     ],
     offset: data.offset || 0,
-    unit: data.metric ? " °C" : " °F",
+    unit: unit,
   });
 }
 
@@ -297,12 +301,14 @@ export function hfluxBuilder(data) {
   const colorFns  = constantColorFns(data.legends,      // series-wise fixed colours
                                      colorHflux);
   const values    = rawData.flat().map(d => d.y);
+  const unit = "W";
 
   return baseBuilder({
     rawData,
     legends: data.legends,
     title: "Heat-Flux Variables vs. Time",
     yAxisCfg: {
+      name: `Heat Flux (${unit})`,
       min: Math.min(...values).toFixed(0),
       max: Math.max(...values).toFixed(0),
       formatter: v => v.toFixed(0),
@@ -311,7 +317,7 @@ export function hfluxBuilder(data) {
     colorFnArr: colorFns,
     offset: data.offset || 0,
     showAllTooltipSeries: true, // this is for heat flux / environment
-    unit: "W", // unit for heat flux
+    unit: unit,
     precision: 0, // no decimals for heat flux values
   });
 }
@@ -338,6 +344,7 @@ export function environmentBuilder(data) {
     legends,
     title: "Environment Variables vs. Time",
     yAxisCfg: {
+      name: "ta, mrt, eht (°C) / solar (W)",
       min: minLeft,
       max: maxLeft,
       formatter: (v) => v,
@@ -355,7 +362,7 @@ export function environmentBuilder(data) {
     option.yAxis, // left
     {
       type: "value",
-      name: "RH / Velocity",
+      name: "RH (-) / Velocity (m/s)",
       nameLocation: "center",
       nameTextStyle: { padding: 15, fontSize: globalTextStyle.fontSize },
       min: 0,
