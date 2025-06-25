@@ -1236,8 +1236,8 @@ export default function WithSubnavigation() {
                       <HStack w="100%">
                         {/* Timeseries results */}
                         <VStack w="75%" alignItems="flex-start">
-                          <Box width="100%">
-                            <HStack w="100%" h="45vh">
+                          <Box width="95%">
+                            <HStack w="100%" h="45vh" spacing="0px">
                               <VStack w="98.5%" h="100%">
                                 {/* Graph */}
                                 <ReactECharts
@@ -1246,13 +1246,13 @@ export default function WithSubnavigation() {
                                   onEvents={onEvents}
                                   style={{ height: "100%", width: "100%" }}
                                 />
-                                <Box w="100%">
+                                <Box w="100%" >
                                   {/* Slider */}
                                   <RangeSlider
                                     left="20%"
                                     right="5%"
-                                    top="5%"
-                                    w="70%"
+                                    top="0%"
+                                    w="75%"
                                     value={sliderVal}
                                     min={1}
                                     max={sliderMaxVal}
@@ -1284,7 +1284,7 @@ export default function WithSubnavigation() {
                                       );
                                     }}
                                   >
-                                    <RangeSliderTrack height="10px" bg="gray.200">
+                                    <RangeSliderTrack height="10px" bg="gray.300">
                                       <RangeSliderFilledTrack bg="gray.500" />
                                     </RangeSliderTrack>
                                     <Tooltip
@@ -1308,7 +1308,7 @@ export default function WithSubnavigation() {
                                       />
                                     </Tooltip>
                                   </RangeSlider>
-                                  <Text align="center" marginLeft={"10%"} fontSize="sm" color="gray.600">
+                                  <Text align="center" marginLeft={"15%"} fontSize="sm" color="gray.600">
                                     Drag ends of slider to adjust. Min is <b>{sliderVal[0]}</b> min from start,
                                     max is <b>{sliderVal[1]}</b> min from start.
                                   </Text>
@@ -1317,8 +1317,8 @@ export default function WithSubnavigation() {
                               {/* Color bar */}
                               <Box
                                 w="1.5%"
-                                h="28vh"
-                                style={{ opacity: 0.8, marginTop: "-4%" }}
+                                h="26vh"
+                                style={{ opacity: 0.7, marginTop: "-4%"}}
                               >
                                 {determineColorFunction(currentChoiceToGraph)}
                               </Box>

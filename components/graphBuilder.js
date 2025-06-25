@@ -151,7 +151,7 @@ function baseBuilder({
     title: { text: title, left: "5%", top: "2%"},
     tooltip: { trigger: "axis", formatter: tooltipFormatter },
     legend: { data: legends },
-    grid: { left: "20%", right: "10%", bottom: "15%", top: "20%", containLabel: false},
+    grid: { left: "20%", right: "5%", bottom: "15%", top: "20%", containLabel: false},
     toolbox: {
       right: 5,
       feature: { saveAsImage: {}, restore: {} },
