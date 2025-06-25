@@ -1,646 +1,6 @@
-// import {
-//   colorComfort,
-//   colorEnv,
-//   colorHflux,
-//   colorSensation,
-//   colorTcore,
-//   colorTcoreNotMetric,
-//   colorTskin,
-//   colorTskinNotMetric,
-//   environmentMinimax,
-//   formatComfDescriptor,
-//   formatSensDescriptor,
-//   hfluxMinimax,
-//   miniMax,
-// } from "@/constants/helperFunctions";
-
-// const globalTextStyle = {
-//   fontFamily: "Arial",
-//   color: "gray.700",
-// };
-
-// export function calculateInterval(len) {
-//   if (len <= 20) return 1;     // ≤ 20 min: every 1 min
-//   if (len <= 60) return 5;      // ≤ 1 hour: every 5 min
-//   if (len <= 120) return 10;    // ≤ 2 hours: every 10 min
-//   if (len <= 240) return 15;    // ≤ 4 hours: every 15 min
-//   if (len <= 360) return 30;    // ≤ 6 hours: every 30 min
-//   return 60;                    // > 6 hours: every 60 min
-// }
-
-// export function shouldShowLabel(index, value, dataLen) {
-//   const step = calculateInterval(dataLen);   // 1, 5, 20 ...
-//   if (index === 0 || index === dataLen - 1) return true; // First and last points always shown
-//   return value % step === 0; // Show label if value is a multiple of step
-// }
-
-// export function comfBuilder(data) {
-//   const dataLength = data.data[0].length;
-//   const interval = calculateInterval(dataLength);
-
-//   const tooltipFormatter = (params) => {
-//     let time, comfort;
-
-//     // Safely handle value as [x, y] array or fallback
-    
-//     if (Array.isArray(params[0].data.value)) {
-//       [time, comfort] = params[0].data.value;
-//     } else {
-//       time = params[0].dataIndex + 1 + data.offset;
-//       comfort = params[0].data.value;
-//     }
-
-//     return `<span id="inlineColor">${time + data.offset}</span> min from start<br />
-//             ${params[0].seriesName}: <span id="inlineColor">${comfort.toFixed(3)}</span>`;
-//   };
-
-//   const buildSeries = (items, legendIdx) => ({
-//     name: data.legends[legendIdx],
-//     type: "line",
-//     showSymbol: true,           // Hide markers by default
-//     emphasis: { showSymbol: true }, // Show on hover
-//     data: items.map((item) => ({
-//       value: [item.index + 1, item.comfort],
-//       itemStyle: {
-//         normal: {
-//           color: colorComfort(item.comfort, legendIdx === 1),
-//         },
-//       },
-//     })),
-//   });
-
-//   const options = {
-//     textStyle: globalTextStyle,
-//     title: {
-//       text: "Comfort vs. Time",
-//       left: "5%",
-//       top: "5%",
-//     },
-//     tooltip: {
-//       trigger: "axis",
-//       formatter: tooltipFormatter,
-//     },
-//     legend: {
-//       data: data.legends,
-//     },
-//     grid: {
-//       left: "5%",
-//       right: "5%",
-//       bottom: "5%",
-//       containLabel: true,
-//     },
-//     toolbox: {
-//       right: 5,
-//       feature: {
-//         saveAsImage: {},
-//         restore: {},
-//       },
-//     },
-//     xAxis: {
-//       type: "value",
-//       min: 0,
-//       max: dataLength,
-//       interval: interval,
-//       name: "Minutes since start",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 10 },
-//       axisPointer: { type: "shadow" },
-//       axisLabel: {
-//         formatter: (v) => `${v}`,
-//         showMinLabel: true,
-//         showMaxLabel: true,
-//       },
-//     },
-//     yAxis: {
-//       type: "value",
-//       name: "Value",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 30 },
-//       min: -4,
-//       max: 4,
-//       axisLabel: {
-//         formatter: (v) => `${v}: ${formatComfDescriptor(v)}`,
-//       },
-//     },
-//     dataZoom: [
-//       {
-//         type: "inside",
-//       },
-//     ],
-//     series: [
-//       buildSeries(data.data[0], 0),
-//       ...(data.data.length > 1 ? [buildSeries(data.data[1], 1)] : []),
-//     ],
-//   };
-
-//   return options;
-// }
-
-// export function sensBuilder(data) {
-//   const options = {
-//     textStyle: globalTextStyle,
-//     title: {
-//       text: "Sensation vs. Time",
-//       left: "5%",
-//       top: "5%",
-//     },
-//     tooltip: {
-//       trigger: "axis",
-//       formatter: function (params) {
-//         return `<span id="inlineColor">${
-//           params[0].dataIndex + 1 + data.offset
-//         }</span> min from start<br />${
-//           params[0].seriesName
-//         }: <span id="inlineColor">${params[0].data.value.toFixed(
-//           3
-//         )}</span><br />${
-//           data.data.length > 1 && params.length > 1
-//             ? `${
-//                 params[0].seriesName
-//               }-compared: <span id="inlineColor">${params[1].data.value.toFixed(
-//                 3
-//               )}</span>`
-//             : ""
-//         }`;
-//       },
-//     },
-//     legend: {
-//       data: data.legends,
-//     },
-//     grid: {
-//       left: "5%",
-//       right: "5%",
-//       bottom: "5%",
-//       containLabel: true,
-//     },
-//     toolbox: {
-//       right: 5,
-//       feature: {
-//         saveAsImage: {},
-//         restore: {},
-//       },
-//     },
-//     xAxis: {
-//       name: "Minutes since start",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 10 },
-//       axisPointer: {
-//         type: "shadow",
-//       },
-//       data: data.data[0].map((e) => {
-//         return e.index + 1;
-//       }),
-//     },
-//     yAxis: {
-//       type: "value",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 10 },
-//       min: -4,
-//       max: 4,
-//       axisLabel: {
-//         formatter: function (val) {
-//           return val + ": " + formatSensDescriptor(val);
-//         },
-//       },
-//       splitNumber: 10,
-//     },
-//     dataZoom: [
-//       {
-//         type: "inside",
-//       },
-//     ],
-//     series: [
-//       {
-//         name: data.legends[0],
-//         type: "line",
-//         data: data.data[0].map(function (item) {
-//           return {
-//             value: item.sensation,
-//             itemStyle: {
-//               normal: {
-//                 color: colorSensation(item.sensation, false),
-//               },
-//             },
-//           };
-//         }),
-//       },
-//     ],
-//   };
-
-//   if (data.data.length > 1) {
-//     options.series.push({
-//       name: data.legends[1],
-//       type: "line",
-//       data: data.data[1].map(function (item) {
-//         return {
-//           value: item.sensation,
-//           itemStyle: {
-//             normal: {
-//               color: colorSensation(item.sensation, true),
-//             },
-//           },
-//         };
-//       }),
-//     });
-//   }
-
-//   return options;
-// }
-
-// export function tskinBuilder(data) {
-//   const options = {
-//     textStyle: globalTextStyle,
-//     title: {
-//       text: "Skin Temperature vs. Time",
-//       left: "5%",
-//       top: "5%",
-//     },
-//     tooltip: {
-//       trigger: "axis",
-//       formatter: function (params) {
-//         return `<span id="inlineColor">${
-//           params[0].dataIndex + 1 + data.offset
-//         }</span> min from start<br />${
-//           params[0].seriesName
-//         }: <span id="inlineColor">${params[0].data.value.toFixed(3)} ${
-//           data.metric ? "C" : "F"
-//         }</span><br />${
-//           data.data.length > 1 && params.length > 1
-//             ? `${
-//                 params[0].seriesName
-//               }-compared: <span id="inlineColor">${params[1].data.value.toFixed(
-//                 3
-//               )} ${data.metric ? "C" : "F"}</span>`
-//             : ""
-//         }`;
-//       },
-//     },
-//     legend: {
-//       data: data.legends,
-//     },
-//     grid: {
-//       left: "5%",
-//       right: "5%",
-//       bottom: "5%",
-//       containLabel: true,
-//     },
-//     toolbox: {
-//       right: 5,
-//       feature: {
-//         saveAsImage: {},
-//         restore: {},
-//       },
-//     },
-//     xAxis: {
-//       name: "Minutes since start",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 10 },
-//       axisPointer: {
-//         type: "shadow",
-//       },
-//       data: data.data[0].map((e) => {
-//         return e.index + 1;
-//       }),
-//     },
-//     yAxis: {
-//       type: "value",
-//       name: "Value",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 10 },
-//       min: data.metric ? 20 : 68,
-//       max: data.metric ? 38 : 101,
-//     },
-//     dataZoom: [
-//       {
-//         type: "inside",
-//       },
-//     ],
-//     series: [
-//       {
-//         name: data.legends[0],
-//         type: "line",
-//         data: data.data[0].map(function (item) {
-//           return {
-//             value: item.tskin,
-//             itemStyle: {
-//               normal: {
-//                 color: data.metric
-//                   ? colorTskin(item.tskin)
-//                   : colorTskinNotMetric(item.tskin),
-//               },
-//             },
-//           };
-//         }),
-//       },
-//     ],
-//   };
-
-//   if (data.data.length > 1) {
-//     options.series.push({
-//       name: data.legends[1],
-//       type: "line",
-//       data: data.data[1].map(function (item) {
-//         return {
-//           value: item.tskin,
-//           itemStyle: {
-//             normal: {
-//               color: data.metric
-//                 ? colorTskin(item.tskin)
-//                 : colorTskinNotMetric(item.tskin),
-//             },
-//           },
-//         };
-//       }),
-//     });
-//   }
-
-//   return options;
-// }
-
-// export function tcoreBuilder(data) {
-//   const options = {
-//     textStyle: globalTextStyle,
-//     title: {
-//       text: "Core Temperature vs. Time",
-//       left: "5%",
-//       top: "5%",
-//     },
-//     tooltip: {
-//       trigger: "axis",
-//       formatter: function (params) {
-//         return `<span id="inlineColor">${
-//           params[0].dataIndex + 1 + data.offset
-//         }</span> min from start<br />${
-//           params[0].seriesName
-//         }: <span id="inlineColor">${params[0].data.value.toFixed(3)} ${
-//           data.metric ? "C" : "F"
-//         }</span><br />${
-//           data.data.length > 1 && params.length > 1
-//             ? `${
-//                 params[0].seriesName
-//               }-compared: <span id="inlineColor">${params[1].data.value.toFixed(
-//                 3
-//               )} ${data.metric ? "C" : "F"}</span>`
-//             : ""
-//         }`;
-//       },
-//     },
-//     legend: {
-//       data: data.legends,
-//     },
-//     grid: {
-//       left: "5%",
-//       right: "5%",
-//       bottom: "5%",
-//       containLabel: true,
-//     },
-//     toolbox: {
-//       right: 5,
-//       feature: {
-//         saveAsImage: {},
-//         restore: {},
-//       },
-//     },
-//     xAxis: {
-//       name: "Minutes since start",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 10 },
-//       axisPointer: {
-//         type: "shadow",
-//       },
-//       data: data.data[0].map((e) => {
-//         return e.index + 1;
-//       }),
-//     },
-//     yAxis: {
-//       type: "value",
-//       name: "Value",
-//       nameLocation: "center",
-//       nameTextStyle: { padding: 10 },
-//       min: data.metric ? 25 : 77,
-//       max: data.metric ? 40 : 104,
-//     },
-//     dataZoom: [
-//       {
-//         type: "inside",
-//       },
-//     ],
-//     series: [
-//       {
-//         name: data.legends[0],
-//         type: "line",
-//         data: data.data[0].map(function (item) {
-//           return {
-//             value: item.tcore,
-//             itemStyle: {
-//               normal: {
-//                 color: data.metric
-//                   ? colorTcore(item.tcore)
-//                   : colorTcoreNotMetric(item.tcore),
-//               },
-//             },
-//           };
-//         }),
-//       },
-//     ],
-//   };
-
-//   if (data.data.length > 1) {
-//     options.series.push({
-//       name: data.legends[1],
-//       type: "line",
-//       data: data.data[1].map(function (item) {
-//         return {
-//           value: item.tcore,
-//           itemStyle: {
-//             normal: {
-//               color: data.metric
-//                 ? colorTcore(item.tcore)
-//                 : colorTcoreNotMetric(item.tcore),
-//             },
-//           },
-//         };
-//       }),
-//     });
-//   }
-
-//   return options;
-// }
-
-export function hfluxBuilder(data) {
-  const options = {
-    textStyle: globalTextStyle,
-    title: {
-      text: "Heat Flux Variables vs. Time",
-      left: "5%",
-      top: "5%",
-    },
-    tooltip: {
-      trigger: "axis",
-      valueFormatter: (value) => value.toFixed(5),
-    },
-    legend: {
-      selectedMode: true,
-      data: data.legends,
-    },
-    grid: {
-      left: 80,
-      right: 30,
-      top: 60,
-      bottom: 60,
-      width: 600,     // 👈 プロットエリアの幅を固定（px指定）
-      height: 300,    // 👈 プロットエリアの高さを固定（px指定）
-      containLabel: true,
-    },
-    toolbox: {
-      right: 5,
-      feature: {
-        saveAsImage: {},
-        restore: {},
-      },
-    },
-    xAxis: {
-      name: "Minutes since start",
-      nameLocation: "center",
-      nameTextStyle: { padding: 10 },
-      axisPointer: {
-        type: "shadow",
-      },
-      data: data.data.map((e) => {
-        return e.index + 1;
-      }),
-    },
-    yAxis: {
-      type: "value",
-      name: "Value",
-      nameLocation: "center",
-      nameTextStyle: { padding: 10 },
-    },
-    dataZoom: [
-      {
-        type: "inside",
-      },
-    ],
-    series: data.legends.map((elem, idx) => {
-      return {
-        name: elem,
-        type: "line",
-        data: data.data.map(function (item) {
-          return {
-            value: item[elem],
-            itemStyle: {
-              normal: {
-                color: colorHflux(elem),
-              },
-            },
-          };
-        }),
-      };
-    }),
-  };
-
-  return options;
-}
-
-export function environmentBuilder(data) {
-  const options = {
-    textStyle: globalTextStyle,
-    title: {
-      text: "Environment Variables vs. Time",
-      left: "5%",
-      top: "5%",
-    },
-    tooltip: {
-      trigger: "axis",
-      valueFormatter: (value) => value.toFixed(5),
-    },
-    legend: {
-      selectedMode: true,
-      data: data.legends,
-    },
-    grid: {
-      left: "5%",
-      right: "5%",
-      bottom: "5%",
-      containLabel: true,
-    },
-    toolbox: {
-      right: 5,
-      feature: {
-        saveAsImage: {},
-        restore: {},
-      },
-    },
-    xAxis: {
-      name: "Minutes since start",
-      nameLocation: "center",
-      nameTextStyle: { padding: 10 },
-      axisPointer: {
-        type: "shadow",
-      },
-      data: data.data.map((e) => e.index + 1),
-    },
-    yAxis: [
-      {
-        type: "value",
-        name: "Value - ta, mrt, solar, eht",
-        nameLocation: "center",
-        nameTextStyle: { padding: 10 },
-      },
-      {
-        type: "value",
-        name: "Value - rh and v",
-        nameLocation: "center",
-        min: 0,
-        max: data.metric ? 2 : 5,
-      },
-    ],
-    dataZoom: [
-      {
-        type: "inside",
-      },
-    ],
-    series: data.legends.map((elem, idx) => {
-      if (elem == "rh" || elem == "v") {
-        return {
-          name: elem,
-          type: "line",
-          yAxisIndex: 1,
-          data: data.data.map(function (item) {
-            return {
-              value: item[elem],
-              itemStyle: {
-                normal: {
-                  color: colorEnv(elem),
-                },
-              },
-            };
-          }),
-        };
-      } else {
-        return {
-          name: elem,
-          type: "line",
-          data: data.data.map(function (item) {
-            return {
-              value: item[elem],
-              itemStyle: {
-                normal: {
-                  color: colorEnv(elem),
-                },
-              },
-            };
-          }),
-        };
-      }
-    }),
-  };
-
-  return options;
-}
 
 // ****************************************************
-//  ECharts Line‑Chart Builders – Refactored Version
+//  ECharts Line‑Chart Builders
 // ----------------------------------------------------
 //  All builders (comfort, sensation, tskin, tcore, etc.)
 //  now share a common scaffold so that axis formatting,
@@ -674,7 +34,7 @@ const globalTextStyle = {
 };
 
 // ----------------------------------------------------
-//  1)  Utility helpers (interval + label visibility)
+//  Utility helpers (interval + label visibility)
 // ----------------------------------------------------
 export function calculateInterval(len) {
   if (len <= 20) return 1;
@@ -691,8 +51,22 @@ export function shouldShowLabel(index, value, dataLen) {
   return value % step === 0;
 }
 
+export function pivotToSeriesArrays(data) {
+  return data.legends.map((legend) =>
+    data.data.map((row) => ({
+      index: row.index,
+      y: row[legend],
+    }))
+  );
+}
+
+export function constantColorFns(legends, colorFn) {
+  return legends.map((name) => (_ /* unused */) => colorFn(name));
+}
+
+
 // ----------------------------------------------------
-//  2)  Generic series builder (single line)
+//  Generic series builder (single line)
 // ----------------------------------------------------
 function buildSeries({ items, legendName, pointColor }) {
   return {
@@ -709,7 +83,7 @@ function buildSeries({ items, legendName, pointColor }) {
 }
 
 // ----------------------------------------------------
-//  3)  Generic chart builder scaffold
+//  Generic chart builder scaffold
 // ----------------------------------------------------
 function baseBuilder({
   rawData,            // Array<Array<item>>  – one array per line
@@ -718,16 +92,50 @@ function baseBuilder({
   yAxisCfg,           // { min, max, formatter }
   colorFnArr,         // Array< fn(value) => color >, one per series
   offset = 0,         // data offset when stitching multiple windows
+  showAllTooltipSeries = false, // show all series in tooltip
+  unit = "", // optional unit for y-axis labels (e.g. "C", "F", etc.)
+  precision = 1, // optional precision for y-axis values
 }) {
   const dataLength = rawData[0].length;
+
+  const xMin = rawData[0][0]?.index + 1 || 0;
+  const xMax = rawData[0].at(-1)?.index + 1 || xMin + 10;  // fallback
+
   const interval = calculateInterval(dataLength);
 
-  // Tooltip shared formatter
-  const tooltipFormatter = (params) => {
-    const [time, val] = params[0].data.value;
-    return `<span id="inlineColor">${time + offset}</span> min from start<br />` +
-           `${params[0].seriesName}: <span id="inlineColor">${val.toFixed(3)}</span>`;
-  };
+  // First label aligned to the next interval
+  const labelStart = Math.ceil(xMin / interval) * interval;
+  const minAligned = Math.floor(xMin / interval) * interval;
+
+  // console.log(`xMin: ${xMin}, xMax: ${xMax}, interval: ${interval}, labelStart: ${labelStart}`);
+
+  // Tooltip logic (switched by flag)
+    const tooltipFormatter = (params) => {
+      const lines = [];
+      lines.push(`Time: <span id="inlineColor">${params[0].dataIndex + 1 + offset}</span> min`);
+
+      // === Full-series mode: used in hflux/environment charts (no comparison)===
+      // Show all series values at the current x-position
+      // This is enabled when 'showAllTooltipSeries' is true
+      if (showAllTooltipSeries || params.length > 2) {
+        params.forEach((p) => {
+          const val = Array.isArray(p.data.value) ? p.data.value[1] : p.data.value;
+          lines.push(
+        `<span style="color:${p.color}">●</span> ${p.seriesName}: <span id="inlineColor">${val.toFixed(precision)}</span> ${unit}`
+          );
+        });
+      } 
+      // === Comparison mode: used for comfort/sensation/tsk/tcore charts ===
+      // Shows primary and (optional) compared series only
+      else {
+        lines.push(`${params[0].seriesName}: <span id="inlineColor">${params[0].data.value[1].toFixed(precision)}</span> ${unit}`);
+        if (params.length > 1) {
+          lines.push(`${params[1].seriesName}-compared: <span id="inlineColor">${params[1].data.value[1].toFixed(precision)}</span> ${unit}`);
+        }
+      }
+
+      return lines.join("<br />");
+    };
 
   // Build series array
   const series = rawData.map((array, idx) =>
@@ -750,9 +158,14 @@ function baseBuilder({
     },
     xAxis: {
       type: "value",
-      min: 0,
-      max: dataLength,
+      min: minAligned,
+      max: xMax,
       interval : interval,
+      axisTick: {
+        show: true,
+        interval: 0,
+        alignWithLabel: true,
+      },
       axisLine: {
       lineStyle: {
         color: chartTextColor, // axis line color
@@ -763,7 +176,9 @@ function baseBuilder({
       nameTextStyle: { padding: 15, fontSize: globalTextStyle.fontSize },
       axisPointer: { type: "shadow" },
       axisLabel: {
-        formatter: (v) => `${v}`,
+        interval: 0, // Show all labels
+        // Show xMin "AND" every interval mark thereafter
+        formatter: (v) => (v === xMin || (v - minAligned) % interval === 0 ? v : ""),
         fontSize: globalTextStyle.fontSize,
         showMinLabel: true,
         showMaxLabel: true,
@@ -792,7 +207,7 @@ function baseBuilder({
 }
 
 // ----------------------------------------------------
-//  4)  Specific chart builders
+//  Specific chart builders
 // ----------------------------------------------------
 
 export function comfBuilder(data) {
@@ -841,8 +256,8 @@ export function tskinBuilder(data) {
     legends: data.legends,
     title: "Skin Temperature vs. Time",
     yAxisCfg: {
-      min,
-      max,
+      min: min,
+      max: max,
       formatter: (v) => v,
       extract: (d) => d.tskin,
     },
@@ -851,6 +266,7 @@ export function tskinBuilder(data) {
       (v) => (data.metric ? colorTskin(v) : colorTskinNotMetric(v)),
     ],
     offset: data.offset || 0,
+    unit: data.metric ? " °C" : " °F",
   });
 }
 
@@ -862,8 +278,8 @@ export function tcoreBuilder(data) {
     legends: data.legends,
     title: "Core Temperature vs. Time",
     yAxisCfg: {
-      min,
-      max,
+      min: min,
+      max: max,
       formatter: (v) => v,
       extract: (d) => d.tcore,
     },
@@ -872,20 +288,87 @@ export function tcoreBuilder(data) {
       (v) => (data.metric ? colorTcore(v) : colorTcoreNotMetric(v)),
     ],
     offset: data.offset || 0,
+    unit: data.metric ? " °C" : " °F",
   });
 }
 
-// For hflux & environment builders, which need multiple y‑axes or many legends,
-// we can still call baseBuilder but pass custom configs or fall back to the
-// original specialised implementations if multi‑axis logic is complex.
+export function hfluxBuilder(data) {
+  const rawData   = pivotToSeriesArrays(data);          // wide → tidy
+  const colorFns  = constantColorFns(data.legends,      // series-wise fixed colours
+                                     colorHflux);
+  const values    = rawData.flat().map(d => d.y);
 
-// ----------------------------------------------------
-//  5)  Example of extending for a dual‑axis chart later
-// ----------------------------------------------------
-// export function environmentBuilder(data) {
-//   // custom multi‑axis logic here …
-// }
+  return baseBuilder({
+    rawData,
+    legends: data.legends,
+    title: "Heat-Flux Variables vs. Time",
+    yAxisCfg: {
+      min: Math.min(...values).toFixed(0),
+      max: Math.max(...values).toFixed(0),
+      formatter: v => v.toFixed(0),
+      extract: d => d.y,
+    },
+    colorFnArr: colorFns,
+    offset: data.offset || 0,
+    showAllTooltipSeries: true, // this is for heat flux / environment
+    unit: "W", // unit for heat flux
+    precision: 0, // no decimals for heat flux values
+  });
+}
 
-// ****************************************************
-//  End of refactored builders
-// ****************************************************
+export function environmentBuilder(data) {
+  // Transform to tidy series data
+  const rawData = pivotToSeriesArrays(data);
+  const legends = data.legends;
+
+  // Assign fixed color functions per series
+  const colorFns = constantColorFns(legends, colorEnv);
+
+  // Calculate y-axis scale (left axis only: exclude rh, v)
+  const leftSeriesVals = rawData
+    .filter((_, idx) => !["rh", "v"].includes(legends[idx]))
+    .flat()
+    .map((d) => d.y);
+  const minLeft = Math.min(...leftSeriesVals);
+  const maxLeft = Math.max(...leftSeriesVals);
+
+  // Build base chart
+  const option = baseBuilder({
+    rawData,
+    legends,
+    title: "Environment Variables vs. Time",
+    yAxisCfg: {
+      min: minLeft,
+      max: maxLeft,
+      formatter: (v) => v,
+      extract: (d) => d.y,
+    },
+    colorFnArr: colorFns,
+    offset: data.offset || 0,
+    showAllTooltipSeries: true,
+    unit: "",
+    precision: 2,
+  });
+
+  // Add right y-axis for rh and v
+  option.yAxis = [
+    option.yAxis, // left
+    {
+      type: "value",
+      name: "RH / Velocity",
+      nameLocation: "center",
+      nameTextStyle: { padding: 15, fontSize: globalTextStyle.fontSize },
+      min: 0,
+      max: data.metric ? 2 : 5,
+    },
+  ];
+
+  // Assign yAxisIndex = 1 to rh / v
+  option.series.forEach((s) => {
+    if (["rh", "v"].includes(s.name)) {
+      s.yAxisIndex = 1;
+    }
+  });
+
+  return option;
+}
