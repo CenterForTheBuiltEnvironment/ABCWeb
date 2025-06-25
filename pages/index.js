@@ -1246,78 +1246,73 @@ export default function WithSubnavigation() {
                                   onEvents={onEvents}
                                   style={{ height: "100%", width: "100%" }}
                                 />
-                                {/* Slider */}
-                                <RangeSlider
-                                  left="5%"
-                                  right="5%"
-                                  top="5%"
-                                  w="85%"
-                                  value={sliderVal}
-                                  min={1}
-                                  max={sliderMaxVal}
-                                  step={1}
-                                  onChange={(e) => {
-                                    setSliderVal([e[0], e[1]]);
-                                    let tempArr = [],
-                                      tempArrCompare = [];
-                                    for (let j = e[0]; j <= e[1]; j++) {
-                                      tempArr.push({
-                                        ...fullData[j - 1][numtoGraph],
-                                        index: j - 1,
-                                      });
-                                      if (isComparing) {
-                                        tempArrCompare.push({
-                                          ...fullDataCompare[j - 1][numtoGraph],
+                                <Box w="100%">
+                                  {/* Slider */}
+                                  <RangeSlider
+                                    left="20%"
+                                    right="5%"
+                                    top="5%"
+                                    w="70%"
+                                    value={sliderVal}
+                                    min={1}
+                                    max={sliderMaxVal}
+                                    step={1}
+                                    onChange={(e) => {
+                                      setSliderVal([e[0], e[1]]);
+                                      let tempArr = [],
+                                        tempArrCompare = [];
+                                      for (let j = e[0]; j <= e[1]; j++) {
+                                        tempArr.push({
+                                          ...fullData[j - 1][numtoGraph],
                                           index: j - 1,
                                         });
+                                        if (isComparing) {
+                                          tempArrCompare.push({
+                                            ...fullDataCompare[j - 1][numtoGraph],
+                                            index: j - 1,
+                                          });
+                                        }
                                       }
-                                    }
-                                    setGraph(
-                                      decideGraph(
-                                        isMetric,
-                                        tempArr,
-                                        tempArrCompare,
-                                        numtoGraph,
-                                        e[0] - 1
-                                      )
-                                    );
-                                  }}
-                                >
-                                  <RangeSliderTrack height="10px" bg="gray.300">
-                                    <RangeSliderFilledTrack bg="cbe.blue" />
-                                  </RangeSliderTrack>
-                                  <Tooltip
-                                    label={`${sliderVal[0]} mins`}
-                                    placement="top"
+                                      setGraph(
+                                        decideGraph(
+                                          isMetric,
+                                          tempArr,
+                                          tempArrCompare,
+                                          numtoGraph,
+                                          e[0] - 1
+                                        )
+                                      );
+                                    }}
                                   >
-                                    <RangeSliderThumb
-                                      borderWidth="7px"
-                                      boxSize={3}
-                                      index={0}
-                                    />
-                                  </Tooltip>
-                                  <Tooltip
-                                    label={`${sliderVal[1]} mins`}
-                                    placement="top"
-                                  >
-                                    <RangeSliderThumb
-                                      borderWidth="7px"
-                                      boxSize={3}
-                                      index={1}
-                                    />
-                                  </Tooltip>
-                                </RangeSlider>
-                                <div
-                                  style={{
-                                    marginTop: "15px",
-                                  }}
-                                >
-                                  <Text>
-                                    Drag ends of slider to adjust. Min is{" "}
-                                    <b>{sliderVal[0]}</b> min from start, and
+                                    <RangeSliderTrack height="10px" bg="gray.200">
+                                      <RangeSliderFilledTrack bg="gray.500" />
+                                    </RangeSliderTrack>
+                                    <Tooltip
+                                      label={`${sliderVal[0]} mins`}
+                                      placement="top"
+                                    >
+                                      <RangeSliderThumb
+                                        borderWidth="7px"
+                                        boxSize={3}
+                                        index={0}
+                                      />
+                                    </Tooltip>
+                                    <Tooltip
+                                      label={`${sliderVal[1]} mins`}
+                                      placement="top"
+                                    >
+                                      <RangeSliderThumb
+                                        borderWidth="7px"
+                                        boxSize={3}
+                                        index={1}
+                                      />
+                                    </Tooltip>
+                                  </RangeSlider>
+                                  <Text align="center" marginLeft={"10%"} fontSize="sm" color="gray.600">
+                                    Drag ends of slider to adjust. Min is <b>{sliderVal[0]}</b> min from start,
                                     max is <b>{sliderVal[1]}</b> min from start.
                                   </Text>
-                                </div>
+                                  </Box>
                               </VStack>
                               {/* Color bar */}
                               <Box
