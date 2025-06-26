@@ -296,23 +296,42 @@ export default function WithSubnavigation() {
   };
 
   function EditableControls({ isHome = false }) {
-  const { isEditing, getSubmitButtonProps, getEditButtonProps } =
-    useEditableControls();
+    const { isEditing, getSubmitButtonProps, getEditButtonProps } =
+      useEditableControls();
 
-  return isEditing ? (
-    <Tooltip label="Submit changes" fontSize="md">
-      <IconButton
-        backgroundColor={"gray.200"}
-        textColor={"gray.600"}
-        colorScheme="gray"
-        icon={<CheckIcon />}
-        {...getSubmitButtonProps()}
-      />
-    </Tooltip>
-  ) : (
-    <>
-      {isHome ? (
-        <HStack justifyContent={"center"} spacing={2}>
+    return isEditing ? (
+      <Tooltip label="Submit changes" fontSize="md">
+        <IconButton
+          backgroundColor={"gray.200"}
+          textColor={"gray.600"}
+          colorScheme="gray"
+          icon={<CheckIcon />}
+          {...getSubmitButtonProps()}
+        />
+      </Tooltip>
+    ) : (
+      <>
+        {isHome ? (
+          <HStack justifyContent={"center"} spacing={2}>
+            <Tooltip label="Edit name" fontSize="md">
+              <IconButton
+                backgroundColor={"gray.200"}
+                textColor={"gray.600"}
+                colorScheme="gray"
+                icon={<EditIcon />}
+                {...getEditButtonProps()}
+              />
+            </Tooltip>
+            <Tooltip label="Close" fontSize="md">
+              <CloseButton
+                params={params}
+                ind={ind}
+                setParams={setParams}
+                setIndex={setIndex}
+              />
+            </Tooltip>
+          </HStack>
+        ) : (
           <Tooltip label="Edit name" fontSize="md">
             <IconButton
               backgroundColor={"gray.200"}
@@ -322,29 +341,10 @@ export default function WithSubnavigation() {
               {...getEditButtonProps()}
             />
           </Tooltip>
-          <Tooltip label="Close" fontSize="md">
-            <CloseButton
-              params={params}
-              ind={ind}
-              setParams={setParams}
-              setIndex={setIndex}
-            />
-          </Tooltip>
-        </HStack>
-      ) : (
-        <Tooltip label="Edit name" fontSize="md">
-          <IconButton
-            backgroundColor={"gray.200"}
-            textColor={"gray.600"}
-            colorScheme="gray"
-            icon={<EditIcon />}
-            {...getEditButtonProps()}
-          />
-        </Tooltip>
-      )}
-    </>
-  );
-}
+        )}
+      </>
+    );
+  }
 
   const toast = useToast();
 
@@ -810,7 +810,13 @@ export default function WithSubnavigation() {
           transition={{ enter: { duration: 0.5 } }}
         >
           {!comfortView ? (
-            <HStack margin="20px" h="100%" alignItems="flex-start" spacing={7} padding={1}>
+            <HStack
+              margin="20px"
+              h="100%"
+              alignItems="flex-start"
+              spacing={7}
+              padding={1}
+            >
               <VStack w="30%" h="100%">
                 <HStack w="100%" padding={2} alignItems="flex-start">
                   <HStack w="90%" overflowY={"scroll"} spacing={3}>
@@ -822,9 +828,7 @@ export default function WithSubnavigation() {
                           backgroundColor={
                             ind == indx ? "cbe.blue" : "cbe.grey"
                           }
-                          textColor={
-                            ind == indx ? "white" : "gray.600"
-                          }
+                          textColor={ind == indx ? "white" : "gray.600"}
                           colorScheme="gray"
                           borderWidth={1}
                           onClick={() => {
@@ -842,20 +846,20 @@ export default function WithSubnavigation() {
                   </HStack>
                   <Tooltip label="Add new phase" fontSize="md">
                     <IconButton
-                    w="5%"
-                    colorScheme="red"
-                    backgroundColor={"red.300"}
-                    // border="2px solid gray"
-                    textColor={"white"}
-                    icon={<AddIcon />}
-                    onClick={() => {
-                      setParams([
-                        ...params,
-                        conditionParams(params.length + 1),
-                      ]);
-                      setIndex(ind + 1);
-                    }}
-                  ></IconButton>
+                      w="5%"
+                      colorScheme="red"
+                      backgroundColor={"red.300"}
+                      // border="2px solid gray"
+                      textColor={"white"}
+                      icon={<AddIcon />}
+                      onClick={() => {
+                        setParams([
+                          ...params,
+                          conditionParams(params.length + 1),
+                        ]);
+                        setIndex(ind + 1);
+                      }}
+                    ></IconButton>
                   </Tooltip>
                 </HStack>
                 <VStack
@@ -893,22 +897,22 @@ export default function WithSubnavigation() {
                           mr="10px"
                         />
                         <EditableControls />
-                          <Tooltip label="Delete this phase" fontSize="md">
-                            <IconButton
-                              w="5%"
-                              colorScheme="red"
-                              backgroundColor={"red.300"}
-                              icon={<CloseIcon />}
-                              isDisabled={params.length == 1}
-                              onClick={() => {
-                                let tempParams = [...params];
-                                tempParams.splice(ind, 1);
-                                setParams(tempParams);
-                                setIndex(Math.max(0, ind - 1));
-                              }}
-                              ml="10px"
-                            />
-                          </Tooltip>
+                        <Tooltip label="Delete this phase" fontSize="md">
+                          <IconButton
+                            w="5%"
+                            colorScheme="red"
+                            backgroundColor={"red.300"}
+                            icon={<CloseIcon />}
+                            isDisabled={params.length == 1}
+                            onClick={() => {
+                              let tempParams = [...params];
+                              tempParams.splice(ind, 1);
+                              setParams(tempParams);
+                              setIndex(Math.max(0, ind - 1));
+                            }}
+                            ml="10px"
+                          />
+                        </Tooltip>
                       </Editable>
                     </Flex>
                     {/* Input parameters */}
@@ -984,52 +988,56 @@ export default function WithSubnavigation() {
                           <MenuList>
                             <MenuOptionGroup title="Select all that apply.">
                               {pcsParams.map((e, index) => {
-                              if (params) {
-                                return (
-                                  <MenuItem
-                                    key={e.name}
-                                    onClick={() => {
-                                      let tempParams = [...params];
-                                      if (
-                                        params[ind].personal_comfort_system.has(
-                                          index
-                                        )
-                                      ) {
-                                        tempParams[
-                                          ind
-                                        ].personal_comfort_system.delete(index);
-                                      } else {
-                                        tempParams[
-                                          ind
-                                        ].personal_comfort_system.add(index);
-                                      }
-                                      setParams(tempParams);
-                                    }}
-                                  >
-                                    <HStack spacing={0}>
-                                      <div
-                                        style={{
-                                          height: "100%",
-                                          width: "25px",
-                                        }}
-                                      >
-                                        {params[
-                                          ind
-                                        ].personal_comfort_system.has(index) ? (
-                                          <CheckIcon />
-                                        ) : (
-                                          <></>
-                                        )}
-                                      </div>
-                                      <Text mr={2} verticalAlign={"center"}>
-                                        {e.name}
-                                      </Text>
-                                      {e.icons}
-                                    </HStack>
-                                  </MenuItem>
-                                );
-                              } else return <></>;
-                            })}
+                                if (params) {
+                                  return (
+                                    <MenuItem
+                                      key={e.name}
+                                      onClick={() => {
+                                        let tempParams = [...params];
+                                        if (
+                                          params[
+                                            ind
+                                          ].personal_comfort_system.has(index)
+                                        ) {
+                                          tempParams[
+                                            ind
+                                          ].personal_comfort_system.delete(
+                                            index
+                                          );
+                                        } else {
+                                          tempParams[
+                                            ind
+                                          ].personal_comfort_system.add(index);
+                                        }
+                                        setParams(tempParams);
+                                      }}
+                                    >
+                                      <HStack spacing={0}>
+                                        <div
+                                          style={{
+                                            height: "100%",
+                                            width: "25px",
+                                          }}
+                                        >
+                                          {params[
+                                            ind
+                                          ].personal_comfort_system.has(
+                                            index
+                                          ) ? (
+                                            <CheckIcon />
+                                          ) : (
+                                            <></>
+                                          )}
+                                        </div>
+                                        <Text mr={2} verticalAlign={"center"}>
+                                          {e.name}
+                                        </Text>
+                                        {e.icons}
+                                      </HStack>
+                                    </MenuItem>
+                                  );
+                                } else return <></>;
+                              })}
                             </MenuOptionGroup>
                           </MenuList>
                         </Menu>
@@ -1103,134 +1111,160 @@ export default function WithSubnavigation() {
                     >
                       <HStack>
                         {/* Body segment selection*/}
-                        <RSelect
-                          className="basic-single"
-                          classNamePrefix="select"
-                          defaultValue={graphsVals[numtoGraph]}
-                          isSearchable={true}
-                          isClearable={false}
-                          options={graphsVals}
-                          instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
-                          styles={{
-                            control: (baseStyles, state) => ({
-                              ...baseStyles,
-                              width: "20vw",
-                            }),
-                          }}
-                          placeholder="Input body part to graph."
-                          onChange={(val) => {
-                            loadingModal.onOpen();
-                            setNumToGraph(val.value);
-                            let changedArr = [],
-                              changedArrCompare = [];
-                            for (let j = 0; j < fullData.length; j++) {
-                              changedArr.push({
-                                ...fullData[j][val.value],
-                                index: j,
-                              });
-                            }
-                            setData(changedArr);
+                        <Tooltip
+                          label="Select a body segment to display"
+                          hasArrow
+                        >
+                          <Box>
+                            <RSelect
+                              className="basic-single"
+                              classNamePrefix="select"
+                              defaultValue={graphsVals[numtoGraph]}
+                              isSearchable={true}
+                              isClearable={false}
+                              options={graphsVals}
+                              instanceId="zjhddiasdwjh1oi2euiAUSD901289990198"
+                              styles={{
+                                control: (baseStyles, state) => ({
+                                  ...baseStyles,
+                                  width: "20vw",
+                                }),
+                              }}
+                              placeholder="Input body part to graph."
+                              onChange={(val) => {
+                                loadingModal.onOpen();
+                                setNumToGraph(val.value);
+                                let changedArr = [],
+                                  changedArrCompare = [];
+                                for (let j = 0; j < fullData.length; j++) {
+                                  changedArr.push({
+                                    ...fullData[j][val.value],
+                                    index: j,
+                                  });
+                                }
+                                setData(changedArr);
 
-                            if (isComparing) {
-                              for (let j = 0; j < fullDataCompare.length; j++) {
-                                changedArrCompare.push({
-                                  ...fullDataCompare[j][val.value],
-                                  index: j,
-                                });
-                              }
-                              setDataCompare(changedArrCompare);
-                            }
+                                if (isComparing) {
+                                  for (
+                                    let j = 0;
+                                    j < fullDataCompare.length;
+                                    j++
+                                  ) {
+                                    changedArrCompare.push({
+                                      ...fullDataCompare[j][val.value],
+                                      index: j,
+                                    });
+                                  }
+                                  setDataCompare(changedArrCompare);
+                                }
 
-                            setGraph(
-                              decideGraph(
-                                isMetric,
-                                changedArr,
-                                changedArrCompare,
-                                val.value
-                              )
-                            );
-                            loadingModal.onClose();
-                          }}
-                        />
-                        {/* Result variable to display*/}
-                        <RSelect
-                          className="basic-single"
-                          classNamePrefix="select"
-                          isSearchable={true}
-                          isClearable={false}
-                          options={modes}
-                          instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
-                          styles={{
-                            control: (baseStyles, state) => ({
-                              ...baseStyles,
-                              width: "20vw",
-                            }),
-                          }}
-                          placeholder={"Comfort"}
-                          onChange={(val) => {
-                            loadingModal.onOpen();
-                            setCurrentChoiceToGraph(val.value);
-                            setGraph(
-                              decideGraph(
-                                isMetric,
-                                graphData.slice(sliderVal[0], sliderVal[1]),
-                                graphDataCompare.slice(
-                                  sliderVal[0],
-                                  sliderVal[1]
-                                ),
-                                numtoGraph,
-                                sliderVal[0],
-                                val.value
-                              )
-                            );
-
-                            let colorsArr = [];
-                            let mins = [],
-                              maxes = [];
-                            for (let i = 0; i <= 17; i++) {
-                              mins.push(
-                                findMin(fullData, places[i], val.value)
-                              );
-                              maxes.push(
-                                findMax(fullData, places[i], val.value)
-                              );
-                            }
-                            for (let time = 0; time < fullData.length; time++) {
-                              let bodyPartsArr = [];
-                              for (let i = 0; i <= 17; i++) {
-                                bodyPartsArr.push(
-                                  determineColor(
-                                    fullData[time][places[i]],
-                                    val.value,
-                                    mins[i],
-                                    maxes[i]
+                                setGraph(
+                                  decideGraph(
+                                    isMetric,
+                                    changedArr,
+                                    changedArrCompare,
+                                    val.value
                                   )
                                 );
-                              }
-                              colorsArr.push(bodyPartsArr);
-                            }
-                            setBodyColors(colorsArr);
-                            setCurrentColorArray(Array(18).fill("cbe.gray"));
+                                loadingModal.onClose();
+                              }}
+                            />
+                          </Box>
+                        </Tooltip>
+                        {/* Result variable to display*/}
+                        <Tooltip
+                          label="Select a result variable to display"
+                          hasArrow
+                        >
+                          <Box>
+                            <RSelect
+                              className="basic-single"
+                              classNamePrefix="select"
+                              isSearchable={true}
+                              isClearable={false}
+                              options={modes}
+                              instanceId="zjhsdwjhiasd1oi2euiAUSD901289990198"
+                              styles={{
+                                control: (baseStyles, state) => ({
+                                  ...baseStyles,
+                                  width: "20vw",
+                                }),
+                              }}
+                              placeholder={"Comfort"}
+                              onChange={(val) => {
+                                loadingModal.onOpen();
+                                setCurrentChoiceToGraph(val.value);
+                                setGraph(
+                                  decideGraph(
+                                    isMetric,
+                                    graphData.slice(sliderVal[0], sliderVal[1]),
+                                    graphDataCompare.slice(
+                                      sliderVal[0],
+                                      sliderVal[1]
+                                    ),
+                                    numtoGraph,
+                                    sliderVal[0],
+                                    val.value
+                                  )
+                                );
 
-                            loadingModal.onClose();
-                          }}
-                        />
+                                let colorsArr = [];
+                                let mins = [],
+                                  maxes = [];
+                                for (let i = 0; i <= 17; i++) {
+                                  mins.push(
+                                    findMin(fullData, places[i], val.value)
+                                  );
+                                  maxes.push(
+                                    findMax(fullData, places[i], val.value)
+                                  );
+                                }
+                                for (
+                                  let time = 0;
+                                  time < fullData.length;
+                                  time++
+                                ) {
+                                  let bodyPartsArr = [];
+                                  for (let i = 0; i <= 17; i++) {
+                                    bodyPartsArr.push(
+                                      determineColor(
+                                        fullData[time][places[i]],
+                                        val.value,
+                                        mins[i],
+                                        maxes[i]
+                                      )
+                                    );
+                                  }
+                                  colorsArr.push(bodyPartsArr);
+                                }
+                                setBodyColors(colorsArr);
+                                setCurrentColorArray(
+                                  Array(18).fill("cbe.gray")
+                                );
+
+                                loadingModal.onClose();
+                              }}
+                            />
+                          </Box>
+                        </Tooltip>
                         {/* CSV output */}
-                        <Button colorScheme="green" background={"green.400"}>
-                          <CSVLink
-                            data={csvData}
-                            filename={`ABCWEB_${new Date().toDateString({
-                              year: "numeric",
-                              month: "2-digit",
-                              day: "2-digit",
-                            })}-${new Date()
-                              .toTimeString()
-                              .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
-                            target="_blank"
-                          >
-                            Export to CSV
-                          </CSVLink>
-                        </Button>
+                        <Tooltip label="Export data as a CSV file" hasArrow>
+                          <Button colorScheme="green" background={"green.400"}>
+                            <CSVLink
+                              data={csvData}
+                              filename={`ABCWEB_${new Date().toDateString({
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                              })}-${new Date()
+                                .toTimeString()
+                                .replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1")}.csv`}
+                              target="_blank"
+                            >
+                              Export to CSV
+                            </CSVLink>
+                          </Button>
+                        </Tooltip>
                       </HStack>
                       {/* Timeseries results and manikin */}
                       <HStack w="100%">
@@ -1246,7 +1280,7 @@ export default function WithSubnavigation() {
                                   onEvents={onEvents}
                                   style={{ height: "100%", width: "100%" }}
                                 />
-                                <Box w="100%" >
+                                <Box w="100%">
                                   {/* Slider */}
                                   <RangeSlider
                                     left="20%"
@@ -1268,7 +1302,9 @@ export default function WithSubnavigation() {
                                         });
                                         if (isComparing) {
                                           tempArrCompare.push({
-                                            ...fullDataCompare[j - 1][numtoGraph],
+                                            ...fullDataCompare[j - 1][
+                                              numtoGraph
+                                            ],
                                             index: j - 1,
                                           });
                                         }
@@ -1284,12 +1320,16 @@ export default function WithSubnavigation() {
                                       );
                                     }}
                                   >
-                                    <RangeSliderTrack height="10px" bg="gray.300">
+                                    <RangeSliderTrack
+                                      height="10px"
+                                      bg="gray.300"
+                                    >
                                       <RangeSliderFilledTrack bg="gray.500" />
                                     </RangeSliderTrack>
                                     <Tooltip
                                       label={`${sliderVal[0]} mins`}
                                       placement="top"
+                                      hasArrow
                                     >
                                       <RangeSliderThumb
                                         borderWidth="7px"
@@ -1300,6 +1340,7 @@ export default function WithSubnavigation() {
                                     <Tooltip
                                       label={`${sliderVal[1]} mins`}
                                       placement="top"
+                                      hasArrow
                                     >
                                       <RangeSliderThumb
                                         borderWidth="7px"
@@ -1308,17 +1349,23 @@ export default function WithSubnavigation() {
                                       />
                                     </Tooltip>
                                   </RangeSlider>
-                                  <Text align="center" marginLeft={"15%"} fontSize="sm" color="gray.600">
-                                    Drag ends of slider to adjust. Min is <b>{sliderVal[0]}</b> min from start,
-                                    max is <b>{sliderVal[1]}</b> min from start.
+                                  <Text
+                                    align="center"
+                                    marginLeft={"15%"}
+                                    fontSize="sm"
+                                    color="gray.600"
+                                  >
+                                    Drag ends of slider to adjust. Min is{" "}
+                                    <b>{sliderVal[0]}</b> min from start, max is{" "}
+                                    <b>{sliderVal[1]}</b> min from start.
                                   </Text>
-                                  </Box>
+                                </Box>
                               </VStack>
                               {/* Color bar */}
                               <Box
                                 w="1.5%"
                                 h="26vh"
-                                style={{ opacity: 0.7, marginTop: "-4%"}}
+                                style={{ opacity: 0.7, marginTop: "-4%" }}
                               >
                                 {determineColorFunction(currentChoiceToGraph)}
                               </Box>
