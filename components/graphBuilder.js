@@ -1,4 +1,3 @@
-
 // ****************************************************
 //  ECharts Line‑Chart Builders
 // ----------------------------------------------------
@@ -23,14 +22,14 @@ import {
 
 import { background, theme } from "@chakra-ui/react";
 const chartTextColor = theme.colors.gray[700]; // "#4A5568"
-  
+
 // -----------------------
 //  Global text style
 // -----------------------
 const globalTextStyle = {
   fontFamily: "Arial",
   color: chartTextColor,
-  fontSize: 14
+  fontSize: 14,
 };
 
 // ----------------------------------------------------
@@ -64,7 +63,6 @@ export function constantColorFns(legends, colorFn) {
   return legends.map((name) => (_ /* unused */) => colorFn(name));
 }
 
-
 // ----------------------------------------------------
 //  Generic series builder (single line)
 // ----------------------------------------------------
@@ -86,20 +84,21 @@ function buildSeries({ items, legendName, pointColor }) {
 //  Generic chart builder scaffold
 // ----------------------------------------------------
 function baseBuilder({
-  rawData,            // Array<Array<item>>  – one array per line
-  legends,            // string[]
-  title,              // string for chart title
-  yAxisCfg,           // { min, max, formatter }
-  colorFnArr,         // Array< fn(value) => color >, one per series
-  offset = 0,         // data offset when stitching multiple windows
+  rawData, // Array<Array<item>>  – one array per line
+  legends, // string[]
+  title, // string for chart title
+  yAxisCfg, // { min, max, formatter }
+  colorFnArr, // Array< fn(value) => color >, one per series
+  offset = 0, // data offset when stitching multiple windows
   showAllTooltipSeries = false, // show all series in tooltip
   unit = "", // optional unit for y-axis labels (e.g. "C", "F", etc.)
-  precision = 1, // optional precision for y-axis values
+  precision = 2, // optional precision for y-axis values
+  chartType = "", // "comfort", "sensation", etc. for tooltip formatting
 }) {
   const dataLength = rawData[0].length;
 
   const xMin = rawData[0][0]?.index + 1 || 0;
-  const xMax = rawData[0].at(-1)?.index + 1 || xMin + 10;  // fallback
+  const xMax = rawData[0].at(-1)?.index + 1 || xMin + 10; // fallback
 
   const interval = calculateInterval(dataLength);
 
@@ -109,33 +108,57 @@ function baseBuilder({
 
   // console.log(`xMin: ${xMin}, xMax: ${xMax}, interval: ${interval}, labelStart: ${labelStart}`);
 
+  const getDescriptor = (val, chartType) => {
+    if (chartType === "comfort") return ` (${formatComfDescriptor(val)})`;
+    if (chartType === "sensation") return ` (${formatSensDescriptor(val)})`;
+    return "";
+  };
+
   // Tooltip logic (switched by flag)
-    const tooltipFormatter = (params) => {
-      const lines = [];
-      lines.push(`Time: <span id="inlineColor">${params[0].dataIndex + 1 + offset}</span> min`);
+  const tooltipFormatter = (params) => {
+    const lines = [];
+    lines.push(
+      `Time: <span id="inlineColor">${
+        params[0].dataIndex + 1 + offset
+      }</span> min`
+    );
 
-      // === Full-series mode: used in hflux/environment charts (no comparison)===
-      // Show all series values at the current x-position
-      // This is enabled when 'showAllTooltipSeries' is true
-      if (showAllTooltipSeries || params.length > 2) {
-        params.forEach((p) => {
-          const val = Array.isArray(p.data.value) ? p.data.value[1] : p.data.value;
-          lines.push(
-        `<span style="color:${p.color}">●</span> ${p.seriesName}: <span id="inlineColor">${val.toFixed(precision)}</span> ${unit}`
-          );
-        });
-      } 
-      // === Comparison mode: used for comfort/sensation/tsk/tcore charts ===
-      // Shows primary and (optional) compared series only
-      else {
-        lines.push(`${params[0].seriesName}: <span id="inlineColor">${params[0].data.value[1].toFixed(precision)}</span> ${unit}`);
-        if (params.length > 1) {
-          lines.push(`${params[1].seriesName}-compared: <span id="inlineColor">${params[1].data.value[1].toFixed(precision)}</span> ${unit}`);
-        }
+    // === Full-series mode: used in hflux/environment charts (no comparison)===
+    // Show all series values at the current x-position
+    // This is enabled when 'showAllTooltipSeries' is true
+    if (showAllTooltipSeries || params.length > 2) {
+      params.forEach((p) => {
+        const val = Array.isArray(p.data.value)
+          ? p.data.value[1]
+          : p.data.value;
+        lines.push(
+          `<span style="color:${p.color}">●</span> ${
+            p.seriesName
+          }: <span id="inlineColor">${val.toFixed(precision)}</span> ${unit}`
+        );
+      });
+    }
+    // === Comparison mode: used for comfort/sensation/tsk/tcore charts ===
+    // Shows primary and (optional) compared series only
+    else {
+      const value1 = params[0].data.value[1];
+      lines.push(
+        `${params[0].seriesName}: <span id="inlineColor">${value1.toFixed(
+          precision
+        )}</span> ${unit}${getDescriptor(value1, chartType)}`
+      );
+      if (params.length > 1) {
+        const value2 = params[1].data.value[1];
+        lines.push(
+          `${params[1].seriesName}-compared: <span id="inlineColor">${value2.toFixed(
+            precision
+          )}</span> ${unit}${getDescriptor(value2, chartType)}`
+        );
       }
+    }
 
-      return lines.join("<br />");
-    };
+    return lines.join("<br />");
+  };
 
   // Build series array
   const series = rawData.map((array, idx) =>
@@ -148,10 +171,16 @@ function baseBuilder({
 
   return {
     textStyle: globalTextStyle,
-    title: { text: title, left: "5%", top: "2%"},
+    title: { text: title, left: "5%", top: "2%" },
     tooltip: { trigger: "axis", formatter: tooltipFormatter },
     legend: { data: legends },
-    grid: { left: "20%", right: "5%", bottom: "15%", top: "20%", containLabel: false},
+    grid: {
+      left: "20%",
+      right: "5%",
+      bottom: "15%",
+      top: "20%",
+      containLabel: false,
+    },
     toolbox: {
       right: 5,
       feature: { saveAsImage: {}, restore: {} },
@@ -160,15 +189,15 @@ function baseBuilder({
       type: "value",
       min: minAligned,
       max: xMax,
-      interval : interval,
+      interval: interval,
       axisTick: {
         show: true,
         interval: 0,
         alignWithLabel: true,
       },
       axisLine: {
-      lineStyle: {
-        color: chartTextColor, // axis line color
+        lineStyle: {
+          color: chartTextColor, // axis line color
         },
       },
       name: "Time (min)",
@@ -178,7 +207,8 @@ function baseBuilder({
       axisLabel: {
         interval: 0, // Show all labels
         // Show xMin "AND" every interval mark thereafter
-        formatter: (v) => (v === xMin || (v - minAligned) % interval === 0 ? v : ""),
+        formatter: (v) =>
+          v === xMin || (v - minAligned) % interval === 0 ? v : "",
         fontSize: globalTextStyle.fontSize,
         showMinLabel: true,
         showMaxLabel: true,
@@ -191,9 +221,9 @@ function baseBuilder({
       nameTextStyle: { padding: 20, fontSize: globalTextStyle.fontSize },
       min: yAxisCfg.min,
       max: yAxisCfg.max,
-            axisLine: {
-      lineStyle: {
-        color: chartTextColor, // axis line color
+      axisLine: {
+        lineStyle: {
+          color: chartTextColor, // axis line color
         },
       },
       splitNumber: yAxisCfg.splitNumber || 5, // default to 5 splits
@@ -222,11 +252,9 @@ export function comfBuilder(data) {
       formatter: (v) => `${v}: ${formatComfDescriptor(v)}`,
       extract: (d) => d.comfort,
     },
-    colorFnArr: [
-      (v) => colorComfort(v, false),
-      (v) => colorComfort(v, true),
-    ],
+    colorFnArr: [(v) => colorComfort(v, false), (v) => colorComfort(v, true)],
     offset: data.offset || 0,
+    chartType: "comfort",
   });
 }
 
@@ -235,12 +263,13 @@ export function sensBuilder(data) {
     rawData: data.data,
     legends: data.legends,
     title: "Sensation vs. Time",
+    chartType: "sensation",
     yAxisCfg: {
       min: -4,
       max: 4,
       formatter: (v) => `${v}: ${formatSensDescriptor(v)}`,
       extract: (d) => d.sensation,
-      splitNumber: 7
+      splitNumber: 7,
     },
     colorFnArr: [
       (v) => colorSensation(v, false),
@@ -299,10 +328,12 @@ export function tcoreBuilder(data) {
 }
 
 export function hfluxBuilder(data) {
-  const rawData   = pivotToSeriesArrays(data);          // wide → tidy
-  const colorFns  = constantColorFns(data.legends,      // series-wise fixed colours
-                                     colorHflux);
-  const values    = rawData.flat().map(d => d.y);
+  const rawData = pivotToSeriesArrays(data); // wide → tidy
+  const colorFns = constantColorFns(
+    data.legends, // series-wise fixed colours
+    colorHflux
+  );
+  const values = rawData.flat().map((d) => d.y);
   const unit = "W";
 
   return baseBuilder({
@@ -313,8 +344,8 @@ export function hfluxBuilder(data) {
       name: `Heat Flux (${unit})`,
       min: Math.min(...values).toFixed(0),
       max: Math.max(...values).toFixed(0),
-      formatter: v => v.toFixed(0),
-      extract: d => d.y,
+      formatter: (v) => v.toFixed(0),
+      extract: (d) => d.y,
     },
     colorFnArr: colorFns,
     offset: data.offset || 0,

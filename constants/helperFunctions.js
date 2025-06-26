@@ -361,40 +361,44 @@ export const getCurrentConditionName = (time, params) => {
 };
 
 export const formatComfDescriptor = (val) => {
-  if (val >= 4) {
+  if (val >= 2.666) {
     return "Very Comfortable";
-  } else if (val >= 2) {
+  } else if (val >= 1.333) {
     return "Comfortable";
   } else if (val >= 0) {
     return "Just Comfortable";
-  } else if (val > -0.0001) {
+  } else if (val >= -1.333) {
     return "Just Uncomfortable";
-  } else if (val > -2) {
-    return "Just Uncomfortable";
-  } else if (val > -4) {
+  } else if (val >= -2.666) {
     return "Uncomfortable";
-  } else return "Very Uncomfortable";
+  } else {
+    return "Very Uncomfortable";
+  }
 };
 
 export const formatSensDescriptor = (val) => {
-  if (val >= 4) {
+  if (val >= 3.5 && val <= 4) {
     return "Very Hot";
-  } else if (val >= 3) {
+  } else if (val >= 2.5 && val < 3.5) {
     return "Hot";
-  } else if (val >= 2) {
+  } else if (val >= 1.5 && val < 2.5) {
     return "Warm";
-  } else if (val >= 1) {
+  } else if (val >= 0.5 && val < 1.5) {
     return "Slightly Warm";
-  } else if (val > -1) {
+  } else if (val > -0.5 && val < 0.5) {
     return "Neutral";
-  } else if (val > -2) {
+  } else if (val <= -0.5 && val > -1.5) {
     return "Slightly Cool";
-  } else if (val > -3) {
+  } else if (val <= -1.5 && val > -2.5) {
     return "Cool";
-  } else if (val > -4) {
+  } else if (val <= -2.5 && val > -3.5) {
     return "Cold";
-  } else return "Very Cold";
+  } else { // val <= -3.5
+    return "Very Cold";
+  }
 };
+
+
 
 export const getSaveFilePicker = async () => {
   const opts = {
