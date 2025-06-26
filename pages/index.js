@@ -1353,7 +1353,7 @@ export default function WithSubnavigation() {
                                     align="center"
                                     marginLeft={"15%"}
                                     fontSize="sm"
-                                    color="gray.600"
+                                    color="gray.700"
                                   >
                                     Drag ends of slider to adjust. Min is{" "}
                                     <b>{sliderVal[0]}</b> min from start, max is{" "}
@@ -1374,38 +1374,35 @@ export default function WithSubnavigation() {
                         </VStack>
                         {/* Manikin visualization */}
                         <VStack w="25%">
-                          <Text fontWeight="bold">
-                            {params[currIndex[0]].condition_name}{" "}
-                            <span
-                              style={{
-                                color: "cbe.lightBlue",
-                                marginLeft: "5px",
-                              }}
-                            >
-                              {" "}
-                              {currIndex[1]} mins{" "}
-                            </span>
-                          </Text>
-                          <Text textAlign="center" w="100%">
-                            Click a point to visualize on manikin.{" "}
+                            <Text fontWeight="bold" color="gray.700" m={0}>
+                              {params[currIndex[0]].condition_name}{" "}
+                              <span style={{ marginLeft: "5px" }}>
+                                {currIndex[1]} mins
+                              </span>
+                            </Text>
+                          <Text textAlign="center" w="100%" fontSize="14" color="gray.700">
+                            Click a point on the graph to display data on the manikin.{" "}
                             {isComparing ? (
-                              <Text fontWeight="bold">
-                                Only results from your current input will be
-                                displayed, not comparison ones.
+                              <Text fontWeight="bold" fontSize="14" color="gray.700">
+                                Only results from your current input will be displayed, not comparison ones.
                               </Text>
                             ) : (
                               ""
                             )}
                           </Text>
                           {/* There is no color shema for heat flux and envirnmental variables */}
-                          <Canvass currentColorArray={currentColorArray} />
+                          <Tooltip label="Drag to rotate model" hasArrow>
+                            <Box>
+                              <Canvass currentColorArray={currentColorArray} />
+                            </Box>
+                          </Tooltip>
+                        
                           {currentChoiceToGraph == "hflux" ||
                           currentChoiceToGraph == "environment" ? (
-                            <Text>No color scheme for this variable.</Text>
+                            <Text fontSize="14" color="red">No color scheme for this variable.</Text>
                           ) : (
                             <></>
                           )}
-                          <Text>Drag to rotate model.</Text>
                         </VStack>
                       </HStack>
                     </VStack>

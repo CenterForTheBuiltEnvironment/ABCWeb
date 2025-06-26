@@ -21,7 +21,7 @@ import {
 } from "@/constants/helperFunctions";
 
 import { background, theme } from "@chakra-ui/react";
-const chartTextColor = theme.colors.gray[700]; // "#4A5568"
+const chartTextColor = theme.colors.gray[700];
 
 // -----------------------
 //  Global text style
