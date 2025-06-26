@@ -196,6 +196,7 @@ function baseBuilder({
         color: chartTextColor, // axis line color
         },
       },
+      splitNumber: yAxisCfg.splitNumber || 5, // default to 5 splits
       axisLabel: {
         formatter: yAxisCfg.formatter,
         fontSize: globalTextStyle.fontSize,
@@ -239,6 +240,7 @@ export function sensBuilder(data) {
       max: 4,
       formatter: (v) => `${v}: ${formatSensDescriptor(v)}`,
       extract: (d) => d.sensation,
+      splitNumber: 7
     },
     colorFnArr: [
       (v) => colorSensation(v, false),
