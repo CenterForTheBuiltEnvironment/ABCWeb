@@ -171,9 +171,19 @@ function baseBuilder({
 
   return {
     textStyle: globalTextStyle,
-    title: { text: title, left: "5%", top: "2%" },
+    title: {
+      text: title,
+      left: "18%",
+      top: "3%",
+    },
     tooltip: { trigger: "axis", formatter: tooltipFormatter },
-    legend: { data: legends },
+    legend: {
+      data: legends,
+      left: "20%",
+      top: "12%",
+      orient: "horizontal",
+      itemGap: 10,
+    },
     grid: {
       left: "20%",
       right: "5%",
@@ -197,7 +207,7 @@ function baseBuilder({
       },
       axisLine: {
         lineStyle: {
-          color: chartTextColor, // axis line color
+          color: chartTextColor,
         },
       },
       name: "Time (min)",
@@ -205,18 +215,17 @@ function baseBuilder({
       nameTextStyle: { padding: 15, fontSize: globalTextStyle.fontSize },
       axisPointer: { type: "shadow" },
       axisLabel: {
-        interval: 0, // Show all labels
-        // Show xMin "AND" every interval mark thereafter
+        interval: 0,
         formatter: (v) =>
           v === xMin || (v - minAligned) % interval === 0 ? v : "",
         fontSize: globalTextStyle.fontSize,
         showMinLabel: true,
         showMaxLabel: true,
       },
-    },
-    yAxis: {
+        },
+        yAxis: {
       type: "value",
-      name: yAxisCfg.name || "", // y-axis name, if not selected it returns empty
+      name: yAxisCfg.name || "", // y-axis name, if not set returns empty string
       nameLocation: "center",
       nameTextStyle: { padding: 20, fontSize: globalTextStyle.fontSize },
       min: yAxisCfg.min,
