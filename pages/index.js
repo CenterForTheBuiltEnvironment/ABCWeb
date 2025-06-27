@@ -93,7 +93,7 @@ import {
   tcoreBuilder,
   tskinBuilder,
 } from "@/components/graphBuilder";
-import CloseButton from "@/components/closeButton";
+import CloseButton from "@/components/button";
 import AdvancedSettingsModal from "@/components/advancedSettingsModal";
 
 export default function WithSubnavigation() {
@@ -1374,17 +1374,28 @@ export default function WithSubnavigation() {
                         </VStack>
                         {/* Manikin visualization */}
                         <VStack w="25%">
-                            <Text fontWeight="bold" color="gray.700" m={0}>
-                              {params[currIndex[0]].condition_name}{" "}
-                              <span style={{ marginLeft: "5px" }}>
-                                {currIndex[1]} mins
-                              </span>
-                            </Text>
-                          <Text textAlign="center" w="100%" fontSize="14" color="gray.700">
-                            Click a point on the graph to display data on the manikin.{" "}
+                          <Text fontWeight="bold" color="gray.700" m={0}>
+                            {params[currIndex[0]].condition_name}{" "}
+                            <span style={{ marginLeft: "5px" }}>
+                              {currIndex[1]} mins
+                            </span>
+                          </Text>
+                          <Text
+                            textAlign="center"
+                            w="100%"
+                            fontSize="14"
+                            color="gray.700"
+                          >
+                            Click a point on the graph to display data on the
+                            manikin.{" "}
                             {isComparing ? (
-                              <Text fontWeight="bold" fontSize="14" color="gray.700">
-                                Only results from your current input will be displayed, not comparison ones.
+                              <Text
+                                fontWeight="bold"
+                                fontSize="14"
+                                color="gray.700"
+                              >
+                                Only results from your current input will be
+                                displayed, not comparison ones.
                               </Text>
                             ) : (
                               ""
@@ -1396,10 +1407,12 @@ export default function WithSubnavigation() {
                               <Canvass currentColorArray={currentColorArray} />
                             </Box>
                           </Tooltip>
-                        
+
                           {currentChoiceToGraph == "hflux" ||
                           currentChoiceToGraph == "environment" ? (
-                            <Text fontSize="14" color="red">No color scheme for this variable.</Text>
+                            <Text fontSize="14" color="red">
+                              No color scheme for this variable.
+                            </Text>
                           ) : (
                             <></>
                           )}
@@ -1694,6 +1707,7 @@ export default function WithSubnavigation() {
                       textAlign="center"
                       w="100%"
                       style={{ marginTop: "10px" }}
+                      textSize="14"
                     >
                       These values are averages. Click &quot;Edit variable
                       data&quot; to see your input data more accurately.
@@ -1701,14 +1715,16 @@ export default function WithSubnavigation() {
                   </>
                 </VStack>
                 <HStack align="center" justifyContent="center">
-                  <Button
-                    backgroundColor={"cbe.Blue"}
-                    textColor={"white"}
-                    colorScheme="blue"
-                    onClick={() => runSimulationManager()}
-                  >
-                    Simulate
-                  </Button>
+                  <Tooltip label="Drag to rotate model" hasArrow>
+                    <Button
+                      backgroundColor={"cbe.Blue"}
+                      textColor={"white"}
+                      colorScheme="blue"
+                      onClick={() => runSimulationManager()}
+                    >
+                      Simulate
+                    </Button>
+                  </Tooltip>
                   <Button
                     textColor="gray.600"
                     bgColor="white"
