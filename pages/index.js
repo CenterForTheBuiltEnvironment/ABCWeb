@@ -34,6 +34,7 @@ import {
   MenuOptionGroup,
   MenuItemOption,
 } from "@chakra-ui/react";
+
 import RSelect from "react-select";
 import {
   HamburgerIcon,
@@ -100,9 +101,10 @@ import {
   UploadCSVButton,
   SaveJSONButton,
   CompareToggleButton,
-  AdvancedSettingButton
+  AdvancedSettingButton,
 } from "@/components/button";
 import AdvancedSettingsModal from "@/components/advancedSettingsModal";
+import HelpPopover from "@/components/helpPopover";
 
 export default function WithSubnavigation() {
   const [isMetric, setMetric] = useState(true);
@@ -321,7 +323,7 @@ export default function WithSubnavigation() {
       <>
         {isHome ? (
           <HStack justifyContent={"center"} spacing={2}>
-            <Tooltip label="Edit name" fontSize="md">
+            <Tooltip label="Edit name" hasArrow>
               <IconButton
                 backgroundColor={"gray.200"}
                 textColor={"gray.600"}
@@ -330,7 +332,7 @@ export default function WithSubnavigation() {
                 {...getEditButtonProps()}
               />
             </Tooltip>
-            <Tooltip label="Close" fontSize="md">
+            <Tooltip label="Close" hasArrow>
               <CloseButton
                 params={params}
                 ind={ind}
@@ -340,7 +342,7 @@ export default function WithSubnavigation() {
             </Tooltip>
           </HStack>
         ) : (
-          <Tooltip label="Edit name" fontSize="md">
+          <Tooltip label="Edit name">
             <IconButton
               backgroundColor={"gray.200"}
               textColor={"gray.600"}
@@ -852,7 +854,7 @@ export default function WithSubnavigation() {
                       );
                     })}
                   </HStack>
-                  <Tooltip label="Add new phase" fontSize="md">
+                  <Tooltip label="Add new phase" hasArrow>
                     <IconButton
                       w="5%"
                       colorScheme="red"
@@ -905,7 +907,7 @@ export default function WithSubnavigation() {
                           mr="10px"
                         />
                         <EditableControls />
-                        <Tooltip label="Delete this phase" fontSize="md">
+                        <Tooltip label="Delete this phase" hasArrow>
                           <IconButton
                             w="5%"
                             colorScheme="red"
@@ -959,22 +961,32 @@ export default function WithSubnavigation() {
                         justifyContent={"center"}
                         spacing={2}
                       >
-                        <MetSelector
-                          params={params}
-                          setParams={setParams}
-                          setMetIndex={setMetIndex}
-                          metIndex={metIndex}
-                          setMetOptions={setMetOptions}
-                          metOptions={metOptions}
-                          ind={ind}
-                          key={refreshKey}
-                        />
-                        <ClothingSelector
-                          params={params}
-                          setParams={setParams}
-                          clo_correspondence={cloTable}
-                          ind={ind}
-                        />
+                        <HStack w="100%" alignItems="center">
+                          <Box>
+                            <MetSelector
+                              params={params}
+                              setParams={setParams}
+                              setMetIndex={setMetIndex}
+                              metIndex={metIndex}
+                              setMetOptions={setMetOptions}
+                              metOptions={metOptions}
+                              ind={ind}
+                              key={refreshKey}
+                            />
+                          </Box>
+                          <HelpPopover type="met" />
+                        </HStack>
+                        <HStack w="100%" alignItems="center">
+                          <Box>
+                            <ClothingSelector
+                              params={params}
+                              setParams={setParams}
+                              clo_correspondence={cloTable}
+                              ind={ind}
+                            />
+                          </Box>
+                          <HelpPopover type="clo" />
+                        </HStack>
                         <Text color="gray.600">
                           {cloTable[params[ind].clo_value].whole_body.iclo} clo
                           -{" "}
@@ -982,73 +994,87 @@ export default function WithSubnavigation() {
                             {cloTable[params[ind].clo_value].description}
                           </span>
                         </Text>
-                        <Menu placement="top" closeOnSelect={false}>
-                          <MenuButton
-                            as={Button}
-                            rightIcon={<ChevronDownIcon />}
-                            w="200px"
-                            background={"white"}
-                            colorScheme="gray"
-                            variant="outline"
-                          >
-                            Personal comfort
-                          </MenuButton>
-                          <MenuList>
-                            <MenuOptionGroup title="Select all that apply.">
-                              {pcsParams.map((e, index) => {
-                                if (params) {
-                                  return (
-                                    <MenuItem
-                                      key={e.name}
-                                      onClick={() => {
-                                        let tempParams = [...params];
-                                        if (
-                                          params[
-                                            ind
-                                          ].personal_comfort_system.has(index)
-                                        ) {
-                                          tempParams[
-                                            ind
-                                          ].personal_comfort_system.delete(
-                                            index
-                                          );
-                                        } else {
-                                          tempParams[
-                                            ind
-                                          ].personal_comfort_system.add(index);
-                                        }
-                                        setParams(tempParams);
-                                      }}
-                                    >
-                                      <HStack spacing={0}>
-                                        <div
-                                          style={{
-                                            height: "100%",
-                                            width: "25px",
+
+                        <Box>
+                          <HStack w="100%" alignItems="center">
+                            <Menu placement="top" closeOnSelect={false}>
+                              <MenuButton
+                                as={Button}
+                                rightIcon={<ChevronDownIcon />}
+                                w="200px"
+                                background={"white"}
+                                colorScheme="gray"
+                                variant="outline"
+                              >
+                                Personal comfort
+                              </MenuButton>
+                              <MenuList>
+                                <MenuOptionGroup title="Select all that apply.">
+                                  {pcsParams.map((e, index) => {
+                                    if (params) {
+                                      return (
+                                        <MenuItem
+                                          key={e.name}
+                                          onClick={() => {
+                                            let tempParams = [...params];
+                                            if (
+                                              params[
+                                                ind
+                                              ].personal_comfort_system.has(
+                                                index
+                                              )
+                                            ) {
+                                              tempParams[
+                                                ind
+                                              ].personal_comfort_system.delete(
+                                                index
+                                              );
+                                            } else {
+                                              tempParams[
+                                                ind
+                                              ].personal_comfort_system.add(
+                                                index
+                                              );
+                                            }
+                                            setParams(tempParams);
                                           }}
                                         >
-                                          {params[
-                                            ind
-                                          ].personal_comfort_system.has(
-                                            index
-                                          ) ? (
-                                            <CheckIcon />
-                                          ) : (
-                                            <></>
-                                          )}
-                                        </div>
-                                        <Text mr={2} verticalAlign={"center"}>
-                                          {e.name}
-                                        </Text>
-                                        {e.icons}
-                                      </HStack>
-                                    </MenuItem>
-                                  );
-                                } else return <></>;
-                              })}
-                            </MenuOptionGroup>
-                          </MenuList>
-                        </Menu>
+                                          <HStack spacing={0}>
+                                            <div
+                                              style={{
+                                                height: "100%",
+                                                width: "25px",
+                                              }}
+                                            >
+                                              {params[
+                                                ind
+                                              ].personal_comfort_system.has(
+                                                index
+                                              ) ? (
+                                                <CheckIcon />
+                                              ) : (
+                                                <></>
+                                              )}
+                                            </div>
+                                            <Text
+                                              mr={2}
+                                              verticalAlign={"center"}
+                                            >
+                                              {e.name}
+                                            </Text>
+                                            {e.icons}
+                                          </HStack>
+                                        </MenuItem>
+                                      );
+                                    } else return <></>;
+                                  })}
+                                </MenuOptionGroup>
+                              </MenuList>
+                            </Menu>
+                            <HelpPopover type="pcs" />
+                          </HStack>
+                        </Box>
+
                         <Menu placement="top">
                           <MenuButton
                             as={Button}
@@ -1085,7 +1111,7 @@ export default function WithSubnavigation() {
                         </Menu>
                       </VStack>
                     </HStack>
-                    <Text style={{ marginTop: "10px" }}>
+                    <Text style={{ marginTop: "10px", fontSize: "14px" }}>
                       These values are averages. Click &quot;Edit data&quot; to
                       see your input data more accurately.
                     </Text>
@@ -1568,23 +1594,34 @@ export default function WithSubnavigation() {
                         alignItems="flex-start"
                         justifyContent={"center"}
                       >
-                        <MetSelector
-                          params={params}
-                          setParams={setParams}
-                          setMetIndex={setMetIndex}
-                          metIndex={metIndex}
-                          setMetOptions={setMetOptions}
-                          metOptions={metOptions}
-                          ind={ind}
-                          isHome
-                        />
-                        <ClothingSelector
-                          params={params}
-                          setParams={setParams}
-                          clo_correspondence={cloTable}
-                          ind={ind}
-                          isHome
-                        />
+                        <HStack alignItems="center">
+                          <Box w="100%">
+                            <MetSelector
+                              params={params}
+                              setParams={setParams}
+                              setMetIndex={setMetIndex}
+                              metIndex={metIndex}
+                              setMetOptions={setMetOptions}
+                              metOptions={metOptions}
+                              ind={ind}
+                              isHome
+                            />
+                          </Box>
+                          <HelpPopover type="met" />
+                        </HStack>
+                        <HStack alignItems="center">
+                          <Box w="100%">
+                            <ClothingSelector
+                              params={params}
+                              setParams={setParams}
+                              clo_correspondence={cloTable}
+                              ind={ind}
+                              isHome
+                            />
+                          </Box>
+                          <HelpPopover type="clo" />
+                        </HStack>
+
                         <Text color="gray.600">
                           {cloTable[params[ind].clo_value].whole_body.iclo} clo
                           -{" "}
@@ -1608,78 +1645,83 @@ export default function WithSubnavigation() {
                       >
                         Ramp
                       </Checkbox> */}
-                        <Menu placement="top" closeOnSelect={false}>
-                          <MenuButton
-                            as={Button}
-                            rightIcon={<ChevronDownIcon />}
-                            w="60%"
-                            colorScheme="gray"
-                            background={"white"}
-                            variant="outline"
-                          >
-                            Personal comfort system
-                          </MenuButton>
-                          <MenuList>
-                            <MenuOptionGroup title="Select all that apply.">
-                              {pcsParams.map((e, index) => {
-                                if (params) {
-                                  return (
-                                    <MenuItem
-                                      key={e.name}
-                                      onClick={() => {
-                                        let tempParams = [...params];
-                                        if (
-                                          params[
-                                            ind
-                                          ].personal_comfort_system.has(index)
-                                        ) {
-                                          tempParams[
-                                            ind
-                                          ].personal_comfort_system.delete(
-                                            index
-                                          );
-                                        } else {
-                                          tempParams[
-                                            ind
-                                          ].personal_comfort_system.add(index);
-                                        }
-                                        setParams(tempParams);
-                                      }}
-                                    >
-                                      <HStack spacing={0}>
-                                        <div
-                                          style={{
-                                            height: "100%",
-                                            width: "25px",
-                                          }}
-                                        >
-                                          {params[
-                                            ind
-                                          ].personal_comfort_system.has(
-                                            index
-                                          ) ? (
-                                            <CheckIcon />
-                                          ) : (
-                                            <></>
-                                          )}
-                                        </div>
-                                        <Text mr={2} verticalAlign={"center"}>
-                                          {e.name}
-                                        </Text>
-                                        {e.icons}
-                                      </HStack>
-                                    </MenuItem>
-                                  );
-                                } else return <></>;
-                              })}
-                            </MenuOptionGroup>
-                          </MenuList>
-                        </Menu>
+                        <HStack>
+                          <Menu placement="top" closeOnSelect={false}>
+                            <MenuButton
+                              as={Button}
+                              rightIcon={<ChevronDownIcon />}
+                              w="100%"
+                              colorScheme="gray"
+                              background={"white"}
+                              variant="outline"
+                            >
+                              Personal comfort system
+                            </MenuButton>
+                            <MenuList>
+                              <MenuOptionGroup title="Select all that apply.">
+                                {pcsParams.map((e, index) => {
+                                  if (params) {
+                                    return (
+                                      <MenuItem
+                                        key={e.name}
+                                        onClick={() => {
+                                          let tempParams = [...params];
+                                          if (
+                                            params[
+                                              ind
+                                            ].personal_comfort_system.has(index)
+                                          ) {
+                                            tempParams[
+                                              ind
+                                            ].personal_comfort_system.delete(
+                                              index
+                                            );
+                                          } else {
+                                            tempParams[
+                                              ind
+                                            ].personal_comfort_system.add(
+                                              index
+                                            );
+                                          }
+                                          setParams(tempParams);
+                                        }}
+                                      >
+                                        <HStack spacing={0}>
+                                          <div
+                                            style={{
+                                              height: "100%",
+                                              width: "25px",
+                                            }}
+                                          >
+                                            {params[
+                                              ind
+                                            ].personal_comfort_system.has(
+                                              index
+                                            ) ? (
+                                              <CheckIcon />
+                                            ) : (
+                                              <></>
+                                            )}
+                                          </div>
+                                          <Text mr={2} verticalAlign={"center"}>
+                                            {e.name}
+                                          </Text>
+                                          {e.icons}
+                                        </HStack>
+                                      </MenuItem>
+                                    );
+                                  } else return <></>;
+                                })}
+                              </MenuOptionGroup>
+                            </MenuList>
+                          </Menu>
+                          <HelpPopover type="pcs" />
+                        </HStack>
                         <Menu placement="top">
                           <MenuButton
                             as={Button}
                             rightIcon={<ChevronDownIcon />}
-                            w="60%"
+                            w="55%"
                             backgroundColor={"cbe.lightBlue"}
                             textColor={"white"}
                             colorScheme="blue"
@@ -1756,16 +1798,16 @@ export default function WithSubnavigation() {
                 personalComfortSystem={personalComfortSystem}
               />
               <CompareToggleButton
-                  isComparing={isComparing}
-                  setComparing={setComparing}
-                  setComparedResults={setComparedResults}
-                  setFullDataCompare={setFullDataCompare}
-                  setDataCompare={setDataCompare}
-                  runSimulationManager={runSimulationManager}
-                  isMetric={isMetric}
-                  setInComparingUploadModal={setInComparingUploadModal}
-                  uploadModal={uploadModal}
-                />
+                isComparing={isComparing}
+                setComparing={setComparing}
+                setComparedResults={setComparedResults}
+                setFullDataCompare={setFullDataCompare}
+                setDataCompare={setDataCompare}
+                runSimulationManager={runSimulationManager}
+                isMetric={isMetric}
+                setInComparingUploadModal={setInComparingUploadModal}
+                uploadModal={uploadModal}
+              />
               <AdvancedSettingButton onClick={advancedModal.onOpen} />
               <Tooltip label="Switch to wide view" hasArrow>
                 <IconButton
