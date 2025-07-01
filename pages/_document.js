@@ -7,7 +7,6 @@ export default function Document() {
       <body>
         <Main />
         <NextScript />
-        <script async src="https://siteimproveanalytics.com/js/siteanalyze_6294756.js"></script>
       </body>
     </Html>
   )
