@@ -332,12 +332,20 @@ export default function WithSubnavigation() {
                 {...getEditButtonProps()}
               />
             </Tooltip>
-            <Tooltip label="Close" hasArrow>
-              <CloseButton
-                params={params}
-                ind={ind}
-                setParams={setParams}
-                setIndex={setIndex}
+            <Tooltip label="Delete this phase" hasArrow>
+              <IconButton
+                w="5%"
+                colorScheme="red"
+                backgroundColor={"red.300"}
+                icon={<CloseIcon />}
+                isDisabled={params.length == 1}
+                onClick={() => {
+                  let tempParams = [...params];
+                  tempParams.splice(ind, 1);
+                  setParams(tempParams);
+                  setIndex(Math.max(0, ind - 1));
+                }}
+                ml="10px"
               />
             </Tooltip>
           </HStack>
