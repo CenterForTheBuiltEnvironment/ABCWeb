@@ -83,7 +83,7 @@ export default function App({ Component, pageProps }) {
       />
       <Script
         async
-        src="https://siteimproveanalytics.com/js/siteanalyze_6294756.js"
+        src={''https://siteimproveanalytics.com/js/siteanalyze_6294756.js'}
         strategy="afterInteractive"
       />
       <Script id="google-analytics">
