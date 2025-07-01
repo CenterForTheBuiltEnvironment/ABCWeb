@@ -928,7 +928,7 @@ export default function WithSubnavigation() {
                     {/* Input parameters */}
                     <HStack w="100%" alignItems="flex-start">
                       {/* Left side */}
-                      <VStack w="45%" alignItems="flex-start" spacing={2}>
+                      <VStack w="45%" alignItems="flex-start" spacing={5}>
                         {listOfParameters(isMetric).map((option) => {
                           return (
                             <div key={option.title}>
@@ -959,7 +959,7 @@ export default function WithSubnavigation() {
                         w="55%"
                         alignItems="flex-start"
                         justifyContent={"center"}
-                        spacing={2}
+                        spacing={5}
                       >
                         <HStack w="100%" alignItems="center">
                           <Box>
@@ -1467,8 +1467,8 @@ export default function WithSubnavigation() {
               {/* Wide view mode */}
               <VStack
                 w="100%"
-                minH="60vh"
-                margin="50px"
+                minH="70vh"
+                marginTop="3%"
                 alignItems="center"
                 justifyContent="center"
               >
@@ -1480,17 +1480,18 @@ export default function WithSubnavigation() {
                   justifyContent="center"
                 >
                   {/* A condition botton */}
-                  <HStack w="100%" overflowY={"scroll"} spacing={3}>
+                  <HStack w="90%" overflowY={"scroll"} spacing={3}>
                     {params.map((elem, indx) => {
                       return (
                         <Button
                           key={indx}
                           minW="110px"
                           backgroundColor={
-                            ind == indx ? "cbe.blue" : "cbe.lightBlue"
+                            ind == indx ? "cbe.blue" : "cbe.grey"
                           }
-                          textColor="white"
+                          textColor={ind == indx ? "white" : "gray.600"}
                           colorScheme="gray"
+                          borderWidth={1}
                           onClick={() => {
                             if (ind == indx) return false;
                             else setIndex(indx);
@@ -1504,32 +1505,34 @@ export default function WithSubnavigation() {
                       );
                     })}
                   </HStack>
-                  {/* + Botton for adding conditions */}
-                  <IconButton
-                    w="5%"
-                    colorScheme="red"
-                    backgroundColor={"red.300"}
-                    textColor={"white"}
-                    icon={<AddIcon />}
-                    onClick={() => {
-                      setParams([
-                        ...params,
-                        conditionParams(params.length + 1),
-                      ]);
-                      setIndex(ind + 1);
-                    }}
-                  ></IconButton>
+                  <Tooltip label="Add new phase" hasArrow>
+                    <IconButton
+                      w="5%"
+                      colorScheme="red"
+                      backgroundColor={"red.300"}
+                      // border="2px solid gray"
+                      textColor={"white"}
+                      icon={<AddIcon />}
+                      onClick={() => {
+                        setParams([
+                          ...params,
+                          conditionParams(params.length + 1),
+                        ]);
+                        setIndex(ind + 1);
+                      }}
+                    ></IconButton>
+                  </Tooltip>
                 </HStack>
                 {/* Main condition section*/}
                 <VStack
-                  minW="60%"
+                  minW="55%"
                   background={"cbe.grey"}
                   borderColor="gray.300"
                   borderWidth="1px"
                   borderRadius="10px"
                   padding={5}
-                  spacing={1}
-                  alignItems="flex-start"
+                  spacing={5}
+                  alignItems="center"
                 >
                   <>
                     {/* Condition title */}
@@ -1539,8 +1542,9 @@ export default function WithSubnavigation() {
                         fontSize="2xl"
                         fontWeight="bold"
                         isPreviewFocusable={false}
+                        alignContent={"center"}
                       >
-                        <EditablePreview mr="10px" />
+                        <EditablePreview textAlign="center" />
                         <Input
                           as={EditableInput}
                           onChange={(e) => {
@@ -1559,9 +1563,14 @@ export default function WithSubnavigation() {
                       </Editable>
                     </Flex>
                     {/* Contents */}
-                    <HStack w="100%" alignItems="flex-start" spacing={5}>
+                    <HStack w="80%" alignItems="flex-start" spacing={5}>
                       {/* Left side input items */}
-                      <VStack pl={200} w="50%" alignItems="flex-start">
+                      <VStack
+                        w="50%"
+                        alignItems="flex-start"
+                        paddingLeft={"15%"}
+                        spacing={3}
+                      >
                         {listOfParameters(isMetric).map((option) => {
                           return (
                             <div key={option.title}>
@@ -1589,10 +1598,11 @@ export default function WithSubnavigation() {
                       </VStack>
                       {/* Right side input items */}
                       <VStack
-                        pl={0}
-                        w="50%"
+                        w="60%"
                         alignItems="flex-start"
-                        justifyContent={"center"}
+                        justifyContent={"flex-start"}
+                        paddingLeft={"10%"}
+                        spacing="18px"
                       >
                         <HStack alignItems="center">
                           <Box w="100%">
@@ -1610,7 +1620,7 @@ export default function WithSubnavigation() {
                           <HelpPopover type="met" />
                         </HStack>
                         <HStack alignItems="center">
-                          <Box w="100%">
+                          <Box w="100%" paddingTop={"10px"}>
                             <ClothingSelector
                               params={params}
                               setParams={setParams}
@@ -1622,7 +1632,7 @@ export default function WithSubnavigation() {
                           <HelpPopover type="clo" />
                         </HStack>
 
-                        <Text color="gray.600">
+                        <Text color="gray.600" marginTop={-3}>
                           {cloTable[params[ind].clo_value].whole_body.iclo} clo
                           -{" "}
                           <span style={{ fontSize: "13px", color: "gray.600" }}>
@@ -1654,6 +1664,7 @@ export default function WithSubnavigation() {
                               colorScheme="gray"
                               background={"white"}
                               variant="outline"
+                              minWidth="250px"
                             >
                               Personal comfort system
                             </MenuButton>
@@ -1721,10 +1732,11 @@ export default function WithSubnavigation() {
                           <MenuButton
                             as={Button}
                             rightIcon={<ChevronDownIcon />}
-                            w="55%"
+                            w="50%"
                             backgroundColor={"cbe.lightBlue"}
                             textColor={"white"}
                             colorScheme="blue"
+                            minWidth="250px"
                           >
                             Edit variable data
                           </MenuButton>
@@ -1764,7 +1776,7 @@ export default function WithSubnavigation() {
                     </Text>
                   </>
                 </VStack>
-                <HStack align="center" justifyContent="center">
+                <HStack align="center" justifyContent="center" marginTop={5}>
                   <SimulateButton onClick={runSimulationManager} />
                   <UploadJSONButton onClick={uploadModal.onOpen} />
                   <UploadCSVButton onClick={uploadCSVModal.onOpen} />
