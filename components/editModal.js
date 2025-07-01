@@ -16,6 +16,7 @@ import {
   Spacer,
   Text,
   VStack,
+  Box,
 } from "@chakra-ui/react";
 import styles from "../styles/Home.module.css";
 import { personalComfortSystem } from "@/constants/constants";
@@ -58,7 +59,21 @@ export default function EditModal({
       <ModalOverlay />
       <ModalContent maxW="90%" maxH="90%" overflowY="scroll">
         <ModalHeader>Edit {optionRendererObj.title.toLowerCase()}</ModalHeader>
-        <ModalBody>
+        <Box
+          backgroundColor="yellow.100"
+          borderLeft="4px solid #ECC94B"
+          padding="8px"
+          marginX="20px"
+          borderRadius="md"
+        >
+          <Text color="gray.700">
+            Use the "Apply to all" button to assign the same value to all
+            body parts for a uniform environment. To create a non-uniform
+            environment, you can either use the "Stratify" buttons or manually
+            adjust each value.
+          </Text>
+        </Box>
+        <ModalBody marginTop={5}>
           <HStack justifyContent="center" spacing={8}>
             <HStack>
               <NumberInput
@@ -192,7 +207,7 @@ export default function EditModal({
               )}
             </HStack>
           </HStack>
-          <HStack w="100%" justifyContent="center" spacing={8} margin={2}>
+          <HStack w="100%" justifyContent="center" spacing={8} marginTop={10}>
             {params[ind][optionRendererObj.val].map((value, indx) => {
               if (indx < 8)
                 return (
@@ -269,7 +284,7 @@ export default function EditModal({
                 );
             })}
           </HStack>
-          <HStack w="100%" justifyContent="center" spacing={8} margin={2}>
+          <HStack w="100%" justifyContent="center" spacing={8} marginTop={5}>
             {params[ind][optionRendererObj.val].map((value, indx) => {
               if (indx >= 8)
                 return (
