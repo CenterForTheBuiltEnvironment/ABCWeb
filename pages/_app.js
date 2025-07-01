@@ -1,23 +1,44 @@
 import "@/styles/globals.css";
 import { ChakraProvider, theme } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
+import Script from "next/script"; // Import Script for Google Analytics
 
 import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/500.css";
 import "@fontsource/ibm-plex-sans/600.css";
 import "@fontsource/ibm-plex-sans/700.css";
 
+const GA_ID = 'G-X2YFMWEBG7'; // Google Analytics ID
+
 const colors = {
   brand: {
     100: "#97DFFC",
+  },
+  berkeleyBlue: {
+    100: "#0c2772",
+  },
+  berkeleyGold: {
+    100: "#fdb516",
+  },
+  cbe: {
+    grey: "#fafafa",
+    lightBlue: "#3fbbec",
+    blue: "#0077c2",
   },
 };
 
 export const newTheme = extendTheme({
   colors,
   fonts: {
-    heading: `'IBM Plex Sans', sans-serif`,
-    body: `'IBM Plex Sans', sans-serif`,
+    heading: `'Arial', sans-serif`,
+    body: `'Arial', sans-serif`,
+  },
+  styles: {
+    global: {
+      body: {
+        color: "gray.700",
+      },
+    },
   },
   components: {
     Checkbox: {
@@ -54,6 +75,20 @@ export const newTheme = extendTheme({
 export default function App({ Component, pageProps }) {
   return (
     <ChakraProvider theme={newTheme}>
+      {/* Google Analytics Script */}
+      <Script
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_ID}');
+        `}
+      </Script>
       <Component {...pageProps} />
     </ChakraProvider>
   );

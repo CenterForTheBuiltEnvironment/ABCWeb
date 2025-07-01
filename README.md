@@ -1,9 +1,13 @@
-# ABCWeb
+# ABCWeb: A Web interface of the Advanced Berkeley Comfort (ABC) model
 
-Live website link: https://clownfish-app-wxmgi.ondigitalocean.app/
+## Links
+ - Live website link: https://abc.cbe.berkeley.edu/ (original link: https://abcweb-384255928646.us-west1.run.app/)
+ - Documentation: https://cbe-berkeley.gitbook.io/advanced-berkeley-comfort-abc-model
 
-Web Interface for ABC
+## Overview
+The Advanced Berkeley Comfort (ABC) model, initially developed by the Building Sciences Group at the University of California, Berkeley, is one of the most sophisticated thermal comfort models This repository is for a graphical web interface of the ABC model.
 
+## Installation
 - git clone this branch
 - cd into the folder
 - run the command 'npm i' or 'yarn add'

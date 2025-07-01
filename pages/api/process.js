@@ -9,7 +9,6 @@
 // clo_ensemble_name
 
 import axios from "axios";
-import clothing from "../../reference/local clo input/clothing_ensembles.json";
 
 const stand_fr = {
   Head: 1.0,
@@ -208,14 +207,18 @@ export default async function handler(req, res) {
           ignore_physiology: false,
           neutralSimulationOutput: false,
         },
+        bodybuilder: req.body.bodyb,
         phases: phases,
-        clothing: clothing,
+        clothing: req.body.clothing,
       };
       const interfaceResult = await axios
         .post(process.env.DB_URL, {
           ...obj,
         })
         .then((result) => {
+          if (req.body.raw) {
+            return res.json(result.data);
+          }
           let graphObject = [],
             ctr = 0;
           for (let i = 0; i < req.body.phases.length; i++) {
