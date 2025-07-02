@@ -296,7 +296,7 @@ export default function WithSubnavigation() {
           return o;
         });
       }
-      return environmentBuilder({ // Test 4
+      return environmentBuilder({ // Test
         data: tempArr,
         legends: ["ta", "mrt", "solar", "eht", "rh", "v"],
         offset: frontOffset,
