@@ -15,7 +15,7 @@ steps:
       - deploy
       - abcweb
       - --image=gcr.io/$PROJECT_ID/abcweb
-      - --region=us-west1
+      - --region=global
       - --platform=managed
       - --allow-unauthenticated
 
