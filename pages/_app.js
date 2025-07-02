@@ -81,6 +81,11 @@ export default function App({ Component, pageProps }) {
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
         strategy="afterInteractive"
       />
+      <Script
+        async
+        src={'https://siteimproveanalytics.com/js/siteanalyze_6294756.js'}
+        strategy="afterInteractive"
+      />
       <Script id="google-analytics">
         {`
           window.dataLayer = window.dataLayer || [];
@@ -89,6 +94,7 @@ export default function App({ Component, pageProps }) {
           gtag('config', '${GA_ID}');
         `}
       </Script>
+
       <Component {...pageProps} />
     </ChakraProvider>
   );
