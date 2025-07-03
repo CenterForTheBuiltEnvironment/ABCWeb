@@ -185,7 +185,7 @@ function baseBuilder({
       itemGap: 10,
     },
     grid: {
-      left: "20%",
+      left: "21%", // enough space for having long comfort legends (e.g. Very Uncomfortable)
       right: "5%",
       bottom: "15%",
       top: "20%",
