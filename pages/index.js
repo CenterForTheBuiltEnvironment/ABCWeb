@@ -732,6 +732,7 @@ export default function WithSubnavigation() {
           borderStyle={"solid"}
           borderColor={useColorModeValue("gray.300", "gray.900")}
           align={"center"}
+          boxShadow="md"
         >
           <Flex
             flex={{ base: 1, md: "auto" }}
@@ -936,7 +937,7 @@ export default function WithSubnavigation() {
                     {/* Input parameters */}
                     <HStack w="100%" alignItems="flex-start">
                       {/* Left side */}
-                      <VStack w="45%" alignItems="flex-start" spacing={5}>
+                      <VStack w="45%" alignItems="flex-start" spacing={3}>
                         {listOfParameters(isMetric).map((option) => {
                           return (
                             <div key={option.title}>
