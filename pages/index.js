@@ -1777,7 +1777,7 @@ export default function WithSubnavigation() {
                       textAlign="center"
                       w="100%"
                       style={{ marginTop: "10px" }}
-                      textSize="14"
+                      fontSize="14"
                     >
                       These values are averages. Click &quot;Edit variable
                       data&quot; to see your input data more accurately.
