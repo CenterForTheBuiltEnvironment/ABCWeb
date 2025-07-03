@@ -67,9 +67,9 @@ export default function EditModal({
           borderRadius="md"
         >
           <Text color="gray.700">
-            Use the "Apply to all" button to assign the same value to all
+            Use the Apply to all button to assign the same value to all
             body parts for a uniform environment. To create a non-uniform
-            environment, you can either use the "Stratify" buttons or manually
+            environment, you can either use the Stratify buttons or manually
             adjust each value.
           </Text>
         </Box>
