@@ -1310,7 +1310,6 @@ export default function WithSubnavigation() {
                         </Tooltip>
                       </HStack>
                       {/* Timeseries results and manikin */}
-                      {/* Test */}
                       <HStack w="100%">
                         {/* Timeseries results */}
                         <VStack w="75%" alignItems="flex-start">
