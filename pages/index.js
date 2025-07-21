@@ -1420,7 +1420,7 @@ export default function WithSubnavigation() {
                           <Text fontWeight="bold" color="gray.700" m={0}>
                             {params[currIndex[0]].condition_name}{" "}
                             <span style={{ marginLeft: "5px" }}>
-                              {currIndex[1]} mins
+                              {currIndex[1]+1} mins
                             </span>
                           </Text>
                           <Text
