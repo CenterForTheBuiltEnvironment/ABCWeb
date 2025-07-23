@@ -385,6 +385,7 @@ export default function WithSubnavigation() {
   const onEvents = useMemo(
     () => ({
       click: (params) => {
+        const absoluteIndex = params.dataIndex + sliderVal[0];
         let tempColorArr = [];
         for (let i = 0; i < bodyColors[params.dataIndex].length; i++) {
           tempColorArr.push(bodyColors[params.dataIndex][i]);
@@ -393,16 +394,16 @@ export default function WithSubnavigation() {
         let curr = 0;
         for (let i = 0; i < cache.length; i++) {
           curr += cache[i].exposure_duration;
-          if (curr > params.dataIndex) {
+          if (curr > absoluteIndex) {
             setIndex(i);
-            setCurrIndex([i, params.dataIndex]);
+            setCurrIndex([i, absoluteIndex]);
             break;
           }
         }
       },
       mouseover: (params) => {},
     }),
-    [cache, bodyColors]
+    [cache, bodyColors, sliderVal]
   );
 
   const runSimulationManager = async (
@@ -1420,7 +1421,7 @@ export default function WithSubnavigation() {
                           <Text fontWeight="bold" color="gray.700" m={0}>
                             {params[currIndex[0]].condition_name}{" "}
                             <span style={{ marginLeft: "5px" }}>
-                              {sliderVal[0]+currIndex[1]} mins
+                              {currIndex[1]} mins
                             </span>
                           </Text>
                           <Text
