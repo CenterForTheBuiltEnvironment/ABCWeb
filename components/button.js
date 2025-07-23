@@ -50,7 +50,7 @@ export const UploadJSONButton = ({ onClick }) => {
         {...commonButtonStyle}
         onClick={onClick}
       >
-        Upload JSON
+        Open
       </Button>
     </Tooltip>
   );

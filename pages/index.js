@@ -1788,7 +1788,7 @@ export default function WithSubnavigation() {
                 <HStack align="center" justifyContent="center" marginTop={5}>
                   <SimulateButton onClick={runSimulationManager} />
                   <UploadJSONButton onClick={uploadModal.onOpen} />
-                  <UploadCSVButton onClick={uploadCSVModal.onOpen} />
+                  {/* <UploadCSVButton onClick={uploadCSVModal.onOpen} /> */}
                   <SaveJSONButton
                     params={params}
                     cloTable={cloTable}
@@ -1811,7 +1811,7 @@ export default function WithSubnavigation() {
             <HStack align="center" justifyContent="center">
               <SimulateButton onClick={runSimulationManager} />
               <UploadJSONButton onClick={uploadModal.onOpen} />
-              <UploadCSVButton onClick={uploadCSVModal.onOpen} />
+              {/* <UploadCSVButton onClick={uploadCSVModal.onOpen} /> */}
               <SaveJSONButton
                 params={params}
                 cloTable={cloTable}
