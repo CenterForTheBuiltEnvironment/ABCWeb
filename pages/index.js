@@ -629,7 +629,7 @@ export default function WithSubnavigation() {
           setBodyColors(colorsArr);
           setCurrentColorArray(Array(18).fill("white"));
 
-          // Prepare CSV data for export (Aki is here)
+          // Prepare CSV data for export
           let data = [];
           data.push(csvHeaderLine);
           for (let time = 0; time < res.data.length; time++) {
@@ -1420,7 +1420,7 @@ export default function WithSubnavigation() {
                           <Text fontWeight="bold" color="gray.700" m={0}>
                             {params[currIndex[0]].condition_name}{" "}
                             <span style={{ marginLeft: "5px" }}>
-                              {currIndex[1]+1} mins
+                              {sliderVal[0]+currIndex[1]} mins
                             </span>
                           </Text>
                           <Text
