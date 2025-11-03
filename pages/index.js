@@ -174,7 +174,21 @@ export default function WithSubnavigation() {
 
   // Handler to update cloTable when custom presets are saved
   const handleClothingPresetsSaved = (customPresets) => {
-    setCloTable([...clo_correspondence, ...customPresets]);
+    const newCloTable = [...clo_correspondence, ...customPresets];
+    setCloTable(newCloTable);
+    
+    // Validate and reset clo_value if out of bounds
+    const newParams = params.map((param) => {
+      const cloValue = parseInt(param.clo_value);
+      if (cloValue >= newCloTable.length || cloValue < 0) {
+        return { ...param, clo_value: 0 };
+      }
+      return param;
+    });
+    if (JSON.stringify(newParams) !== JSON.stringify(params)) {
+      setParams(newParams);
+    }
+    
     setRefreshKey(Math.random()); // Force refresh of components
   };
 
@@ -183,18 +197,34 @@ export default function WithSubnavigation() {
     if (typeof window !== "undefined") {
       const handleStorageChange = () => {
         const saved = localStorage.getItem("abc_clothing_presets");
+        let newCloTable;
         if (saved) {
           try {
             const customPresets = JSON.parse(saved);
-            setCloTable([...clo_correspondence, ...customPresets]);
-            setRefreshKey(Math.random());
+            newCloTable = [...clo_correspondence, ...customPresets];
           } catch (e) {
             console.error("Error loading custom presets:", e);
+            newCloTable = clo_correspondence;
           }
         } else {
-          setCloTable(clo_correspondence);
-          setRefreshKey(Math.random());
+          newCloTable = clo_correspondence;
         }
+        
+        setCloTable(newCloTable);
+        
+        // Validate and reset clo_value if out of bounds
+        const newParams = params.map((param) => {
+          const cloValue = parseInt(param.clo_value);
+          if (cloValue >= newCloTable.length || cloValue < 0) {
+            return { ...param, clo_value: 0 };
+          }
+          return param;
+        });
+        if (JSON.stringify(newParams) !== JSON.stringify(params)) {
+          setParams(newParams);
+        }
+        
+        setRefreshKey(Math.random());
       };
 
       window.addEventListener("clothingPresetsUpdated", handleStorageChange);
@@ -202,7 +232,7 @@ export default function WithSubnavigation() {
         window.removeEventListener("clothingPresetsUpdated", handleStorageChange);
       };
     }
-  }, []);
+  }, [params, setParams]);
 
   const decideGraph = (
     metric,
@@ -1063,10 +1093,10 @@ export default function WithSubnavigation() {
                           </Tooltip>
                         </HStack>
                         <Text color="gray.600">
-                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
+                          {cloTable[params[ind].clo_value]?.whole_body?.iclo ?? 0} clo
                           -{" "}
                           <span style={{ fontSize: "13px", color: "gray.600" }}>
-                            {cloTable[params[ind].clo_value].description}
+                            {cloTable[params[ind].clo_value]?.description ?? "N/A"}
                           </span>
                         </Text>
 
@@ -1718,10 +1748,10 @@ export default function WithSubnavigation() {
                         </HStack>
 
                         <Text color="gray.600" marginTop={-3}>
-                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
+                          {cloTable[params[ind].clo_value]?.whole_body?.iclo ?? 0} clo
                           -{" "}
                           <span style={{ fontSize: "13px", color: "gray.600" }}>
-                            {cloTable[params[ind].clo_value].description}
+                            {cloTable[params[ind].clo_value]?.description ?? "N/A"}
                           </span>
                         </Text>
                         {/* Ramp function is not working correctly on the backend now */}
