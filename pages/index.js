@@ -84,6 +84,7 @@ import UploadModal from "@/components/uploadParam";
 import Spinner from "@/components/spinner";
 import ClothingSelector from "@/components/clothingSelector";
 import MetSelector from "@/components/metSelector";
+import AddCustomClothes from "@/components/addCustomClothes";
 import Image from "next/image";
 import { CSVDownload, CSVLink } from "react-csv";
 import {
@@ -135,6 +136,7 @@ export default function WithSubnavigation() {
   const uploadCSVModal = useDisclosure();
   const [refreshKey, setRefreshKey] = useState(Math.random());
   const advancedModal = useDisclosure();
+  const customClothesModal = useDisclosure();
 
   const [bodyColors, setBodyColors] = useState([]);
   const [currentColorArray, setCurrentColorArray] = useState(
@@ -154,7 +156,53 @@ export default function WithSubnavigation() {
   const [fullDataCompare, setFullDataCompare] = useState([]);
   const [graphDataCompare, setDataCompare] = useState([]);
 
-  const [cloTable, setCloTable] = useState(clo_correspondence);
+  const [cloTable, setCloTable] = useState(() => {
+    // Initialize with default clothing, then merge custom presets from localStorage
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("abc_clothing_presets");
+      if (saved) {
+        try {
+          const customPresets = JSON.parse(saved);
+          return [...clo_correspondence, ...customPresets];
+        } catch (e) {
+          console.error("Error loading custom presets:", e);
+        }
+      }
+    }
+    return clo_correspondence;
+  });
+
+  // Handler to update cloTable when custom presets are saved
+  const handleClothingPresetsSaved = (customPresets) => {
+    setCloTable([...clo_correspondence, ...customPresets]);
+    setRefreshKey(Math.random()); // Force refresh of components
+  };
+
+  // Listen for custom clothing preset updates
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleStorageChange = () => {
+        const saved = localStorage.getItem("abc_clothing_presets");
+        if (saved) {
+          try {
+            const customPresets = JSON.parse(saved);
+            setCloTable([...clo_correspondence, ...customPresets]);
+            setRefreshKey(Math.random());
+          } catch (e) {
+            console.error("Error loading custom presets:", e);
+          }
+        } else {
+          setCloTable(clo_correspondence);
+          setRefreshKey(Math.random());
+        }
+      };
+
+      window.addEventListener("clothingPresetsUpdated", handleStorageChange);
+      return () => {
+        window.removeEventListener("clothingPresetsUpdated", handleStorageChange);
+      };
+    }
+  }, []);
 
   const decideGraph = (
     metric,
@@ -410,6 +458,7 @@ export default function WithSubnavigation() {
     metric = isMetric,
     comparing = isComparing
   ) => {
+      console.log("running simulation manager");
     if (comparing) {
       let totDurationMain = 0,
         totDurationComparing = 0;
@@ -723,6 +772,12 @@ export default function WithSubnavigation() {
           setPcsParams={setPcsParams}
           isMetric={isMetric}
         />
+        <AddCustomClothes
+          isOpen={customClothesModal.isOpen}
+          onClose={customClothesModal.onClose}
+          onSave={handleClothingPresetsSaved}
+          defaultClothing={clo_correspondence}
+        />
         <Spinner loadingModal={loadingModal} />
         <Flex
           bg={useColorModeValue("cbe.grey", "gray.800")}
@@ -996,6 +1051,16 @@ export default function WithSubnavigation() {
                             />
                           </Box>
                           <HelpPopover type="clo" />
+                          <Tooltip label="Manage custom clothing presets" hasArrow>
+                            <Button
+                              size="sm"
+                              leftIcon={<AddIcon />}
+                              onClick={customClothesModal.onOpen}
+                              variant="outline"
+                            >
+                              Presets
+                            </Button>
+                          </Tooltip>
                         </HStack>
                         <Text color="gray.600">
                           {cloTable[params[ind].clo_value].whole_body.iclo} clo
@@ -1640,6 +1705,16 @@ export default function WithSubnavigation() {
                             />
                           </Box>
                           <HelpPopover type="clo" />
+                          <Tooltip label="Manage custom clothing presets" hasArrow>
+                            <Button
+                              size="sm"
+                              leftIcon={<AddIcon />}
+                              onClick={customClothesModal.onOpen}
+                              variant="outline"
+                            >
+                              Presets
+                            </Button>
+                          </Tooltip>
                         </HStack>
 
                         <Text color="gray.600" marginTop={-3}>
