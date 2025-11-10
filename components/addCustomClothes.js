@@ -105,6 +105,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
   const [selectedPresetIndex, setSelectedPresetIndex] = useState(null);
   const [presetData, setPresetData] = useState(createNewPreset());
   const [editingIndex, setEditingIndex] = useState(null);
+  const [tabIndex, setTabIndex] = useState(0);
 
   // Load custom presets from localStorage on mount
   useEffect(() => {
@@ -126,12 +127,23 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
       if (editingIndex === -1) {
         // New preset
         setPresetData(createNewPreset());
+        setTabIndex(1); // Switch to Create/Edit tab
       } else {
         // Edit existing custom preset
         setPresetData({ ...customPresets[editingIndex] });
+        setTabIndex(1); // Switch to Create/Edit tab
       }
     }
   }, [editingIndex, customPresets]);
+
+  // Reset tab index when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setTabIndex(0);
+      setEditingIndex(null);
+      setPresetData(createNewPreset());
+    }
+  }, [isOpen]);
 
   const handleSavePreset = () => {
     // Validate
@@ -247,7 +259,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
         <ModalHeader>Manage Clothing Presets</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Tabs>
+          <Tabs index={tabIndex} onChange={setTabIndex}>
             <TabList>
               <Tab>Browse Presets</Tab>
               <Tab>{editingIndex !== null ? "Edit Preset" : "Create New Preset"}</Tab>
@@ -313,7 +325,10 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                               <HStack>
                                 <Button
                                   size="sm"
-                                  onClick={() => setEditingIndex(customIndex)}
+                                  onClick={() => {
+                                    setEditingIndex(customIndex);
+                                    setTabIndex(1); // Switch to Create/Edit tab
+                                  }}
                                 >
                                   Edit
                                 </Button>
@@ -369,29 +384,53 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                     </Text>
                     <HStack spacing={4}>
                       <VStack align="start">
-                        <Text fontSize="sm">FCLO:</Text>
+                        <Text fontSize="sm">
+                          FCLO <Text as="span" fontSize="xs" color="gray.500">(fraction of surface area)</Text>:
+                        </Text>
                         <NumberInput
                           value={presetData.whole_body.fclo}
-                          onChange={(_, value) =>
-                            updateField("whole_body.fclo", parseFloat(value) || 0)
-                          }
+                          onChange={(valueString, valueNumber) => {
+                            // Allow empty string while typing, convert to number on blur
+                            if (valueString === "" || valueString === "-") {
+                              updateField("whole_body.fclo", 0);
+                            } else if (!isNaN(valueNumber)) {
+                              updateField("whole_body.fclo", valueNumber);
+                            }
+                          }}
                           precision={2}
                           step={0.01}
+                          allowMouseWheel={false}
                         >
-                          <NumberInputField w="120px" />
+                          <NumberInputField 
+                            w="120px" 
+                            onFocus={(e) => e.target.select()}
+                            placeholder="1.0"
+                          />
                         </NumberInput>
                       </VStack>
                       <VStack align="start">
-                        <Text fontSize="sm">ICLO:</Text>
+                        <Text fontSize="sm">
+                          ICLO <Text as="span" fontSize="xs" color="gray.500">(insulation)</Text>:
+                        </Text>
                         <NumberInput
                           value={presetData.whole_body.iclo}
-                          onChange={(_, value) =>
-                            updateField("whole_body.iclo", parseFloat(value) || 0)
-                          }
+                          onChange={(valueString, valueNumber) => {
+                            // Allow empty string while typing, convert to number on blur
+                            if (valueString === "" || valueString === "-") {
+                              updateField("whole_body.iclo", 0);
+                            } else if (!isNaN(valueNumber)) {
+                              updateField("whole_body.iclo", valueNumber);
+                            }
+                          }}
                           precision={2}
                           step={0.01}
+                          allowMouseWheel={false}
                         >
-                          <NumberInputField w="120px" />
+                          <NumberInputField 
+                            w="120px" 
+                            onFocus={(e) => e.target.select()}
+                            placeholder="0.0"
+                          />
                         </NumberInput>
                       </VStack>
                     </HStack>
@@ -424,18 +463,25 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                                         </Text>
                                         <NumberInput
                                           size="sm"
-                                          value={presetData.segment_data[segment]?.fclo || 1.0}
-                                          onChange={(_, value) =>
-                                            updateSegmentField(
-                                              segment,
-                                              "fclo",
-                                              parseFloat(value) || 0
-                                            )
-                                          }
+                                          value={presetData.segment_data[segment]?.fclo ?? 1.0}
+                                          onChange={(valueString, valueNumber) => {
+                                            // Allow empty string while typing
+                                            if (valueString === "" || valueString === "-") {
+                                              updateSegmentField(segment, "fclo", 0);
+                                            } else if (!isNaN(valueNumber)) {
+                                              updateSegmentField(segment, "fclo", valueNumber);
+                                            }
+                                          }}
                                           precision={2}
                                           step={0.01}
+                                          allowMouseWheel={false}
                                         >
-                                          <NumberInputField h="28px" fontSize="xs" />
+                                          <NumberInputField 
+                                            h="28px" 
+                                            fontSize="xs"
+                                            onFocus={(e) => e.target.select()}
+                                            placeholder="1.0"
+                                          />
                                         </NumberInput>
                                       </VStack>
                                       <VStack spacing={0} flex={1}>
@@ -444,18 +490,25 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                                         </Text>
                                         <NumberInput
                                           size="sm"
-                                          value={presetData.segment_data[segment]?.iclo || 0.0}
-                                          onChange={(_, value) =>
-                                            updateSegmentField(
-                                              segment,
-                                              "iclo",
-                                              parseFloat(value) || 0
-                                            )
-                                          }
+                                          value={presetData.segment_data[segment]?.iclo ?? 0.0}
+                                          onChange={(valueString, valueNumber) => {
+                                            // Allow empty string while typing
+                                            if (valueString === "" || valueString === "-") {
+                                              updateSegmentField(segment, "iclo", 0);
+                                            } else if (!isNaN(valueNumber)) {
+                                              updateSegmentField(segment, "iclo", valueNumber);
+                                            }
+                                          }}
                                           precision={2}
                                           step={0.01}
+                                          allowMouseWheel={false}
                                         >
-                                          <NumberInputField h="28px" fontSize="xs" />
+                                          <NumberInputField 
+                                            h="28px" 
+                                            fontSize="xs"
+                                            onFocus={(e) => e.target.select()}
+                                            placeholder="0.0"
+                                          />
                                         </NumberInput>
                                       </VStack>
                                     </HStack>

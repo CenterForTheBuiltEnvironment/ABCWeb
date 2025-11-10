@@ -50,20 +50,7 @@ const sit_fr = {
 
 export default async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ success: false, error: "Method not allowed" });
-    if (req.method === "POST") {
-        try {
-            const response = await axios.post("https://abc.cbe.berkeley.edu/api/process", req.body);
-            // if (response.data.length > 0) {
-            //     return res.status(409).json({ success: false, error: "Database already populated" });
-            // }
-            return res.json(response.data);
-        } catch (err) {
-            console.log(err);
-            return res.json({ success: false, error: err.response });
-        }
-    }
 
-    // causes error, use the abc server instead
     try {
       let phases = [],
         currTimer = 0;

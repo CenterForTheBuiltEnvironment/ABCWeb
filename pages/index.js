@@ -156,21 +156,23 @@ export default function WithSubnavigation() {
   const [fullDataCompare, setFullDataCompare] = useState([]);
   const [graphDataCompare, setDataCompare] = useState([]);
 
-  const [cloTable, setCloTable] = useState(() => {
-    // Initialize with default clothing, then merge custom presets from localStorage
+  // Initialize with default clothing only - load custom presets in useEffect to avoid hydration mismatch
+  const [cloTable, setCloTable] = useState(clo_correspondence);
+
+  // Load custom presets from localStorage after component mounts (client-side only)
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("abc_clothing_presets");
       if (saved) {
         try {
           const customPresets = JSON.parse(saved);
-          return [...clo_correspondence, ...customPresets];
+          setCloTable([...clo_correspondence, ...customPresets]);
         } catch (e) {
           console.error("Error loading custom presets:", e);
         }
       }
     }
-    return clo_correspondence;
-  });
+  }, []);
 
   // Handler to update cloTable when custom presets are saved
   const handleClothingPresetsSaved = (customPresets) => {
@@ -1071,19 +1073,21 @@ export default function WithSubnavigation() {
                           </Box>
                           <HelpPopover type="met" />
                         </HStack>
-                        <HStack w="100%" alignItems="center">
-                          <Box>
-                            <ClothingSelector
-                              params={params}
-                              setParams={setParams}
-                              clo_correspondence={cloTable}
-                              ind={ind}
-                            />
-                          </Box>
-                          <HelpPopover type="clo" />
+                        <VStack w="100%" alignItems="flex-start" spacing={2}>
+                          <HStack w="100%" alignItems="center">
+                            <Box>
+                              <ClothingSelector
+                                params={params}
+                                setParams={setParams}
+                                clo_correspondence={cloTable}
+                                ind={ind}
+                              />
+                            </Box>
+                            <HelpPopover type="clo" />
+                          </HStack>
                           <Tooltip label="Manage custom clothing presets" hasArrow>
                             <Button
-                              size="sm"
+                              w="200px"
                               leftIcon={<AddIcon />}
                               onClick={customClothesModal.onOpen}
                               variant="outline"
@@ -1091,7 +1095,7 @@ export default function WithSubnavigation() {
                               Presets
                             </Button>
                           </Tooltip>
-                        </HStack>
+                        </VStack>
                         <Text color="gray.600">
                           {cloTable[params[ind].clo_value]?.whole_body?.iclo ?? 0} clo
                           -{" "}
@@ -1724,20 +1728,22 @@ export default function WithSubnavigation() {
                           </Box>
                           <HelpPopover type="met" />
                         </HStack>
-                        <HStack alignItems="center">
-                          <Box w="100%" paddingTop={"10px"}>
-                            <ClothingSelector
-                              params={params}
-                              setParams={setParams}
-                              clo_correspondence={cloTable}
-                              ind={ind}
-                              isHome
-                            />
-                          </Box>
-                          <HelpPopover type="clo" />
+                        <VStack alignItems="flex-start" spacing={2}>
+                          <HStack alignItems="center" w="100%">
+                            <Box w="100%" paddingTop={"10px"}>
+                              <ClothingSelector
+                                params={params}
+                                setParams={setParams}
+                                clo_correspondence={cloTable}
+                                ind={ind}
+                                isHome
+                              />
+                            </Box>
+                            <HelpPopover type="clo" />
+                          </HStack>
                           <Tooltip label="Manage custom clothing presets" hasArrow>
                             <Button
-                              size="sm"
+                              w="250px"
                               leftIcon={<AddIcon />}
                               onClick={customClothesModal.onOpen}
                               variant="outline"
@@ -1745,7 +1751,7 @@ export default function WithSubnavigation() {
                               Presets
                             </Button>
                           </Tooltip>
-                        </HStack>
+                        </VStack>
 
                         <Text color="gray.600" marginTop={-3}>
                           {cloTable[params[ind].clo_value]?.whole_body?.iclo ?? 0} clo
