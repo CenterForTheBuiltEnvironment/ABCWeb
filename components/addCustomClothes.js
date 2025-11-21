@@ -27,8 +27,8 @@ import {
   GridItem,
   Badge,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { DeleteIcon, AddIcon } from "@chakra-ui/icons";
+import { useState, useEffect, useRef } from "react";
+import { DeleteIcon, AddIcon, DownloadIcon } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 
 const STORAGE_KEY = "abc_clothing_presets";
@@ -106,6 +106,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
   const [presetData, setPresetData] = useState(createNewPreset());
   const [editingIndex, setEditingIndex] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
+  const fileInputRef = useRef(null);
 
   // Load custom presets from localStorage on mount
   useEffect(() => {
@@ -247,6 +248,92 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
     });
   };
 
+  const handleExportPreset = (preset) => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(preset, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", (preset.ensemble_name || "preset") + ".json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const validatePreset = (data) => {
+    if (!data || typeof data !== 'object') return false;
+    if (!data.ensemble_name || typeof data.ensemble_name !== 'string') return false;
+    if (!data.whole_body || typeof data.whole_body !== 'object') return false;
+    if (typeof data.whole_body.fclo !== 'number' || typeof data.whole_body.iclo !== 'number') return false;
+    if (!data.segment_data || typeof data.segment_data !== 'object') return false;
+
+    // Basic segment validation - check if at least one expected segment exists or structure is correct
+    // We can be lenient or strict. Let's check for at least one key from DEFAULT_SEGMENTS
+    const hasValidSegment = DEFAULT_SEGMENTS.some(seg => data.segment_data[seg]);
+    if (!hasValidSegment) return false;
+
+    return true;
+  };
+
+  const handleImportPreset = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        if (validatePreset(json)) {
+          // Add as new custom preset
+          const newPreset = { ...json, isCustom: true };
+          const updatedPresets = [...customPresets, newPreset];
+          setCustomPresets(updatedPresets);
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPresets));
+            window.dispatchEvent(new Event("clothingPresetsUpdated"));
+          }
+
+          if (onSave) {
+            onSave([...updatedPresets]);
+          }
+
+          toast({
+            title: "Success",
+            description: "Preset imported successfully!",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+
+          // Reset file input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+
+          // Switch to browse tab
+          setTabIndex(0);
+        } else {
+          toast({
+            title: "Error",
+            description: "Invalid preset file structure.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        toast({
+          title: "Error",
+          description: "Failed to parse JSON file.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Get all presets (default + custom)
   const allPresets = defaultClothing
     ? [...defaultClothing, ...customPresets]
@@ -263,6 +350,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
             <TabList>
               <Tab>Browse Presets</Tab>
               <Tab>{editingIndex !== null ? "Edit Preset" : "Create New Preset"}</Tab>
+              <Tab>Import Preset</Tab>
             </TabList>
 
             <TabPanels>
@@ -333,6 +421,12 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                                   Edit
                                 </Button>
                                 <IconButton
+                                  icon={<DownloadIcon />}
+                                  size="sm"
+                                  onClick={() => handleExportPreset(preset)}
+                                  aria-label="Export preset"
+                                />
+                                <IconButton
                                   icon={<DeleteIcon />}
                                   size="sm"
                                   colorScheme="red"
@@ -401,8 +495,8 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                           step={0.01}
                           allowMouseWheel={false}
                         >
-                          <NumberInputField 
-                            w="120px" 
+                          <NumberInputField
+                            w="120px"
                             onFocus={(e) => e.target.select()}
                             placeholder="1.0"
                           />
@@ -426,8 +520,8 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                           step={0.01}
                           allowMouseWheel={false}
                         >
-                          <NumberInputField 
-                            w="120px" 
+                          <NumberInputField
+                            w="120px"
                             onFocus={(e) => e.target.select()}
                             placeholder="0.0"
                           />
@@ -476,8 +570,8 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                                           step={0.01}
                                           allowMouseWheel={false}
                                         >
-                                          <NumberInputField 
-                                            h="28px" 
+                                          <NumberInputField
+                                            h="28px"
                                             fontSize="xs"
                                             onFocus={(e) => e.target.select()}
                                             placeholder="1.0"
@@ -503,8 +597,8 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                                           step={0.01}
                                           allowMouseWheel={false}
                                         >
-                                          <NumberInputField 
-                                            h="28px" 
+                                          <NumberInputField
+                                            h="28px"
                                             fontSize="xs"
                                             onFocus={(e) => e.target.select()}
                                             placeholder="0.0"
@@ -520,6 +614,39 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                         ))}
                       </Grid>
                     </Box>
+                  </Box>
+                </VStack>
+              </TabPanel>
+
+              {/* Import Tab */}
+              <TabPanel>
+                <VStack spacing={6} align="center" justify="center" minH="200px">
+                  <Text fontSize="lg" fontWeight="bold">Import Preset from JSON</Text>
+                  <Text color="gray.600" textAlign="center">
+                    Upload a previously exported JSON file to add it to your presets.
+                  </Text>
+                  <Box
+                    border="2px dashed"
+                    borderColor="gray.300"
+                    borderRadius="md"
+                    p={10}
+                    w="100%"
+                    textAlign="center"
+                    _hover={{ borderColor: "blue.400", bg: "blue.50" }}
+                    cursor="pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <VStack spacing={2}>
+                      <DownloadIcon w={8} h={8} color="gray.400" transform="rotate(180deg)" />
+                      <Text>Click to upload JSON file</Text>
+                    </VStack>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImportPreset}
+                      accept=".json"
+                      style={{ display: "none" }}
+                    />
                   </Box>
                 </VStack>
               </TabPanel>
