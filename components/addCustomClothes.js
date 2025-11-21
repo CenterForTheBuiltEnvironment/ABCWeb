@@ -26,10 +26,13 @@ import {
   Grid,
   GridItem,
   Badge,
+  Checkbox,
+  Tooltip,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 import { DeleteIcon, AddIcon, DownloadIcon } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
+import { clothingItems } from "../constants/clothingItems";
 
 const STORAGE_KEY = "abc_clothing_presets";
 
@@ -97,6 +100,7 @@ const createNewPreset = () => ({
   whole_body: { fclo: 1.0, iclo: 0.0 },
   segment_data: createDefaultSegmentData(),
   isCustom: true,
+  selectedItems: [],
 });
 
 export default function AddCustomClothes({ isOpen, onClose, onSave, defaultClothing }) {
@@ -106,6 +110,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
   const [presetData, setPresetData] = useState(createNewPreset());
   const [editingIndex, setEditingIndex] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
+  const [selectedItems, setSelectedItems] = useState([]);
   const fileInputRef = useRef(null);
 
   // Load custom presets from localStorage on mount
@@ -128,11 +133,14 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
       if (editingIndex === -1) {
         // New preset
         setPresetData(createNewPreset());
-        setTabIndex(1); // Switch to Create/Edit tab
+        setSelectedItems([]);
+        // Tab switch handled by button click
       } else {
         // Edit existing custom preset
-        setPresetData({ ...customPresets[editingIndex] });
-        setTabIndex(1); // Switch to Create/Edit tab
+        const preset = customPresets[editingIndex];
+        setPresetData({ ...preset });
+        setSelectedItems(preset.selectedItems || []);
+        // Tab switch handled by button click
       }
     }
   }, [editingIndex, customPresets]);
@@ -143,6 +151,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
       setTabIndex(0);
       setEditingIndex(null);
       setPresetData(createNewPreset());
+      setSelectedItems([]);
     }
   }, [isOpen]);
 
@@ -160,9 +169,11 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
     }
 
     const updatedPresets = [...customPresets];
-    if (editingIndex === -1) {
+    const presetToSave = { ...presetData, isCustom: true, selectedItems }; // Preserve selectedItems
+
+    if (editingIndex === -1 || editingIndex === null) {
       // Add new preset
-      updatedPresets.push({ ...presetData, isCustom: true });
+      updatedPresets.push(presetToSave);
       toast({
         title: "Success",
         description: "Custom clothing preset saved!",
@@ -172,7 +183,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
       });
     } else {
       // Update existing preset
-      updatedPresets[editingIndex] = { ...presetData, isCustom: true };
+      updatedPresets[editingIndex] = presetToSave;
       toast({
         title: "Success",
         description: "Preset updated!",
@@ -245,6 +256,108 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
       const newData = { ...prev };
       newData.segment_data[segment][field] = parseFloat(value) || 0;
       return newData;
+    });
+  };
+
+  const toggleClothingItem = (itemId) => {
+    setSelectedItems((prev) => {
+      if (prev.includes(itemId)) {
+        return prev.filter((id) => id !== itemId);
+      } else {
+        return [...prev, itemId];
+      }
+    });
+  };
+
+  const createPresetFromSelection = () => {
+    // Validate
+    if (!presetData.ensemble_name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an ensemble name",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const newPreset = { ...presetData }; // Start with current data (has name/desc)
+    const selectedClothes = clothingItems.filter(item => selectedItems.includes(item.id));
+
+    // Ensure description is set if empty, or append? 
+    // User request says "input... like advanced", so we rely on user input. 
+    // If user didn't input description, maybe auto-generate? 
+    // Let's stick to user input, but if empty, maybe default to item list?
+    if (!newPreset.description) {
+      newPreset.description = selectedClothes.map(c => c.name).join(", ");
+    }
+
+    // Calculate segment values
+    // Logic: Sum iclo, Max fclo
+    DEFAULT_SEGMENTS.forEach(segment => {
+      let totalIclo = 0;
+      let maxFclo = 1.0; // Base fclo
+
+      selectedClothes.forEach(item => {
+        if (item.segment_data && item.segment_data[segment]) {
+          totalIclo += item.segment_data[segment].iclo || 0;
+          if (item.segment_data[segment].fclo > maxFclo) {
+            maxFclo = item.segment_data[segment].fclo;
+          }
+        }
+      });
+
+      newPreset.segment_data[segment] = {
+        iclo: parseFloat(totalIclo.toFixed(2)),
+        fclo: parseFloat(maxFclo.toFixed(2))
+      };
+    });
+
+    // Calculate whole body values
+    let sumIclo = 0;
+    let maxBodyFclo = 1.0;
+    DEFAULT_SEGMENTS.forEach(seg => {
+      sumIclo += newPreset.segment_data[seg].iclo;
+      if (newPreset.segment_data[seg].fclo > maxBodyFclo) maxBodyFclo = newPreset.segment_data[seg].fclo;
+    });
+    newPreset.whole_body.iclo = parseFloat((sumIclo / DEFAULT_SEGMENTS.length).toFixed(2));
+    newPreset.whole_body.fclo = parseFloat(maxBodyFclo.toFixed(2));
+    newPreset.isCustom = true;
+    newPreset.selectedItems = [...selectedItems]; // Save selection
+
+    // SAVE LOGIC (Directly)
+    const updatedPresets = [...customPresets];
+
+    if (editingIndex === -1 || editingIndex === null) {
+      updatedPresets.push(newPreset);
+    } else {
+      updatedPresets[editingIndex] = newPreset;
+    }
+
+    setCustomPresets(updatedPresets);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPresets));
+      window.dispatchEvent(new Event("clothingPresetsUpdated"));
+    }
+
+    if (onSave) {
+      onSave([...updatedPresets]);
+    }
+
+    // Reset and redirect
+    setPresetData(createNewPreset());
+    setSelectedItems([]);
+    setEditingIndex(null);
+    setTabIndex(0); // Go to Browse tab
+
+    toast({
+      title: "Success",
+      description: editingIndex === -1 ? "Preset created and saved!" : "Preset updated!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
     });
   };
 
@@ -349,7 +462,8 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
           <Tabs index={tabIndex} onChange={setTabIndex}>
             <TabList>
               <Tab>Browse Presets</Tab>
-              <Tab>{editingIndex !== null ? "Edit Preset" : "Create New Preset"}</Tab>
+              <Tab>{editingIndex !== null ? "Edit Preset (Simple)" : "Create New Preset"}</Tab>
+              <Tab>{editingIndex !== null ? "Edit Preset (Advanced)" : "Advanced Create New Preset"}</Tab>
               <Tab>Import Preset</Tab>
             </TabList>
 
@@ -361,14 +475,6 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                     <Text fontSize="lg" fontWeight="bold">
                       Available Presets ({allPresets.length})
                     </Text>
-                    <Button
-                      leftIcon={<AddIcon />}
-                      colorScheme="blue"
-                      onClick={() => setEditingIndex(-1)}
-                      size="sm"
-                    >
-                      Create New
-                    </Button>
                   </HStack>
                   <Divider />
                   <Box
@@ -415,16 +521,24 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                                   size="sm"
                                   onClick={() => {
                                     setEditingIndex(customIndex);
-                                    setTabIndex(1); // Switch to Create/Edit tab
+                                    setTabIndex(1); // Switch to Simple Edit tab
                                   }}
                                 >
                                   Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditingIndex(customIndex);
+                                    setTabIndex(2); // Switch to Advanced Edit tab
+                                  }}
+                                >
+                                  Adv. Edit
                                 </Button>
                                 <IconButton
                                   icon={<DownloadIcon />}
                                   size="sm"
                                   onClick={() => handleExportPreset(preset)}
-                                  aria-label="Export preset"
                                 />
                                 <IconButton
                                   icon={<DeleteIcon />}
@@ -443,7 +557,72 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                 </VStack>
               </TabPanel>
 
-              {/* Create/Edit Tab */}
+              {/* Create New Preset Tab */}
+              <TabPanel>
+                <VStack spacing={6} align="stretch">
+                  <Box>
+                    <Text fontWeight="bold" mb={2}>Basic Information</Text>
+                    <VStack spacing={3}>
+                      <HStack w="100%" align="center">
+                        <Text w="150px">Ensemble Name:</Text>
+                        <Input
+                          value={presetData.ensemble_name}
+                          onChange={(e) => updateField("ensemble_name", e.target.value)}
+                          placeholder="e.g., Summer Casual"
+                        />
+                      </HStack>
+                      <HStack w="100%" align="center">
+                        <Text w="150px">Description:</Text>
+                        <Input
+                          value={presetData.description}
+                          onChange={(e) => updateField("description", e.target.value)}
+                          placeholder="e.g., T-shirt and shorts"
+                        />
+                      </HStack>
+                    </VStack>
+                  </Box>
+
+                  <Text>Select clothing items to build your preset. Values will be calculated automatically.</Text>
+
+                  {/* Group items by category */}
+                  {["Tops", "Bottoms", "Outerwear", "Footwear", "Underwear"].map(category => (
+                    <Box key={category}>
+                      <Text fontWeight="bold" mb={2}>{category}</Text>
+                      <Grid templateColumns="repeat(auto-fill, minmax(150px, 1fr))" gap={4}>
+                        {clothingItems.filter(item => item.category === category).map(item => (
+                          <Box
+                            key={item.id}
+                            p={3}
+                            border="1px solid"
+                            borderColor={selectedItems.includes(item.id) ? "blue.500" : "gray.200"}
+                            bg={selectedItems.includes(item.id) ? "blue.50" : "white"}
+                            borderRadius="md"
+                            cursor="pointer"
+                            onClick={() => toggleClothingItem(item.id)}
+                            _hover={{ borderColor: "blue.300" }}
+                          >
+                            <VStack>
+                              <Text fontWeight="medium">{item.name}</Text>
+                              {selectedItems.includes(item.id) && <Badge colorScheme="blue">Selected</Badge>}
+                            </VStack>
+                          </Box>
+                        ))}
+                      </Grid>
+                      <Divider my={4} />
+                    </Box>
+                  ))}
+
+                  <Tooltip label="Please enter an ensemble name" isDisabled={!!presetData.ensemble_name.trim()}>
+                    <Box w="100%">
+                      <Button w="100%" colorScheme="blue" size="lg" onClick={createPresetFromSelection} isDisabled={!presetData.ensemble_name.trim()}>
+                        {editingIndex === -1 || editingIndex === null ? "Create Preset" : "Save Changes"}
+                      </Button>
+                    </Box>
+                  </Tooltip>
+                </VStack>
+              </TabPanel>
+
+              {/* Advanced Create/Edit Tab */}
               <TabPanel>
                 <VStack spacing={6} align="stretch">
                   <Box>
@@ -615,6 +794,14 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                       </Grid>
                     </Box>
                   </Box>
+
+                  <Tooltip label="Please enter an ensemble name" isDisabled={!!presetData.ensemble_name.trim()}>
+                    <Box w="100%">
+                      <Button w="100%" colorScheme="blue" size="lg" onClick={handleSavePreset} mt={4} isDisabled={!presetData.ensemble_name.trim()}>
+                        {editingIndex === -1 || editingIndex === null ? "Create Preset" : "Save Changes"}
+                      </Button>
+                    </Box>
+                  </Tooltip>
                 </VStack>
               </TabPanel>
 
@@ -652,24 +839,19 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
               </TabPanel>
             </TabPanels>
           </Tabs>
-        </ModalBody>
+        </ModalBody >
 
         <ModalFooter>
           {editingIndex !== null && (
-            <>
-              <Button variant="ghost" mr={3} onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button colorScheme="blue" onClick={handleSavePreset}>
-                {editingIndex === -1 ? "Create Preset" : "Save Changes"}
-              </Button>
-            </>
+            <Button variant="ghost" mr={3} onClick={handleCancel}>
+              Cancel
+            </Button>
           )}
           {editingIndex === null && (
             <Button onClick={onClose}>Close</Button>
           )}
         </ModalFooter>
-      </ModalContent>
-    </Modal>
+      </ModalContent >
+    </Modal >
   );
 }
