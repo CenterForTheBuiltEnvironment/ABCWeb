@@ -585,7 +585,7 @@ export default function AddCustomClothes({ isOpen, onClose, onSave, defaultCloth
                   <Text>Select clothing items to build your preset. Values will be calculated automatically.</Text>
 
                   {/* Group items by category */}
-                  {["Tops", "Bottoms", "Outerwear", "Footwear", "Underwear"].map(category => (
+                  {["Tops", "Bottoms", "Outerwear", "Footwear", "Accessories", "Underwear"].map(category => (
                     <Box key={category}>
                       <Text fontWeight="bold" mb={2}>{category}</Text>
                       <Grid templateColumns="repeat(auto-fill, minmax(150px, 1fr))" gap={4}>
