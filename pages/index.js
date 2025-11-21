@@ -1123,7 +1123,7 @@ export default function WithSubnavigation() {
                     </HStack>
                     <Text style={{ marginTop: "10px", fontSize: "14px" }}>
                       These values are averages. Click &quot;Edit data&quot; to
-                      see your input data even more accurately.
+                      see your input data even accurately.
                     </Text>
                   </>
                 </VStack>
@@ -1782,7 +1782,7 @@ export default function WithSubnavigation() {
                       fontSize="14"
                     >
                       These values are averages. Click &quot;Edit variable
-                      data&quot; to see your input data more accurately.
+                      data&quot; to see your input data even more accurately.
                     </Text>
                   </>
                 </VStack>
