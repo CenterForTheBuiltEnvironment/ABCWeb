@@ -35,4 +35,8 @@ yarn-error.log*
 next-env.d.ts
 
 # jetbrains
+<<<<<<< HEAD
 .idea/
+=======
+.idea
+>>>>>>> f7b441cf3592a2b19b1e01e72557e59e6861b7b1
