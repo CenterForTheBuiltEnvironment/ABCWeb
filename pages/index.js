@@ -6,14 +6,12 @@ import {
   Button,
   Stack,
   Collapse,
-  Checkbox,
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
   Switch,
   HStack,
   VStack,
-  Spacer,
   useToast,
   Fade,
   Menu,
@@ -25,14 +23,12 @@ import {
   EditablePreview,
   EditableInput,
   useEditableControls,
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
-  RangeSliderThumb,
-  RangeSliderMark,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
   Tooltip,
   MenuOptionGroup,
-  MenuItemOption,
 } from "@chakra-ui/react";
 
 import RSelect from "react-select";
@@ -47,7 +43,7 @@ import {
 } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import Head from "next/head";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import dynamic from "next/dynamic";
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
@@ -84,7 +80,6 @@ import UploadModal from "@/components/uploadParam";
 import Spinner from "@/components/spinner";
 import ClothingSelector from "@/components/clothingSelector";
 import MetSelector from "@/components/metSelector";
-import AddCustomClothes from "@/components/addCustomClothes";
 import Image from "next/image";
 import { CSVDownload, CSVLink } from "react-csv";
 import {
@@ -103,6 +98,7 @@ import {
   SaveJSONButton,
   CompareToggleButton,
   AdvancedSettingButton,
+  TimelinePlayButton,
 } from "@/components/button";
 import AdvancedSettingsModal from "@/components/advancedSettingsModal";
 import HelpPopover from "@/components/helpPopover";
@@ -136,7 +132,6 @@ export default function WithSubnavigation() {
   const uploadCSVModal = useDisclosure();
   const [refreshKey, setRefreshKey] = useState(Math.random());
   const advancedModal = useDisclosure();
-  const customClothesModal = useDisclosure();
 
   const [bodyColors, setBodyColors] = useState([]);
   const [currentColorArray, setCurrentColorArray] = useState(
@@ -146,8 +141,12 @@ export default function WithSubnavigation() {
   const [csvData, setCSVData] = useState();
   const [currentChoiceToGraph, setCurrentChoiceToGraph] = useState("comfort");
   const [sliderMaxVal, setSliderMaxVal] = useState(0);
-  const [sliderVal, setSliderVal] = useState([0, 0]);
   const [comfortView, setComfortView] = useState(true);
+
+  // Playback state for time‑lapse of model colors
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackIndex, setPlaybackIndex] = useState(null); // absolute minute index (1‑based)
+  const [isScrubbing, setIsScrubbing] = useState(false); // true when user is dragging the slider
 
   const [isComparing, setComparing] = useState(false);
   const [comparedResults, setComparedResults] = useState();
@@ -156,85 +155,10 @@ export default function WithSubnavigation() {
   const [fullDataCompare, setFullDataCompare] = useState([]);
   const [graphDataCompare, setDataCompare] = useState([]);
 
-  // Initialize with default clothing only - load custom presets in useEffect to avoid hydration mismatch
   const [cloTable, setCloTable] = useState(clo_correspondence);
 
-  // Load custom presets from localStorage after component mounts (client-side only)
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("abc_clothing_presets");
-      if (saved) {
-        try {
-          const customPresets = JSON.parse(saved);
-          setCloTable([...clo_correspondence, ...customPresets]);
-        } catch (e) {
-          console.error("Error loading custom presets:", e);
-        }
-      }
-    }
-  }, []);
-
-  // Handler to update cloTable when custom presets are saved
-  const handleClothingPresetsSaved = (customPresets) => {
-    const newCloTable = [...clo_correspondence, ...customPresets];
-    setCloTable(newCloTable);
-    
-    // Validate and reset clo_value if out of bounds
-    const newParams = params.map((param) => {
-      const cloValue = parseInt(param.clo_value);
-      if (cloValue >= newCloTable.length || cloValue < 0) {
-        return { ...param, clo_value: 0 };
-      }
-      return param;
-    });
-    if (JSON.stringify(newParams) !== JSON.stringify(params)) {
-      setParams(newParams);
-    }
-    
-    setRefreshKey(Math.random()); // Force refresh of components
-  };
-
-  // Listen for custom clothing preset updates
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const handleStorageChange = () => {
-        const saved = localStorage.getItem("abc_clothing_presets");
-        let newCloTable;
-        if (saved) {
-          try {
-            const customPresets = JSON.parse(saved);
-            newCloTable = [...clo_correspondence, ...customPresets];
-          } catch (e) {
-            console.error("Error loading custom presets:", e);
-            newCloTable = clo_correspondence;
-          }
-        } else {
-          newCloTable = clo_correspondence;
-        }
-        
-        setCloTable(newCloTable);
-        
-        // Validate and reset clo_value if out of bounds
-        const newParams = params.map((param) => {
-          const cloValue = parseInt(param.clo_value);
-          if (cloValue >= newCloTable.length || cloValue < 0) {
-            return { ...param, clo_value: 0 };
-          }
-          return param;
-        });
-        if (JSON.stringify(newParams) !== JSON.stringify(params)) {
-          setParams(newParams);
-        }
-        
-        setRefreshKey(Math.random());
-      };
-
-      window.addEventListener("clothingPresetsUpdated", handleStorageChange);
-      return () => {
-        window.removeEventListener("clothingPresetsUpdated", handleStorageChange);
-      };
-    }
-  }, [params, setParams]);
+  // Playback speed for timeline animation (ms per step)
+  const PLAYBACK_INTERVAL_MS = 250;
 
   const decideGraph = (
     metric,
@@ -446,51 +370,212 @@ export default function WithSubnavigation() {
 
   const toast = useToast();
 
-  useEffect(() => {}, [
-    metIndex,
-    graphOptions,
-    ind,
-    numtoGraph,
-    currentColorArray,
-    isInComparingUploadModal,
-    isComparing,
-  ]);
-
+  // Run simulation when compared results are uploaded
   useEffect(() => {
     if (comparedResults) {
       runSimulationManager();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comparedResults]);
+
+  const supportsTimelinePlayback =
+    currentChoiceToGraph !== "hflux" && currentChoiceToGraph !== "environment";
+
+  const canPlayTimeline =
+    supportsTimelinePlayback &&
+    fullData.length > 0 &&
+    bodyColors.length > 0;
+
+  // Helper to update model color and label for a given absolute time index
+  const setTimeStepByIndex = useCallback(
+    (absoluteIndex) => {
+      if (!bodyColors || bodyColors.length === 0) return;
+      if (!graphData || graphData.length === 0) return;
+
+      // Clamp to the smaller of bodyColors.length and graphData.length for safety
+      const maxBound = Math.min(bodyColors.length, graphData.length);
+      const clampedIndex = Math.max(1, Math.min(absoluteIndex, maxBound));
+
+      // Update model colors
+      const colorArray = bodyColors[clampedIndex - 1];
+      if (colorArray) {
+        setCurrentColorArray(colorArray);
+      }
+
+      // Update label showing which condition and minute we are on
+      if (cache && cache.length > 0) {
+        let cumulative = 0;
+        for (let i = 0; i < cache.length; i++) {
+          cumulative += cache[i].exposure_duration;
+          if (cumulative >= clampedIndex) {
+            setIndex(i);
+            setCurrIndex([i, clampedIndex]);
+            break;
+          }
+        }
+      }
+    },
+    [bodyColors, cache, graphData]
+  );
+
+  const handleTimelineToggle = useCallback(() => {
+    if (!canPlayTimeline) return;
+    if (!graphData || graphData.length === 0) return;
+
+    const maxIndex = graphData.length;
+
+    setIsPlaying((prev) => {
+      if (prev) {
+        // Pause playback
+        return false;
+      }
+
+      // Start or resume playback; if we've already finished (at the end),
+      // restart from the beginning.
+      let start = playbackIndex !== null ? playbackIndex : 1;
+
+      if (start >= maxIndex) {
+        start = 1;
+      }
+
+      setPlaybackIndex(start);
+      return true;
+    });
+  }, [canPlayTimeline, playbackIndex, graphData]);
 
   const onEvents = useMemo(
     () => ({
       click: (params) => {
-        const absoluteIndex = params.dataIndex + sliderVal[0];
-        let tempColorArr = [];
-        for (let i = 0; i < bodyColors[params.dataIndex].length; i++) {
-          tempColorArr.push(bodyColors[params.dataIndex][i]);
-        }
-        setCurrentColorArray(tempColorArr);
-        let curr = 0;
-        for (let i = 0; i < cache.length; i++) {
-          curr += cache[i].exposure_duration;
-          if (curr > absoluteIndex) {
-            setIndex(i);
-            setCurrIndex([i, absoluteIndex]);
-            break;
-          }
-        }
+        // Clamp dataIndex to valid graphData bounds
+        const clampedDataIndex = Math.max(0, Math.min(params.dataIndex, graphData.length - 1));
+        const absoluteIndex = clampedDataIndex + 1; // dataIndex is 0-based, we need 1-based
+        setIsPlaying(false); // clicking the graph should pause playback
+        setIsScrubbing(true); // disable animation for instant snap
+        setPlaybackIndex(absoluteIndex); // move red dot to clicked position
+        setTimeStepByIndex(absoluteIndex);
+        // Reset scrubbing state after a brief moment to allow snap
+        setTimeout(() => setIsScrubbing(false), 50);
       },
-      mouseover: (params) => {},
+      mouseover: () => {},
     }),
-    [cache, bodyColors, sliderVal]
+    [setTimeStepByIndex, graphData.length]
   );
+
+  // Build a small red dot series that follows the active series on the chart
+  const playbackSeries = useMemo(() => {
+    if (
+      !supportsTimelinePlayback ||
+      !graphOptions ||
+      playbackIndex === null ||
+      !graphData ||
+      graphData.length === 0
+    ) {
+      return null;
+    }
+
+    // Clamp idx to valid bounds [0, graphData.length - 1]
+    const idx = Math.max(0, Math.min(playbackIndex - 1, graphData.length - 1));
+    const dataPoint = graphData[idx];
+    if (!dataPoint) return null;
+
+    // Use the same x-coordinate that the graph line uses: index + 1
+    const x = dataPoint.index + 1;
+
+    // Extract y-value exactly as the graph builders do
+    let y = null;
+    if (currentChoiceToGraph === "comfort") {
+      y = dataPoint.comfort;
+    } else if (currentChoiceToGraph === "sensation") {
+      y = dataPoint.sensation;
+    } else if (currentChoiceToGraph === "tskin") {
+      y = dataPoint.tskin;
+    } else if (currentChoiceToGraph === "tcore") {
+      y = dataPoint.tcore;
+    }
+
+    if (typeof y !== "number" || !isFinite(y)) return null;
+
+    // Only animate smoothly during playback; snap instantly when scrubbing
+    const shouldAnimate = isPlaying && !isScrubbing;
+
+    return {
+      name: "Timeline cursor",
+      type: "scatter",
+      symbol: "circle",
+      symbolSize: 12,
+      itemStyle: { color: "red", opacity: 1, borderColor: "darkred", borderWidth: 2 },
+      data: [[x, y]],
+      z: 10,
+      animation: shouldAnimate,
+      animationDuration: 0,
+      animationDurationUpdate: shouldAnimate ? PLAYBACK_INTERVAL_MS : 0,
+      animationEasing: "linear",
+      animationEasingUpdate: "linear",
+      tooltip: { show: false },
+    };
+  }, [
+    supportsTimelinePlayback,
+    graphOptions,
+    playbackIndex,
+    graphData,
+    currentChoiceToGraph,
+    isPlaying,
+    isScrubbing,
+  ]);
+
+  const enhancedGraphOptions = useMemo(() => {
+    if (!graphOptions) return graphOptions;
+    if (!playbackSeries) return graphOptions;
+    return {
+      ...graphOptions,
+      series: [...(graphOptions.series || []), playbackSeries],
+    };
+  }, [graphOptions, playbackSeries]);
+
+  // Interval‑driven playback from start to end of timeline
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (!supportsTimelinePlayback) return;
+    if (!graphData || graphData.length === 0) return;
+
+    const maxIndex = graphData.length;
+    let start = playbackIndex !== null ? playbackIndex : 1;
+
+    // Clamp start to valid bounds
+    if (start < 1 || start > maxIndex) {
+      start = 1;
+    }
+
+    let current = start;
+    setPlaybackIndex(current);
+
+    const id = setInterval(() => {
+      current += 1;
+      if (current > maxIndex) {
+        clearInterval(id);
+        setIsPlaying(false);
+        return;
+      }
+      setPlaybackIndex(current);
+    }, PLAYBACK_INTERVAL_MS);
+
+    return () => clearInterval(id);
+  }, [isPlaying, supportsTimelinePlayback, graphData, playbackIndex]);
+
+  // Whenever playback index changes, update the model and label
+  useEffect(() => {
+    if (playbackIndex === null) return;
+    setTimeStepByIndex(playbackIndex);
+  }, [playbackIndex, setTimeStepByIndex]);
 
   const runSimulationManager = async (
     metric = isMetric,
     comparing = isComparing
   ) => {
-      console.log("running simulation manager");
+    // Reset playback whenever a new simulation is triggered
+    setIsPlaying(false);
+    setPlaybackIndex(null);
+
     if (comparing) {
       let totDurationMain = 0,
         totDurationComparing = 0;
@@ -681,9 +766,8 @@ export default function WithSubnavigation() {
             totalDuration += params[i].exposure_duration;
           }
 
-          // Set slider values based on total duration
+          // Set slider max based on total duration
           setSliderMaxVal(totalDuration);
-          setSliderVal([1, totalDuration]);
 
           // Prepare color values for each body part
           let colorsArr = [];
@@ -709,7 +793,28 @@ export default function WithSubnavigation() {
           }
           // Update body colors and current colors in the UI
           setBodyColors(colorsArr);
-          setCurrentColorArray(Array(18).fill("white"));
+
+          // Initialize model colors to the first simulated timestep by default
+          if (colorsArr.length > 0) {
+            const firstIndex = 0;
+            setCurrentColorArray(colorsArr[firstIndex]);
+
+            // Map that timestep back to a condition + minute for the label
+            let cumulative = 0;
+            let conditionIdx = 0;
+            const absoluteIndex = firstIndex + 1;
+            for (let i = 0; i < phases.length; i++) {
+              cumulative += phases[i].exposure_duration;
+              if (cumulative >= absoluteIndex) {
+                conditionIdx = i;
+                break;
+              }
+            }
+            setCurrIndex([conditionIdx, absoluteIndex]);
+
+            // Initialize playback index to the first timestep so user can play from the start
+            setPlaybackIndex(absoluteIndex);
+          }
 
           // Prepare CSV data for export
           let data = [];
@@ -803,12 +908,6 @@ export default function WithSubnavigation() {
           setParams={setParams}
           setPcsParams={setPcsParams}
           isMetric={isMetric}
-        />
-        <AddCustomClothes
-          isOpen={customClothesModal.isOpen}
-          onClose={customClothesModal.onClose}
-          onSave={handleClothingPresetsSaved}
-          defaultClothing={clo_correspondence}
         />
         <Spinner loadingModal={loadingModal} />
         <Flex
@@ -1073,34 +1172,22 @@ export default function WithSubnavigation() {
                           </Box>
                           <HelpPopover type="met" />
                         </HStack>
-                        <VStack w="100%" alignItems="flex-start" spacing={2}>
-                          <HStack w="100%" alignItems="center">
-                            <Box>
-                              <ClothingSelector
-                                params={params}
-                                setParams={setParams}
-                                clo_correspondence={cloTable}
-                                ind={ind}
-                              />
-                            </Box>
-                            <HelpPopover type="clo" />
-                          </HStack>
-                          <Tooltip label="Manage custom clothing presets" hasArrow>
-                            <Button
-                              w="200px"
-                              leftIcon={<AddIcon />}
-                              onClick={customClothesModal.onOpen}
-                              variant="outline"
-                            >
-                              Presets
-                            </Button>
-                          </Tooltip>
-                        </VStack>
+                        <HStack w="100%" alignItems="center">
+                          <Box>
+                            <ClothingSelector
+                              params={params}
+                              setParams={setParams}
+                              clo_correspondence={cloTable}
+                              ind={ind}
+                            />
+                          </Box>
+                          <HelpPopover type="clo" />
+                        </HStack>
                         <Text color="gray.600">
-                          {cloTable[params[ind].clo_value]?.whole_body?.iclo ?? 0} clo
+                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
                           -{" "}
                           <span style={{ fontSize: "13px", color: "gray.600" }}>
-                            {cloTable[params[ind].clo_value]?.description ?? "N/A"}
+                            {cloTable[params[ind].clo_value].description}
                           </span>
                         </Text>
 
@@ -1337,16 +1424,15 @@ export default function WithSubnavigation() {
                               onChange={(val) => {
                                 loadingModal.onOpen();
                                 setCurrentChoiceToGraph(val.value);
+                                setIsPlaying(false);
+                                setPlaybackIndex(null);
                                 setGraph(
                                   decideGraph(
                                     isMetric,
-                                    graphData.slice(sliderVal[0], sliderVal[1]),
-                                    graphDataCompare.slice(
-                                      sliderVal[0],
-                                      sliderVal[1]
-                                    ),
+                                    graphData,
+                                    graphDataCompare,
                                     numtoGraph,
-                                    sliderVal[0],
+                                    0,
                                     val.value
                                   )
                                 );
@@ -1381,9 +1467,19 @@ export default function WithSubnavigation() {
                                   colorsArr.push(bodyPartsArr);
                                 }
                                 setBodyColors(colorsArr);
-                                setCurrentColorArray(
-                                  Array(18).fill("cbe.gray")
-                                );
+
+                                // Keep the character model in sync when switching modes
+                                if (colorsArr.length > 0) {
+                                  const absoluteIndex =
+                                    currIndex && currIndex[1]
+                                      ? currIndex[1]
+                                      : 1;
+                                  const colorIndex = Math.min(
+                                    Math.max(absoluteIndex - 1, 0),
+                                    colorsArr.length - 1
+                                  );
+                                  setCurrentColorArray(colorsArr[colorIndex]);
+                                }
 
                                 loadingModal.onClose();
                               }}
@@ -1419,88 +1515,60 @@ export default function WithSubnavigation() {
                                 {/* Graph */}
                                 <ReactECharts
                                   notMerge={true}
-                                  option={graphOptions}
+                                  option={enhancedGraphOptions || graphOptions}
                                   onEvents={onEvents}
                                   style={{ height: "100%", width: "100%" }}
                                 />
                                 <Box w="100%">
-                                  {/* Slider */}
-                                  <RangeSlider
+                                  {/* Timeline Slider */}
+                                  <Slider
                                     left="20%"
                                     right="5%"
                                     top="0%"
                                     w="75%"
-                                    value={sliderVal}
+                                    value={playbackIndex || 1}
                                     min={1}
-                                    max={sliderMaxVal}
+                                    max={sliderMaxVal || graphData.length || 1}
                                     step={1}
-                                    onChange={(e) => {
-                                      setSliderVal([e[0], e[1]]);
-                                      let tempArr = [],
-                                        tempArrCompare = [];
-                                      for (let j = e[0]; j <= e[1]; j++) {
-                                        tempArr.push({
-                                          ...fullData[j - 1][numtoGraph],
-                                          index: j - 1,
-                                        });
-                                        if (isComparing) {
-                                          tempArrCompare.push({
-                                            ...fullDataCompare[j - 1][
-                                              numtoGraph
-                                            ],
-                                            index: j - 1,
-                                          });
-                                        }
-                                      }
-                                      setGraph(
-                                        decideGraph(
-                                          isMetric,
-                                          tempArr,
-                                          tempArrCompare,
-                                          numtoGraph,
-                                          e[0] - 1
-                                        )
-                                      );
+                                    onChangeStart={() => {
+                                      setIsScrubbing(true);
+                                      setIsPlaying(false);
+                                    }}
+                                    onChangeEnd={() => {
+                                      setIsScrubbing(false);
+                                    }}
+                                    onChange={(val) => {
+                                      // Clamp value to valid graph data bounds
+                                      const maxVal = Math.max(1, graphData.length);
+                                      const clampedVal = Math.max(1, Math.min(val, maxVal));
+                                      setPlaybackIndex(clampedVal);
+                                      setTimeStepByIndex(clampedVal);
                                     }}
                                   >
-                                    <RangeSliderTrack
-                                      height="10px"
-                                      bg="gray.300"
-                                    >
-                                      <RangeSliderFilledTrack bg="gray.500" />
-                                    </RangeSliderTrack>
+                                    <SliderTrack height="10px" bg="gray.300">
+                                      <SliderFilledTrack bg="red.400" />
+                                    </SliderTrack>
                                     <Tooltip
-                                      label={`${sliderVal[0]} mins`}
+                                      label={`${playbackIndex || 1} mins`}
                                       placement="top"
                                       hasArrow
+                                      isOpen
                                     >
-                                      <RangeSliderThumb
-                                        borderWidth="7px"
-                                        boxSize={3}
-                                        index={0}
+                                      <SliderThumb
+                                        borderWidth="2px"
+                                        borderColor="red.500"
+                                        boxSize={5}
                                       />
                                     </Tooltip>
-                                    <Tooltip
-                                      label={`${sliderVal[1]} mins`}
-                                      placement="top"
-                                      hasArrow
-                                    >
-                                      <RangeSliderThumb
-                                        borderWidth="7px"
-                                        boxSize={3}
-                                        index={1}
-                                      />
-                                    </Tooltip>
-                                  </RangeSlider>
+                                  </Slider>
                                   <Text
                                     align="center"
                                     marginLeft={"15%"}
                                     fontSize="sm"
                                     color="gray.700"
                                   >
-                                    Drag ends of slider to adjust. Min is{" "}
-                                    <b>{sliderVal[0]}</b> min from start, max is{" "}
-                                    <b>{sliderVal[1]}</b> min from start.
+                                    Drag slider to scrub through time. Currently at{" "}
+                                    <b>{playbackIndex || 1}</b> min.
                                   </Text>
                                 </Box>
                               </VStack>
@@ -1728,36 +1796,24 @@ export default function WithSubnavigation() {
                           </Box>
                           <HelpPopover type="met" />
                         </HStack>
-                        <VStack alignItems="flex-start" spacing={2}>
-                          <HStack alignItems="center" w="100%">
-                            <Box w="100%" paddingTop={"10px"}>
-                              <ClothingSelector
-                                params={params}
-                                setParams={setParams}
-                                clo_correspondence={cloTable}
-                                ind={ind}
-                                isHome
-                              />
-                            </Box>
-                            <HelpPopover type="clo" />
-                          </HStack>
-                          <Tooltip label="Manage custom clothing presets" hasArrow>
-                            <Button
-                              w="250px"
-                              leftIcon={<AddIcon />}
-                              onClick={customClothesModal.onOpen}
-                              variant="outline"
-                            >
-                              Presets
-                            </Button>
-                          </Tooltip>
-                        </VStack>
+                        <HStack alignItems="center">
+                          <Box w="100%" paddingTop={"10px"}>
+                            <ClothingSelector
+                              params={params}
+                              setParams={setParams}
+                              clo_correspondence={cloTable}
+                              ind={ind}
+                              isHome
+                            />
+                          </Box>
+                          <HelpPopover type="clo" />
+                        </HStack>
 
                         <Text color="gray.600" marginTop={-3}>
-                          {cloTable[params[ind].clo_value]?.whole_body?.iclo ?? 0} clo
+                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
                           -{" "}
                           <span style={{ fontSize: "13px", color: "gray.600" }}>
-                            {cloTable[params[ind].clo_value]?.description ?? "N/A"}
+                            {cloTable[params[ind].clo_value].description}
                           </span>
                         </Text>
                         {/* Ramp function is not working correctly on the backend now */}
@@ -1929,6 +1985,11 @@ export default function WithSubnavigation() {
                 cloTable={cloTable}
                 bodybuilderObj={bodybuilderObj}
                 personalComfortSystem={personalComfortSystem}
+              />
+              <TimelinePlayButton
+                isPlaying={isPlaying}
+                isDisabled={!canPlayTimeline}
+                onToggle={handleTimelineToggle}
               />
               <CompareToggleButton
                 isComparing={isComparing}

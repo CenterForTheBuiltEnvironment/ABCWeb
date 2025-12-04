@@ -95,6 +95,47 @@ function baseBuilder({
   precision = 2, // optional precision for y-axis values
   chartType = "", // "comfort", "sensation", etc. for tooltip formatting
 }) {
+  if (
+    !rawData ||
+    !Array.isArray(rawData) ||
+    rawData.length === 0 ||
+    !Array.isArray(rawData[0]) ||
+    rawData[0].length === 0
+  ) {
+    return {
+      textStyle: globalTextStyle,
+      title: {
+        text: title,
+        left: "18%",
+        top: "3%",
+      },
+      tooltip: { trigger: "axis" },
+      legend: {
+        data: legends || [],
+        left: "20%",
+        top: "12%",
+        orient: "horizontal",
+        itemGap: 10,
+      },
+      grid: {
+        left: "21%",
+        right: "5%",
+        bottom: "15%",
+        top: "20%",
+        containLabel: false,
+      },
+      xAxis: { type: "value" },
+      yAxis: {
+        type: "value",
+        min: yAxisCfg?.min ?? 0,
+        max: yAxisCfg?.max ?? 1,
+        axisLabel: { formatter: yAxisCfg?.formatter || ((v) => v) },
+      },
+      dataZoom: [{ type: "inside" }],
+      series: [],
+    };
+  }
+
   const dataLength = rawData[0].length;
 
   const xMin = rawData[0][0]?.index + 1 || 0;

@@ -1,5 +1,5 @@
 import { CloseIcon } from "@chakra-ui/icons";
-import { IconButton, Button, Tooltip } from "@chakra-ui/react";
+import { IconButton, Button, Tooltip, Icon } from "@chakra-ui/react";
 import axios from "axios";
 import { getSaveFilePicker } from "@/constants/helperFunctions";
 
@@ -38,6 +38,46 @@ export const SimulateButton = ({ onClick }) => {
         onClick={onClick}
       >
         Simulate
+      </Button>
+    </Tooltip>
+  );
+};
+
+export const TimelinePlayButton = ({ isPlaying, isDisabled, onToggle }) => {
+  const ariaLabel = isPlaying
+    ? "Pause time-lapse animation"
+    : "Play time-lapse animation";
+
+  return (
+    <Tooltip label="Show time-lapse of body color over time" hasArrow>
+      <Button
+        {...commonButtonStyle}
+        onClick={onToggle}
+        isDisabled={isDisabled}
+        aria-label={ariaLabel}
+      >
+        <Icon viewBox="0 0 24 24" boxSize={5} focusable="false">
+          {isPlaying ? (
+            <>
+              <rect
+                x="6"
+                y="5"
+                width="4"
+                height="14"
+                fill="currentColor"
+              />
+              <rect
+                x="14"
+                y="5"
+                width="4"
+                height="14"
+                fill="currentColor"
+              />
+            </>
+          ) : (
+            <path d="M8 5v14l11-7z" fill="currentColor" />
+          )}
+        </Icon>
       </Button>
     </Tooltip>
   );

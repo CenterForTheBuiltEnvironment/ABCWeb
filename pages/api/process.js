@@ -9,7 +9,6 @@
 // clo_ensemble_name
 
 import axios from "axios";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 const stand_fr = {
   Head: 1.0,
@@ -50,7 +49,15 @@ const sit_fr = {
 
 export default async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ success: false, error: "Method not allowed" });
-
+    if (req.method === "POST") {
+        try {
+            const response = await axios.post("https://abc.cbe.berkeley.edu/api/process", req.body);
+            return res.json(response.data);
+        } catch (err) {
+            console.log(err);
+            return res.json({ success: false, error: err.response });
+        }
+    }  else {
     try {
       let phases = [],
         currTimer = 0;
@@ -226,7 +233,7 @@ export default async function handler(req, res) {
           for (let i = 0; i < req.body.phases.length; i++) {
             for (let j = 0; j < req.body.phases[i].exposure_duration; j++) {
               let innerGraph = [];
-              innerGraph.push(result.data.results[ctr].overall); // this is the error
+              innerGraph.push(result.data.results[ctr].overall);
               for (const key in result.data.results[ctr].segments) {
                 if (result.data.results[ctr].segments.hasOwnProperty(key)) {
                   innerGraph.push(result.data.results[ctr].segments[key]);
@@ -244,4 +251,5 @@ export default async function handler(req, res) {
       console.log(err);
       return res.json({ success: false, error: err.response });
     }
+  }
 }
