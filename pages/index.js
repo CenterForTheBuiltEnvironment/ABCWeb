@@ -43,7 +43,7 @@ import {
 } from "@chakra-ui/icons";
 import clo_correspondence from "../reference/local clo input/clothing_ensembles.json";
 import Head from "next/head";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import axios from "axios";
 import dynamic from "next/dynamic";
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false });
@@ -532,6 +532,9 @@ export default function WithSubnavigation() {
     };
   }, [graphOptions, playbackSeries]);
 
+  // Ref to track playback position without causing effect re-runs
+  const playbackPositionRef = useRef(1);
+
   // Interval‑driven playback from start to end of timeline
   useEffect(() => {
     if (!isPlaying) return;
@@ -539,7 +542,9 @@ export default function WithSubnavigation() {
     if (!graphData || graphData.length === 0) return;
 
     const maxIndex = graphData.length;
-    let start = playbackIndex !== null ? playbackIndex : 1;
+
+    // Read the current playbackIndex at effect start (via ref to avoid dependency)
+    let start = playbackPositionRef.current;
 
     // Clamp start to valid bounds
     if (start < 1 || start > maxIndex) {
@@ -556,15 +561,17 @@ export default function WithSubnavigation() {
         setIsPlaying(false);
         return;
       }
+      playbackPositionRef.current = current;
       setPlaybackIndex(current);
     }, PLAYBACK_INTERVAL_MS);
 
     return () => clearInterval(id);
-  }, [isPlaying, supportsTimelinePlayback, graphData, playbackIndex]);
+  }, [isPlaying, supportsTimelinePlayback, graphData]);
 
-  // Whenever playback index changes, update the model and label
+  // Whenever playback index changes, update the model, label, and ref
   useEffect(() => {
     if (playbackIndex === null) return;
+    playbackPositionRef.current = playbackIndex;
     setTimeStepByIndex(playbackIndex);
   }, [playbackIndex, setTimeStepByIndex]);
 
@@ -1309,7 +1316,7 @@ export default function WithSubnavigation() {
                     </HStack>
                     <Text style={{ marginTop: "10px", fontSize: "14px" }}>
                       These values are averages. Click &quot;Edit data&quot; to
-                      see your input data more accurately.
+                      see your input data even accurately.
                     </Text>
                   </>
                 </VStack>
@@ -1949,7 +1956,7 @@ export default function WithSubnavigation() {
                       fontSize="14"
                     >
                       These values are averages. Click &quot;Edit variable
-                      data&quot; to see your input data more accurately.
+                      data&quot; to see your input data even more accurately.
                     </Text>
                   </>
                 </VStack>
