@@ -147,6 +147,7 @@ export default function WithSubnavigation() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackIndex, setPlaybackIndex] = useState(null); // absolute minute index (1‑based)
   const [isScrubbing, setIsScrubbing] = useState(false); // true when user is dragging the slider
+  const playbackPositionRef = useRef(1); // ref to track position without causing effect re-runs
 
   const [isComparing, setComparing] = useState(false);
   const [comparedResults, setComparedResults] = useState();
@@ -532,9 +533,6 @@ export default function WithSubnavigation() {
     };
   }, [graphOptions, playbackSeries]);
 
-  // Ref to track playback position without causing effect re-runs
-  const playbackPositionRef = useRef(1);
-
   // Interval‑driven playback from start to end of timeline
   useEffect(() => {
     if (!isPlaying) return;
@@ -543,7 +541,7 @@ export default function WithSubnavigation() {
 
     const maxIndex = graphData.length;
 
-    // Read the current playbackIndex at effect start (via ref to avoid dependency)
+    // Read the current playback position from the ref (set by other interactions)
     let start = playbackPositionRef.current;
 
     // Clamp start to valid bounds
@@ -552,6 +550,7 @@ export default function WithSubnavigation() {
     }
 
     let current = start;
+    playbackPositionRef.current = current;
     setPlaybackIndex(current);
 
     const id = setInterval(() => {
