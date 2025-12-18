@@ -80,6 +80,7 @@ import UploadModal from "@/components/uploadParam";
 import Spinner from "@/components/spinner";
 import ClothingSelector from "@/components/clothingSelector";
 import MetSelector from "@/components/metSelector";
+import AddCustomClothes from "@/components/addCustomClothes";
 import Image from "next/image";
 import { CSVDownload, CSVLink } from "react-csv";
 import {
@@ -132,6 +133,7 @@ export default function WithSubnavigation() {
   const uploadCSVModal = useDisclosure();
   const [refreshKey, setRefreshKey] = useState(Math.random());
   const advancedModal = useDisclosure();
+  const customClothesModal = useDisclosure();
 
   const [bodyColors, setBodyColors] = useState([]);
   const [currentColorArray, setCurrentColorArray] = useState(
@@ -156,7 +158,85 @@ export default function WithSubnavigation() {
   const [fullDataCompare, setFullDataCompare] = useState([]);
   const [graphDataCompare, setDataCompare] = useState([]);
 
+  // Initialize with default clothing only - load custom presets in useEffect to avoid hydration mismatch
   const [cloTable, setCloTable] = useState(clo_correspondence);
+
+  // Load custom presets from localStorage after component mounts (client-side only)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("abc_clothing_presets");
+      if (saved) {
+        try {
+          const customPresets = JSON.parse(saved);
+          setCloTable([...clo_correspondence, ...customPresets]);
+        } catch (e) {
+          console.error("Error loading custom presets:", e);
+        }
+      }
+    }
+  }, []);
+
+  // Handler to update cloTable when custom presets are saved
+  const handleClothingPresetsSaved = (customPresets) => {
+    const newCloTable = [...clo_correspondence, ...customPresets];
+    setCloTable(newCloTable);
+
+    // Validate and reset clo_value if out of bounds
+    const newParams = params.map((param) => {
+      const cloValue = parseInt(param.clo_value);
+      if (cloValue >= newCloTable.length || cloValue < 0) {
+        return { ...param, clo_value: 0 };
+      }
+      return param;
+    });
+    if (JSON.stringify(newParams) !== JSON.stringify(params)) {
+      setParams(newParams);
+    }
+
+    setRefreshKey(Math.random()); // Force refresh of components
+  };
+
+  // Listen for custom clothing preset updates
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleStorageChange = () => {
+        const saved = localStorage.getItem("abc_clothing_presets");
+        let newCloTable;
+        if (saved) {
+          try {
+            const customPresets = JSON.parse(saved);
+            newCloTable = [...clo_correspondence, ...customPresets];
+          } catch (e) {
+            console.error("Error loading custom presets:", e);
+            newCloTable = clo_correspondence;
+          }
+        } else {
+          newCloTable = clo_correspondence;
+        }
+
+        setCloTable(newCloTable);
+
+        // Validate and reset clo_value if out of bounds
+        const newParams = params.map((param) => {
+          const cloValue = parseInt(param.clo_value);
+          if (cloValue >= newCloTable.length || cloValue < 0) {
+            return { ...param, clo_value: 0 };
+          }
+          return param;
+        });
+        if (JSON.stringify(newParams) !== JSON.stringify(params)) {
+          setParams(newParams);
+        }
+
+        setRefreshKey(Math.random());
+      };
+
+      window.addEventListener("clothingPresetsUpdated", handleStorageChange);
+      return () => {
+        window.removeEventListener("clothingPresetsUpdated", handleStorageChange);
+      };
+    }
+  }, [params, setParams]);
 
   // Playback speed for timeline animation (ms per step)
   const PLAYBACK_INTERVAL_MS = 250;
@@ -915,6 +995,12 @@ export default function WithSubnavigation() {
           setPcsParams={setPcsParams}
           isMetric={isMetric}
         />
+        <AddCustomClothes
+          isOpen={customClothesModal.isOpen}
+          onClose={customClothesModal.onClose}
+          onSave={handleClothingPresetsSaved}
+          defaultClothing={clo_correspondence}
+        />
         <Spinner loadingModal={loadingModal} />
         <Flex
           bg={useColorModeValue("cbe.grey", "gray.800")}
@@ -1189,11 +1275,24 @@ export default function WithSubnavigation() {
                           </Box>
                           <HelpPopover type="clo" />
                         </HStack>
+                        <Tooltip label="Manage custom clothing presets" hasArrow>
+                          <Button
+                            w="200px"
+                            leftIcon={<AddIcon />}
+                            onClick={customClothesModal.onOpen}
+                            variant="outline"
+                          >
+                            Presets
+                          </Button>
+                        </Tooltip>
                         <Text color="gray.600">
-                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
+                          {cloTable[params[ind].clo_value]?.whole_body?.iclo ??
+                            0}{" "}
+                          clo
                           -{" "}
                           <span style={{ fontSize: "13px", color: "gray.600" }}>
-                            {cloTable[params[ind].clo_value].description}
+                            {cloTable[params[ind].clo_value]?.description ??
+                              "N/A"}
                           </span>
                         </Text>
 
@@ -1814,12 +1913,25 @@ export default function WithSubnavigation() {
                           </Box>
                           <HelpPopover type="clo" />
                         </HStack>
+                        <Tooltip label="Manage custom clothing presets" hasArrow>
+                          <Button
+                            w="250px"
+                            leftIcon={<AddIcon />}
+                            onClick={customClothesModal.onOpen}
+                            variant="outline"
+                          >
+                            Presets
+                          </Button>
+                        </Tooltip>
 
                         <Text color="gray.600" marginTop={-3}>
-                          {cloTable[params[ind].clo_value].whole_body.iclo} clo
+                          {cloTable[params[ind].clo_value]?.whole_body?.iclo ??
+                            0}{" "}
+                          clo
                           -{" "}
                           <span style={{ fontSize: "13px", color: "gray.600" }}>
-                            {cloTable[params[ind].clo_value].description}
+                            {cloTable[params[ind].clo_value]?.description ??
+                              "N/A"}
                           </span>
                         </Text>
                         {/* Ramp function is not working correctly on the backend now */}
